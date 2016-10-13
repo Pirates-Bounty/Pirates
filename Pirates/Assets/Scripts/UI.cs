@@ -53,6 +53,7 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+
         Text t = textGO.AddComponent<Text>();
         if (text != "") {
             t.text = text;
@@ -139,6 +140,29 @@ public static class UI {
         i.textComponent = t;
         i.placeholder = pt;
         return inputGO;
+    }
+
+    public static GameObject CreateYesNoDialog(string name, string text, Font font, Color fontColor, int fontSize, Sprite sprite, Sprite buttonSprite, Sprite highlightedButtonSprite, Color color, Transform parent, Vector3 position, Vector2 minAnchor, Vector2 maxAnchor, UnityEngine.Events.UnityAction yesAction) {
+        GameObject panelGO = new GameObject(name);
+        panelGO.transform.parent = parent;
+        panelGO.AddComponent<RectTransform>();
+        RectTransform rectTransform = panelGO.GetComponent<RectTransform>();
+        rectTransform.anchorMin = minAnchor;
+        rectTransform.anchorMax = maxAnchor;
+        rectTransform.position = position;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+
+        Image image = panelGO.AddComponent<Image>();
+        image.color = color;
+        if (sprite) {
+            image.sprite = sprite;
+        }
+
+        CreateText("Text", text, font, fontColor, fontSize * 2, panelGO.transform, Vector3.zero, new Vector2(0.25f, 0.5f), new Vector2(0.75f, 0.9f), TextAnchor.MiddleCenter, true);
+        CreateButton("Yes Button", "Yes", font, fontColor, fontSize, panelGO.transform, buttonSprite, highlightedButtonSprite, Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.4f, 0.4f), yesAction);
+        CreateButton("No Button", "No", font, fontColor, fontSize, panelGO.transform, buttonSprite, highlightedButtonSprite, Vector3.zero, new Vector2(0.6f, 0.1f), new Vector2(0.9f, 0.4f), delegate { GameObject.Destroy(panelGO); });
+        return panelGO;
     }
 }
 
