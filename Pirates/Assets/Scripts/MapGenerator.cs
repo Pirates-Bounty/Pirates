@@ -114,8 +114,13 @@ public class MapGenerator : MonoBehaviour {
 
 
                     case (int)TileType.GRASS:
+                        Tile.AddComponent<BoxCollider2D>();
                         break;
 
+
+                    case (int)TileType.SAND:
+                        Tile.AddComponent<BoxCollider2D>();
+                        break;
                     default:
                         
                         break;
