@@ -3,83 +3,70 @@ using System.Collections;
 
 public class basicPlayer : MonoBehaviour {
 
+	public bool playerOne;
+
 	public Rigidbody2D rb;
 
 	public float rotationSpeed; //150.0f
 	public float moveSpeed;		//	5.0f
 
+	public float bulletForce = 10.0f;
+	public GameObject projectile;
+	public float firingDelay = 0.3f;
+	private float firingTimer;
+	private bool loadedBullet;
+
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody2D>();
+		firingTimer = firingDelay;
+		loadedBullet = false;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		// Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * Time.deltaTime);
-		// rb.MoveRotation(rb.rotation * deltaRotation);
-		// rb.AddForce(transform.forward * thrust);
-
-
-		if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) {
-			rb.AddForce(Input.GetAxis("Vertical") * transform.up * moveSpeed);
+		if ((playerOne && Input.GetKey(KeyCode.W)) || (!playerOne && Input.GetKey(KeyCode.UpArrow))) {
+			rb.AddForce(transform.up * moveSpeed);
+		}
+		else if ((playerOne && Input.GetKey(KeyCode.S)) || (!playerOne && Input.GetKey(KeyCode.DownArrow))) {
+			rb.AddForce(-transform.up * moveSpeed/4);
 		}
 
-		else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) {
-			rb.AddForce(Input.GetAxis("Vertical") * transform.up * moveSpeed/6);
+		if ((playerOne && Input.GetKey (KeyCode.A)) || (!playerOne && Input.GetKey (KeyCode.LeftArrow))) {
+			transform.Rotate (0, 0, Time.deltaTime * rotationSpeed);
+			rb.velocity = rb.velocity.magnitude * transform.up;
 		}
+		else if ((playerOne && Input.GetKey (KeyCode.D)) || (!playerOne && Input.GetKey (KeyCode.RightArrow))) {
+			transform.Rotate (0, 0, -Time.deltaTime * rotationSpeed);
+			rb.velocity = rb.velocity.magnitude * transform.up;
+		}
+	}
 
-     	// rb.AddForce(Input.GetAxis("Horizontal") * transform.right * rotationSpeed);
-		// rb.AddForce(transform.up * thrust);
+	void Update () {
+		// check if you want to fire the cannons!
+		// you can hold the fire button down to fire at regular intervals, or tap it and fire automatically at the next interval
+		if (firingTimer > 0) {
+			firingTimer -= Time.deltaTime;
+			if (!loadedBullet && ((playerOne && Input.GetKeyDown (KeyCode.Space)) || (!playerOne && Input.GetKeyDown (KeyCode.F)))) {
+				loadedBullet = true;
+			}
+		} else if ((playerOne && Input.GetKeyDown (KeyCode.Space)) || (!playerOne && Input.GetKeyDown (KeyCode.F)) || loadedBullet) {
+			FireCannons ();
+			firingTimer = firingDelay;
+			loadedBullet = false;
+		}
+	}
 
-   //   	if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) {
-   //   		Debug.Log("left");
-			// rb.MoveRotation(rb.rotation + rotationSpeed * Time.fixedDeltaTime);
-   //   	} 	
-   //   	else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) {
-   //   		Debug.Log("right");
-   //   		rb.MoveRotation(-(rb.rotation + rotationSpeed * Time.fixedDeltaTime));
-   //   	}
- 		//apply some sort of rotation
+	void FireCannons () {
+		Quaternion q = Quaternion.FromToRotation (Vector3.up, transform.right);
+		GameObject go = (GameObject)Instantiate (projectile, transform.position, q);
+		Rigidbody2D bulletRb = go.GetComponent<Rigidbody2D> ();
+		bulletRb.AddForce (go.transform.up * bulletForce);
 
-		var x = Input.GetAxis("Horizontal") * Time.deltaTime * rotationSpeed;
-		// var z = Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed;
-		transform.Rotate(0, 0, -x);
-
-		// var velocityDirection = transform.InverseTransformDirection(rb.velocity);
-			// from -90 to 90
-		// if (velocityDirection.z > 0) {
-		// Debug.Log(rb.velocity.y);
-		// Debug.Log(rb.rotation);
-		// if (rb.rotation > -90 && rb.rotation < 90) {
-		// 	if (rb.velocity.y >= 0) {
-		// 		rb.velocity = rb.velocity.magnitude * transform.up;
-		// 	} 
-		// 	else if (rb.velocity.y < 0) {
-		// 		rb.velocity = rb.velocity.magnitude * -transform.up;
-		// 	}
-		// } 
-		// else if (rb.rotation <= -90 || rb.rotation >= 90) {
-		// 	if (rb.velocity.y >= 0) {
-		// 		rb.velocity = rb.velocity.magnitude * -transform.up;
-		// 	} 
-		// 	else if (rb.velocity.y < 0) {
-		// 		rb.velocity = rb.velocity.magnitude * transform.up;
-		// 	}
-		// }
-		rb.velocity = rb.velocity.magnitude * transform.up;
-
-			// v = rb.velocity.magnitude;
- 		// 	rb.velocity = transform.forward*v; //change this from forward if something else should be
-		// }
-		// else if (velocityDirection.z < 0) {
-		// 	Debug.Log("2");
-
-		// 	rb.velocity = rb.velocity.magnitude * -transform.up;
-		// }
-        // rb.velocity = Quaternion.AngleAxis(rb.rotation, Vector3.up) * rb.velocity;
-		// transform.Translate(0, z, 0);
-
-
+		q = Quaternion.FromToRotation (Vector3.up, -transform.right);
+		go = (GameObject)Instantiate (projectile, transform.position, q);
+		bulletRb = go.GetComponent<Rigidbody2D> ();
+		bulletRb.AddForce (go.transform.up * bulletForce);
 	}
 }
