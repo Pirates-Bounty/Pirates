@@ -16,16 +16,24 @@ public class basicPlayer : MonoBehaviour {
 	private float firingTimer;
 	private bool loadedBullet;
 
+	public int health;
+	public int maxHealth = 100;
+	public int resources;
+	public int prestige;
+
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody2D>();
 		firingTimer = firingDelay;
 		loadedBullet = false;
+		health = maxHealth;
+		prestige = 0;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		// use up-arrow/W and down-arrow/S to accelerate and decelerate
 		if ((playerOne && Input.GetKey(KeyCode.W)) || (!playerOne && Input.GetKey(KeyCode.UpArrow))) {
 			rb.AddForce(transform.up * moveSpeed);
 		}
@@ -33,6 +41,7 @@ public class basicPlayer : MonoBehaviour {
 			rb.AddForce(-transform.up * moveSpeed/4);
 		}
 
+		// use left-arrow/A and right-arrow/D to turn
 		if ((playerOne && Input.GetKey (KeyCode.A)) || (!playerOne && Input.GetKey (KeyCode.LeftArrow))) {
 			transform.Rotate (0, 0, Time.deltaTime * rotationSpeed);
 			rb.velocity = rb.velocity.magnitude * transform.up;
@@ -41,6 +50,11 @@ public class basicPlayer : MonoBehaviour {
 			transform.Rotate (0, 0, -Time.deltaTime * rotationSpeed);
 			rb.velocity = rb.velocity.magnitude * transform.up;
 		}
+
+		// if you run out of health, you die!
+		if (health <= 0) {
+			/* figure out what code to put here! */
+		}
 	}
 
 	void Update () {
@@ -48,16 +62,17 @@ public class basicPlayer : MonoBehaviour {
 		// you can hold the fire button down to fire at regular intervals, or tap it and fire automatically at the next interval
 		if (firingTimer > 0) {
 			firingTimer -= Time.deltaTime;
-			if (!loadedBullet && ((playerOne && Input.GetKeyDown (KeyCode.Space)) || (!playerOne && Input.GetKeyDown (KeyCode.F)))) {
+			if (!loadedBullet && ((!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)))) {
 				loadedBullet = true;
 			}
-		} else if ((playerOne && Input.GetKeyDown (KeyCode.Space)) || (!playerOne && Input.GetKeyDown (KeyCode.F)) || loadedBullet) {
+		} else if ((!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)) || loadedBullet) {
 			FireCannons ();
 			firingTimer = firingDelay;
 			loadedBullet = false;
 		}
 	}
 
+	// fire the cannons!
 	void FireCannons () {
 		Quaternion q = Quaternion.FromToRotation (Vector3.up, transform.right);
 		GameObject go = (GameObject)Instantiate (projectile, transform.position, q);
