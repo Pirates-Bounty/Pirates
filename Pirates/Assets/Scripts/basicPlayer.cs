@@ -84,6 +84,13 @@ public class basicPlayer : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag == "Resource") {
+			resources++;
+			Destroy (col.gameObject);
+		}
+	}
+
 	// fire the cannons!
 	void FireCannons () {
 		Quaternion q = Quaternion.FromToRotation (Vector3.up, transform.right);
