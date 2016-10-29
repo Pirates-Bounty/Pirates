@@ -96,6 +96,14 @@ public class basicPlayer : MonoBehaviour {
 			resources++;
 			Destroy (col.gameObject);
 		}
+		if (playerOne) {
+			health -= 50;
+		}
+		if (!playerOne) {
+			healthP2 -= 50;
+		}
+		Debug.Log ("rammed");
+	}
 	}
 
 	// fire the cannons!
@@ -109,15 +117,5 @@ public class basicPlayer : MonoBehaviour {
 		go = (GameObject)Instantiate (projectile, transform.position, q);
 		bulletRb = go.GetComponent<Rigidbody2D> ();
 		bulletRb.AddForce (go.transform.up * bulletForce);
-	}
-
-	void OnTriggerEnter2D(Collider2D other) {
-		if (playerOne) {
-			health -= 50;
-		}
-		if (!playerOne) {
-			healthP2 -= 50;
-		}
-		Debug.Log ("rammed");
 	}
 }
