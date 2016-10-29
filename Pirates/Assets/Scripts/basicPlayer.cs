@@ -26,6 +26,9 @@ public class basicPlayer : MonoBehaviour {
 	public int resources;
 	public int prestige;
 
+	private upgradeMenu upMenu;
+	public bool activeMenu;
+
 
 	// Use this for initialization
 	void Start () {
@@ -35,24 +38,27 @@ public class basicPlayer : MonoBehaviour {
 		loadedBullet = false;
 		health = maxHealth;
 		prestige = 0;
+
+		upMenu = GetComponent<upgradeMenu> ();
+		activeMenu = false;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 		// use up-arrow/W and down-arrow/S to accelerate and decelerate
-		if ((playerOne && Input.GetKey(KeyCode.W)) || (!playerOne && Input.GetKey(KeyCode.UpArrow))) {
+		if (!activeMenu && ((playerOne && Input.GetKey(KeyCode.W)) || (!playerOne && Input.GetKey(KeyCode.UpArrow)))) {
 			rb.AddForce(transform.up * moveSpeed);
 		}
-		else if ((playerOne && Input.GetKey(KeyCode.S)) || (!playerOne && Input.GetKey(KeyCode.DownArrow))) {
+		else if (!activeMenu && ((playerOne && Input.GetKey(KeyCode.S)) || (!playerOne && Input.GetKey(KeyCode.DownArrow)))) {
 			rb.AddForce(-transform.up * moveSpeed/4);
 		}
 
 		// use left-arrow/A and right-arrow/D to turn
-		if ((playerOne && Input.GetKey (KeyCode.A)) || (!playerOne && Input.GetKey (KeyCode.LeftArrow))) {
+		if (!activeMenu && ((playerOne && Input.GetKey (KeyCode.A)) || (!playerOne && Input.GetKey (KeyCode.LeftArrow)))) {
 			transform.Rotate (0, 0, Time.deltaTime * rotationSpeed);
 			rb.velocity = rb.velocity.magnitude * transform.up;
 		}
-		else if ((playerOne && Input.GetKey (KeyCode.D)) || (!playerOne && Input.GetKey (KeyCode.RightArrow))) {
+		else if (!activeMenu && ((playerOne && Input.GetKey (KeyCode.D)) || (!playerOne && Input.GetKey (KeyCode.RightArrow)))) {
 			transform.Rotate (0, 0, -Time.deltaTime * rotationSpeed);
 			rb.velocity = rb.velocity.magnitude * transform.up;
 		}
@@ -69,13 +75,26 @@ public class basicPlayer : MonoBehaviour {
 		// you can hold the fire button down to fire at regular intervals, or tap it and fire automatically at the next interval
 		if (firingTimer > 0) {
 			firingTimer -= Time.deltaTime;
-			if (!loadedBullet && ((!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)))) {
+			if (!activeMenu && !loadedBullet && ((!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)))) {
 				loadedBullet = true;
 			}
-		} else if ((!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)) || loadedBullet) {
+		} else if (!activeMenu && (!playerOne && Input.GetKeyDown (KeyCode.Space)) || (playerOne && Input.GetKeyDown (KeyCode.F)) || loadedBullet) {
 			FireCannons ();
 			firingTimer = firingDelay;
 			loadedBullet = false;
+		}
+
+		// open the menu when the player presses the menu button!
+		if (!activeMenu && ((!playerOne && Input.GetKeyUp (KeyCode.Return)) || (playerOne && Input.GetKeyUp (KeyCode.E)))) {
+			upMenu.OpenMenu ();
+			activeMenu = true;
+		}
+	}
+
+	void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag == "Resource") {
+			resources++;
+			Destroy (col.gameObject);
 		}
 	}
 
