@@ -5,6 +5,10 @@ public class basicPlayer : MonoBehaviour {
 
 	public bool playerOne;
 
+	public Sprite boat1;
+	public Sprite deadBoat;
+
+	private SpriteRenderer spriteRenderer;
 	public Rigidbody2D rb;
 
 	public float rotationSpeed; //150.0f
@@ -17,6 +21,7 @@ public class basicPlayer : MonoBehaviour {
 	private bool loadedBullet;
 
 	public int health;
+	public int healthP2;
 	public int maxHealth = 100;
 	public int resources;
 	public int prestige;
@@ -24,6 +29,7 @@ public class basicPlayer : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		spriteRenderer = GetComponent<SpriteRenderer>();
 		rb = GetComponent<Rigidbody2D>();
 		firingTimer = firingDelay;
 		loadedBullet = false;
@@ -54,6 +60,7 @@ public class basicPlayer : MonoBehaviour {
 		// if you run out of health, you die!
 		if (health <= 0) {
 			/* figure out what code to put here! */
+			spriteRenderer.sprite = deadBoat;
 		}
 	}
 
@@ -83,5 +90,15 @@ public class basicPlayer : MonoBehaviour {
 		go = (GameObject)Instantiate (projectile, transform.position, q);
 		bulletRb = go.GetComponent<Rigidbody2D> ();
 		bulletRb.AddForce (go.transform.up * bulletForce);
+	}
+
+	void OnTriggerEnter2D(Collider2D other) {
+		if (playerOne) {
+			health -= 50;
+		}
+		if (!playerOne) {
+			healthP2 -= 50;
+		}
+		Debug.Log ("rammed");
 	}
 }
