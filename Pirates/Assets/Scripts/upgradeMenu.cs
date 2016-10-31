@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class upgradeMenu : MonoBehaviour {
 
 	public bool playerOne;
-	private basicPlayer myPlayer;
+	private Player myPlayer;
 	public GameObject[] buttons;
 	public GameObject myCanvas;
 	public int selected;
@@ -17,7 +17,7 @@ public class upgradeMenu : MonoBehaviour {
 		selected = 0;
 		//buttons [selected].GetComponent<Button> ().Select ();
 		//myCanvas = transform.GetChild (0).gameObject;
-		myPlayer = GetComponent<basicPlayer> ();
+		myPlayer = GetComponent<Player> ();
 		playerOne = myPlayer.playerOne;
 	}
 	

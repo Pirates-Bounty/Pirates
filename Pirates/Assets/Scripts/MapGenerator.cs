@@ -15,7 +15,6 @@ public class MapGenerator : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        canvas = GameObject.Find("Canvas").transform;
         Generate();
         GenerateGameObjects();
 
@@ -96,7 +95,7 @@ public class MapGenerator : MonoBehaviour {
 
                 int id = map[i, j];
                 GameObject Tile = new GameObject(tileNames[id]);
-               SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
                 sR.sprite = sprites[id];
                 sR.color = colors[id];
                 Tile.transform.position = tilePos;
