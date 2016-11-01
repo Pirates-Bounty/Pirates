@@ -7,6 +7,7 @@ public class Game : MonoBehaviour {
     public Player player2;
     public Player[] players;
 
+
     const int MAX_PLAYERS = 2;
 
     void Awake()
@@ -24,12 +25,14 @@ public class Game : MonoBehaviour {
             player1.right = KeyCode.D;
             player1.left = KeyCode.A;
             player1.fire = KeyCode.Q;
+            player1.menu = KeyCode.Escape;
             //Player 2
             player2.up = KeyCode.I;
             player2.down = KeyCode.K;
             player2.right = KeyCode.L;
             player2.left = KeyCode.J;
             player2.fire = KeyCode.U;
+            player2.menu = KeyCode.Delete;
 
         }
         else if (Instance != this)
@@ -47,6 +50,7 @@ public class Game : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	    
-	}
+
+    }
+
 }

@@ -57,6 +57,10 @@ public class MapGenerator : MonoBehaviour {
         {
             for (int j = 0; j < height; ++j)
             {
+                if(i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                    map[i, j] = (int)TileType.WATER;
+                    continue;
+                }
                 //Make this less random
                 float x = (float)i * frequency / 1000f;
                 float y = (float)j * frequency / 1000f;
@@ -106,6 +110,9 @@ public class MapGenerator : MonoBehaviour {
                 switch (map[i, j])
                 {
                     case (int)TileType.WATER:
+                        if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                            Tile.AddComponent<BoxCollider2D>();
+                        }
                         //Change Sprite
 
                         //Move parts out, only have switch for gameObject
