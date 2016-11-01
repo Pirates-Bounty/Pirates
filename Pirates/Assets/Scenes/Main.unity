@@ -160,9 +160,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0df42657c9aa847a246f5815a62813, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 300
-  height: 300
-  frequency: 50
+  width: 200
+  height: 200
+  frequency: 15
   sprites:
   - {fileID: 21300000, guid: 4089652f3920b604183ec6d06c6e07c6, type: 3}
   - {fileID: 21300000, guid: 4089652f3920b604183ec6d06c6e07c6, type: 3}
@@ -171,7 +171,7 @@ MonoBehaviour:
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 0.15862082, g: 1, b: 0, a: 1}
   - {r: 0.89705884, g: 0.73775357, b: 0.21766868, a: 1}
-  seed: 1000
+  seed: 250
   tileNames:
   - water
   - grass
@@ -229,11 +229,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
---- !u!4 &291484035 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 4000014212426460, guid: 54d9292a44d2ef44384740929086fdf7,
-    type: 2}
-  m_PrefabInternal: {fileID: 1537611665}
 --- !u!114 &577820247 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114000013203596488, guid: 54d9292a44d2ef44384740929086fdf7,
@@ -317,11 +312,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4000012422776088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 50
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 4000012422776088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 50
+      value: 140
       objectReference: {fileID: 0}
     - target: {fileID: 4000012422776088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_LocalPosition.z
@@ -356,29 +351,7 @@ Prefab:
       propertyPath: m_NormalizedViewPortRect.x
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4000014212426460, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000013203596488, guid: 54d9292a44d2ef44384740929086fdf7,
-        type: 2}
-      propertyPath: projectileSpawn
-      value: 
-      objectReference: {fileID: 291484035}
-    - target: {fileID: 4000012729698690, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 223000012051239478, guid: 54d9292a44d2ef44384740929086fdf7,
-        type: 2}
-      propertyPath: m_SortingOrder
-      value: 2
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &1915629300
