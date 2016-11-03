@@ -11,6 +11,8 @@ public class MapGenerator : MonoBehaviour {
     public int seed;
     public string[] tileNames;
     private Transform canvas;
+    public float perlinMult = 2.5f;
+    public float octaves = 3;
     public int[,] map;
 
     // Use this for initialization
@@ -66,24 +68,54 @@ public class MapGenerator : MonoBehaviour {
                 float y = (float)j * frequency / 1000f;
                 float noise = Mathf.PerlinNoise(x + xOffset, y + yOffset);
 
+
+
+                float amplitude = 1f;
+                float range = 1f;
+                for (int o = 1; o < octaves/2; o++)
+                {
+                    
+                    x *= perlinMult;
+                    y *= perlinMult;
+                    //perlinMult-= .1f;
+                    amplitude = 0.5f;
+                    range += amplitude;
+                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
+                }
+                for (int o = 1; o < octaves / 2; o++)
+                {
+
+                    x /= perlinMult;
+                    y /= perlinMult;
+                    //perlinMult-= .1f;
+                    amplitude = 0.5f;
+                    range += amplitude;
+                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
+                }
+                noise =  noise / range;
+
+
+
                 if (noise < .6f)
                 {
                     map[i, j] = (int)TileType.WATER;
                 }
 
-                else if (noise < .7f)
+                else if (noise < .65f)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= .7f)
+                else if (noise >= .65f)
                 {
                     map[i, j] = (int)TileType.GRASS;
                 }
             }
         }
     }
+
+
 
 
 
