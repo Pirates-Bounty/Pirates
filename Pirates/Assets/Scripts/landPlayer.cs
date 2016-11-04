@@ -23,20 +23,16 @@ public class landPlayer : MonoBehaviour {
 	void Update () {
 
 		if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) {
-			if (spriteRenderer.sprite != upSprite) {
 				spriteRenderer.sprite = upSprite;
 				//display up sprite
-			}
 		}
 		else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) {
 			spriteRenderer.sprite = leftSprite;
 			//display left sprite
 		}
 		else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) {
-			if (spriteRenderer.sprite != downSprite) {
 				spriteRenderer.sprite = downSprite;
 				//display down sprite
-			}
 		}
 		else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) {
 			spriteRenderer.sprite = rightSprite;

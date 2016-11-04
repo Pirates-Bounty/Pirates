@@ -11,11 +11,12 @@ public class MapGenerator : MonoBehaviour {
     public int seed;
     public string[] tileNames;
     private Transform canvas;
+    public float perlinMult = 2.5f;
+    public float octaves = 3;
     public int[,] map;
 
     // Use this for initialization
     void Start () {
-        canvas = GameObject.Find("Canvas").transform;
         Generate();
         GenerateGameObjects();
 
@@ -58,29 +59,63 @@ public class MapGenerator : MonoBehaviour {
         {
             for (int j = 0; j < height; ++j)
             {
+                if(i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                    map[i, j] = (int)TileType.WATER;
+                    continue;
+                }
                 //Make this less random
                 float x = (float)i * frequency / 1000f;
                 float y = (float)j * frequency / 1000f;
                 float noise = Mathf.PerlinNoise(x + xOffset, y + yOffset);
+
+
+
+                float amplitude = 1f;
+                float range = 1f;
+                for (int o = 1; o < octaves/2; o++)
+                {
+                    
+                    x *= perlinMult;
+                    y *= perlinMult;
+                    //perlinMult-= .1f;
+                    amplitude = 0.5f;
+                    range += amplitude;
+                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
+                }
+                for (int o = 1; o < octaves / 2; o++)
+                {
+
+                    x /= perlinMult;
+                    y /= perlinMult;
+                    //perlinMult-= .1f;
+                    amplitude = 0.5f;
+                    range += amplitude;
+                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
+                }
+                noise =  noise / range;
+
+
 
                 if (noise < .6f)
                 {
                     map[i, j] = (int)TileType.WATER;
                 }
 
-                else if (noise < .7f)
+                else if (noise < .65f)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= .7f)
+                else if (noise >= .65f)
                 {
                     map[i, j] = (int)TileType.GRASS;
                 }
             }
         }
     }
+
+
 
 
 
@@ -96,7 +131,7 @@ public class MapGenerator : MonoBehaviour {
 
                 int id = map[i, j];
                 GameObject Tile = new GameObject(tileNames[id]);
-               SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
                 sR.sprite = sprites[id];
                 sR.color = colors[id];
                 Tile.transform.position = tilePos;
@@ -107,6 +142,9 @@ public class MapGenerator : MonoBehaviour {
                 switch (map[i, j])
                 {
                     case (int)TileType.WATER:
+                        if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                            Tile.AddComponent<BoxCollider2D>();
+                        }
                         //Change Sprite
 
                         //Move parts out, only have switch for gameObject

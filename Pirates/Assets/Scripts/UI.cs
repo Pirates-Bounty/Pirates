@@ -21,6 +21,8 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
+        rectTransform.localRotation = Quaternion.identity;
 
         GameObject buttonText = new GameObject("Text");
         buttonText.transform.parent = buttonGO.transform;
@@ -30,6 +32,8 @@ public static class UI {
         textRectTransform.anchorMax = Vector3.one;
         textRectTransform.offsetMin = Vector2.zero;
         textRectTransform.offsetMax = Vector2.zero;
+        textRectTransform.localScale = Vector3.one;
+        textRectTransform.localRotation = Quaternion.identity;
         Text t = buttonText.AddComponent<Text>();
         if (text != "") {
             t.text = text;
@@ -53,6 +57,9 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
+        rectTransform.localRotation = Quaternion.identity;
+
 
         Text t = textGO.AddComponent<Text>();
         if (text != "") {
@@ -76,6 +83,9 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
+        rectTransform.localRotation = Quaternion.identity;
+
 
         Image image = panelGO.AddComponent<Image>();
         image.color = color;
@@ -102,6 +112,7 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
 
         GameObject inputText = new GameObject("Text");
         inputText.transform.parent = inputGO.transform;
@@ -111,6 +122,8 @@ public static class UI {
         textRectTransform.anchorMax = Vector3.one;
         textRectTransform.offsetMin = Vector2.zero;
         textRectTransform.offsetMax = Vector2.zero;
+        textRectTransform.localRotation = Quaternion.identity;
+
         Text t = inputText.AddComponent<Text>();
         if (text != "") {
             t.text = text;
@@ -128,6 +141,7 @@ public static class UI {
         placeholderTextRectTransform.anchorMax = Vector3.one;
         placeholderTextRectTransform.offsetMin = Vector2.zero;
         placeholderTextRectTransform.offsetMax = Vector2.zero;
+        placeholderTextRectTransform.localScale = Vector3.one;
         Text pt = placeholderText.AddComponent<Text>();
         if (placeholder != "") {
             pt.text = placeholder;
@@ -152,6 +166,8 @@ public static class UI {
         rectTransform.position = position;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
+        rectTransform.localRotation = Quaternion.identity;
 
         Image image = panelGO.AddComponent<Image>();
         image.color = color;
