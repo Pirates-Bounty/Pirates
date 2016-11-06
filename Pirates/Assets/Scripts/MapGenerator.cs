@@ -6,14 +6,15 @@ public class MapGenerator : MonoBehaviour {
     public int width;
     public int height;
     public float frequency;
+    //public float amplitude;
     public Sprite[] sprites;
     public Color[] colors;
     public int seed;
     public string[] tileNames;
-    private Transform canvas;
-    public float perlinMult = 2.5f;
-    public float octaves = 3;
+    public int octaves = 3;
     public int[,] map;
+    private Transform canvas;
+
 
     // Use this for initialization
     void Start () {
@@ -63,42 +64,14 @@ public class MapGenerator : MonoBehaviour {
                     map[i, j] = (int)TileType.WATER;
                     continue;
                 }
-                //Make this less random
-                float x = (float)i * frequency / 1000f;
-                float y = (float)j * frequency / 1000f;
-                float noise = Mathf.PerlinNoise(x + xOffset, y + yOffset);
 
-
-
-                float amplitude = 1f;
-                float range = 1f;
-                for (int o = 1; o < octaves/2; o++)
-                {
-                    
-                    x *= perlinMult;
-                    y *= perlinMult;
-                    //perlinMult-= .1f;
-                    amplitude = 0.5f;
-                    range += amplitude;
-                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
-                }
-                for (int o = 1; o < octaves / 2; o++)
-                {
-
-                    x /= perlinMult;
-                    y /= perlinMult;
-                    //perlinMult-= .1f;
-                    amplitude = 0.5f;
-                    range += amplitude;
-                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
-                }
-                noise =  noise / range;
-
-
-
+                //Mathf.PerlinNoise(x + xOffset, y + yOffset);
+                float noise = PerlinFractal(new Vector2(i+xOffset,j+yOffset), octaves, frequency/1000.0f);
+                
                 if (noise < .6f)
                 {
-                    map[i, j] = (int)TileType.WATER;
+                    
+                    map[i, j] = (int)TileType.GRASS;
                 }
 
                 else if (noise < .65f)
@@ -109,7 +82,8 @@ public class MapGenerator : MonoBehaviour {
 
                 else if (noise >= .65f)
                 {
-                    map[i, j] = (int)TileType.GRASS;
+                    
+                    map[i, j] = (int)TileType.WATER;
                 }
             }
         }
@@ -117,7 +91,25 @@ public class MapGenerator : MonoBehaviour {
 
 
 
+    public static float PerlinFractal(Vector2 v, int octaves, float frequency, float persistence = 0.5f, float lacunarity = 2.0f)
+    {
+        float total = 0.0f;
+        float amplitude = 1.0f;
+        float maxAmp = 0.0f; // keeps track of max possible noise
 
+        for (int i = 0; i < octaves; ++i)
+        {
+            float noise = Mathf.PerlinNoise(v.x * frequency, v.y * frequency);
+            noise = noise * 2 - 1;
+            noise = 1.0f - Mathf.Abs(noise);
+            total += noise * amplitude;
+            maxAmp += amplitude;
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+        //Debug.Log(total);
+        return total/maxAmp;
+    }
 
 
 
