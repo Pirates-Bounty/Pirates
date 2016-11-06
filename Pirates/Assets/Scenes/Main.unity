@@ -176,7 +176,6 @@ MonoBehaviour:
   - water
   - grass
   - sand
-  perlinMult: 3
   octaves: 4
 --- !u!4 &134104758
 Transform:
@@ -389,7 +388,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000012422776088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 38.9
+      value: 23.9
       objectReference: {fileID: 0}
     - target: {fileID: 4000012422776088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_LocalPosition.z
@@ -418,16 +417,6 @@ Prefab:
     - target: {fileID: 1000012361358088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
       propertyPath: m_Name
       value: Player 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 20000013036883118, guid: 54d9292a44d2ef44384740929086fdf7,
-        type: 2}
-      propertyPath: orthographic size
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 81000011710865160, guid: 54d9292a44d2ef44384740929086fdf7,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}

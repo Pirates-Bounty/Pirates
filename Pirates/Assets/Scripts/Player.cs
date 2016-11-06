@@ -90,12 +90,12 @@ public class Player : MonoBehaviour {
             rb.AddForce(-transform.up * moveSpeed / 4);
         }
         if (Input.GetKey(left)) {
-            transform.Rotate(0, 0, Time.deltaTime * rotationSpeed);
-            rb.velocity = rb.velocity.magnitude * transform.up;
+            rb.AddTorque(rotationSpeed * Time.deltaTime);
+            //rb.velocity = rb.velocity.magnitude * transform.up;
         }
         if (Input.GetKey(right)) {
-            transform.Rotate(0, 0, -Time.deltaTime * rotationSpeed);
-            rb.velocity = rb.velocity.magnitude * transform.up;
+            rb.AddTorque(-rotationSpeed * Time.deltaTime);
+            //rb.velocity = rb.velocity.magnitude * transform.up;
         }
     }
     public void ApplyDamage(float damage) {
