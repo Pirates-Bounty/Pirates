@@ -6,20 +6,27 @@ public class Menu : MonoBehaviour {
     private Font font;
     private Sprite sprite;
     private Sprite highlightedSprite;
+    private Sprite background;
     private Color color = Color.black;
 
     private GameObject playButton;
     private GameObject instructionsButton;
     private GameObject quitButton;
+    private GameObject backgroundPanel;
+    private float maxRotation = 0.5f;
+    private float currentRotation = 0.0f;
+    private bool positive = true;
 
 	private AudioClip menuM;
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").transform;
-        font = (Font)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Fonts/Angel Tears.otf", typeof(Font));
-        sprite = (Sprite)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Textures/Button.png", typeof(Sprite));
-        highlightedSprite = (Sprite)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Textures/HighlightedButton.png", typeof(Sprite));
-
+        font = Resources.Load<Font>("Art/Fonts/Angel Tears");
+        sprite = Resources.Load<Sprite>("Art/Textures/Button");
+        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
+        //Background
+        backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
             Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.45f), delegate { Navigator.Instance.LoadLevel("Main"); });
@@ -35,6 +42,14 @@ public class Menu : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        // make the background sway back and forth
+        if(currentRotation < maxRotation && positive) {
+            currentRotation += Time.deltaTime;
+        } else if(currentRotation > -maxRotation && !positive){
+            currentRotation -= Time.deltaTime;
+        } else {
+            positive = !positive;
+        }
+        backgroundPanel.GetComponent<RectTransform>().rotation = Quaternion.Euler(0.0f, 0.0f, currentRotation);
 	}
 }

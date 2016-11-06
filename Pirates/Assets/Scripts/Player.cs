@@ -40,10 +40,10 @@ public class Player : MonoBehaviour {
         //playerCamera = GetComponentInChildren<Camera>();
         canvas = GetComponentInChildren<Canvas>();
         currentHealth = maxHealth;
-        menuBackground = (Sprite)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Textures/Menu Background.jpg", typeof(Sprite));
-        font = (Font)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Fonts/riesling.ttf", typeof(Font));
-        sprite = (Sprite)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Textures/Button.png", typeof(Sprite));
-        highlightedSprite = (Sprite)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Art/Textures/HighlightedButton.png", typeof(Sprite));
+        menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
+        font = Resources.Load<Font>("Art/Fonts/riesling");
+        sprite = Resources.Load<Sprite>("Art/Textures/Button");
+        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
         RenderInterface();
         CreateInGameMenu();
     }
@@ -66,8 +66,17 @@ public class Player : MonoBehaviour {
         if(currentHealth <= 0.0f) {
             Destroy(gameObject);
         }
-        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f*(maxHealth - currentHealth)/100.0f, 0.95f);
-        if (Input.GetKeyDown(menu) && SceneManager.GetActiveScene().Equals(SceneManager.GetSceneByName("Main"))) {
+        UpdateInterface();
+    }
+
+	void FireCannons () {
+		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, projectileSpawn.position, Quaternion.identity);
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed + rb.velocity.magnitude));
+    }
+
+    private void UpdateInterface() {
+        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (maxHealth - currentHealth) / 100.0f, 0.95f);
+        if (Input.GetKeyDown(menu)) {
             if (!inGameMenu) {
                 CreateInGameMenu();
             }
@@ -75,11 +84,6 @@ public class Player : MonoBehaviour {
             inGameMenu.SetActive(menuActive);
         }
         resourcesText.GetComponent<Text>().text = "Resources " + resources;
-    }
-
-	void FireCannons () {
-		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, projectileSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed + rb.velocity.magnitude));
     }
 
     private void GetMovement() {
@@ -91,11 +95,9 @@ public class Player : MonoBehaviour {
         }
         if (Input.GetKey(left)) {
             rb.AddTorque(rotationSpeed * Time.deltaTime);
-            //rb.velocity = rb.velocity.magnitude * transform.up;
         }
         if (Input.GetKey(right)) {
             rb.AddTorque(-rotationSpeed * Time.deltaTime);
-            //rb.velocity = rb.velocity.magnitude * transform.up;
         }
     }
     public void ApplyDamage(float damage) {

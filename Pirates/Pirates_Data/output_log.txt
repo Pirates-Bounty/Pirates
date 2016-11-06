@@ -1,0 +1,33 @@
+Initialize engine version: 5.4.1f1 (649f48bbbf0f)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 950M (ID=0x139a)
+    Vendor:   NVIDIA
+    VRAM:     2018 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.146 seconds
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 0.643160 ms
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 4.682273 ms
+
+Unloading 13 unused Assets to reduce memory usage. Loaded Objects now: 218.
+Total: 1.799506 ms (FindLiveObjects: 0.038321 ms CreateObjectMapping: 0.019358 ms MarkObjects: 0.128395 ms  DeleteObjects: 1.613037 ms)
+
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 520 -> priority: 1 
