@@ -79,7 +79,7 @@ public class Player : MonoBehaviour {
 
 	void FireCannons () {
 		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, projectileSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed));
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed + rb.velocity.magnitude));
     }
 
     private void GetMovement() {
