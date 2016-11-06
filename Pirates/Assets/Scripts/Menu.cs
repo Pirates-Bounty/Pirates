@@ -11,6 +11,8 @@ public class Menu : MonoBehaviour {
     private GameObject playButton;
     private GameObject instructionsButton;
     private GameObject quitButton;
+
+	private AudioClip menuM;
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").transform;
