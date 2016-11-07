@@ -2,15 +2,20 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class Player : MonoBehaviour {
+public class Player : NetworkBehaviour {
+    public const float maxHealth = 100.0f;
+    public const float projectileSpeed = 50.0f;
 
-	public Rigidbody2D rb;
-    public float maxHealth = 100.0f;
+    public const float firingDelay = 0.3f;
+    public const float rotationSpeed = 25.0f;
+    public const float moveSpeed = 3.0f;
+    [SyncVar(hook = "OnChangePlayer")]
+    public float currentHealth = maxHealth;
     public int resources = 1000;
-    private float currentHealth;
-	public float rotationSpeed; //150.0f
-	public float moveSpeed;		//	5.0f
+
+
     public KeyCode up;
     public KeyCode down;
     public KeyCode left;
@@ -18,12 +23,10 @@ public class Player : MonoBehaviour {
     public KeyCode fire;
     public KeyCode menu;
     public Transform projectileSpawn;
+    public GameObject projectile;
 
-    public float projectileSpeed = 100.0f;
-	public GameObject projectile;
-	public float firingDelay = 0.3f;
-	private float firingTimer;
-    //private Camera playerCamera;
+    private float firingTimer;
+    private Camera playerCamera;
     private Canvas canvas;
     private GameObject healthBar;
     private Font font;
@@ -32,50 +35,56 @@ public class Player : MonoBehaviour {
     private GameObject inGameMenu;
     private GameObject resourcesText;
     private Sprite menuBackground;
+    private Rigidbody2D rb;
     private bool menuActive = false;
+
 
     // Use this for initialization
     void Start () {
 		firingTimer = firingDelay;
-        //playerCamera = GetComponentInChildren<Camera>();
-        canvas = GetComponentInChildren<Canvas>();
-        currentHealth = maxHealth;
+        playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
+        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        rb = GetComponent<Rigidbody2D>();
         menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
         font = Resources.Load<Font>("Art/Fonts/riesling");
         sprite = Resources.Load<Sprite>("Art/Textures/Button");
         highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        if (!isLocalPlayer) {
+            return;
+        }
         RenderInterface();
         CreateInGameMenu();
     }
 
 	void Update () {
+        if (!isLocalPlayer) {
+            return;
+        }
         // update the camera's position
-        //playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
+        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
         // get player's movement
         GetMovement();
+
         firingTimer -= Time.deltaTime;
         if (firingTimer < 0) {
             // fire cannons
             if (Input.GetKeyDown(fire))
             {
-                FireCannons();
+                CmdFireCannons();
                 firingTimer = firingDelay;
             }
         }
-        // destroy the player if they are dead
-        if(currentHealth <= 0.0f) {
-            Destroy(gameObject);
-        }
+
         UpdateInterface();
     }
-
-	void FireCannons () {
+    [Command]   
+	void CmdFireCannons () {
 		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, projectileSpawn.position, Quaternion.identity);
         instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed + rb.velocity.magnitude));
+        NetworkServer.Spawn(instantiatedProjectile);
     }
 
     private void UpdateInterface() {
-        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (maxHealth - currentHealth) / 100.0f, 0.95f);
         if (Input.GetKeyDown(menu)) {
             if (!inGameMenu) {
                 CreateInGameMenu();
@@ -84,6 +93,12 @@ public class Player : MonoBehaviour {
             inGameMenu.SetActive(menuActive);
         }
         resourcesText.GetComponent<Text>().text = "Resources " + resources;
+    }
+    void OnChangePlayer(float health) {
+        if (!isLocalPlayer) {
+            return;
+        }
+        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (maxHealth - health) / 100.0f, 0.95f);
     }
 
     private void GetMovement() {
@@ -101,7 +116,14 @@ public class Player : MonoBehaviour {
         }
     }
     public void ApplyDamage(float damage) {
+        if (!isServer) {
+            return;
+        }
         currentHealth -= damage;
+        // destroy the player if they are dead
+        if (currentHealth <= 0.0f) {
+            Destroy(gameObject);
+        }
     }
 
     private void RenderInterface() {
@@ -128,5 +150,9 @@ public class Player : MonoBehaviour {
             sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.1f), new Vector2(0.75f, 0.3f),
             delegate { menuActive = !menuActive; inGameMenu.SetActive(menuActive); });
         inGameMenu.SetActive(menuActive);
+    }
+
+    public override void OnStartLocalPlayer() {
+        GetComponent<SpriteRenderer>().color = Color.red;
     }
 }

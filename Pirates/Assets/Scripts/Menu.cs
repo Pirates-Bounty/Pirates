@@ -29,7 +29,7 @@ public class Menu : MonoBehaviour {
         backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.45f), delegate { Navigator.Instance.LoadLevel("Main"); });
+            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.45f), delegate { Navigator.Instance.LoadLevel("Lobby"); });
 
         // Instructions Button
         playButton = UI.CreateButton("How To Play", "How To Play", font, color, 64, canvas, sprite, highlightedSprite,

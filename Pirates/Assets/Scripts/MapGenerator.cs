@@ -119,7 +119,7 @@ public class MapGenerator : MonoBehaviour {
         {
             for (int j = 0; j < height; j++)
             {
-                Vector2 tilePos = new Vector2(i, j);
+                Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
 
                 int id = map[i, j];
                 GameObject Tile = new GameObject(tileNames[id]);

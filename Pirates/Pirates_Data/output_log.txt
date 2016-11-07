@@ -14,7 +14,7 @@ Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirat
 Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.146 seconds
+- Completed reload, in  0.178 seconds
 Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Jeffrey Araki\Documents\GitHub\Pirates\Pirates\Pirates_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
@@ -22,12 +22,49 @@ desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 0.643160 ms
+UnloadTime: 0.694517 ms
 Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 4.682273 ms
+UnloadTime: 4.725722 ms
 
-Unloading 13 unused Assets to reduce memory usage. Loaded Objects now: 218.
-Total: 1.799506 ms (FindLiveObjects: 0.038321 ms CreateObjectMapping: 0.019358 ms MarkObjects: 0.128395 ms  DeleteObjects: 1.613037 ms)
+Unloading 13 unused Assets to reduce memory usage. Loaded Objects now: 607.
+Total: 2.349824 ms (FindLiveObjects: 0.037530 ms CreateObjectMapping: 0.022518 ms MarkObjects: 0.513974 ms  DeleteObjects: 1.775010 ms)
+
+MatchMakingClient ListMatches :https://mm.unet.unity3d.com/json/reply/ListMatchRequest
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+MatchMakingClient Join :https://mm.unet.unity3d.com/json/reply/JoinMatchRequest
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+DontDestroyOnLoad only work for root GameObjects or components on root GameObjects.
+ 
+(Filename:  Line: 386)
+
+DontDestroyOnLoad only work for root GameObjects or components on root GameObjects.
+ 
+(Filename:  Line: 386)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.277333 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 851.
+Total: 0.830813 ms (FindLiveObjects: 0.031604 ms CreateObjectMapping: 0.029629 ms MarkObjects: 0.764443 ms  DeleteObjects: 0.004740 ms)
+
+Log: connection {1} has been disconnected by timeout; address {::ffff:52.86.130.215:9999}
+MatchMakingClient DropConnection :https://mm.unet.unity3d.com/json/reply/DropConnectionRequest
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+MatchMakingClient DropConnection :https://mm.unet.unity3d.com/json/reply/DropConnectionRequest
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+UnloadTime: 37.868992 ms
+
+Unloading 3 unused Assets to reduce memory usage. Loaded Objects now: 685.
+Total: 0.790517 ms (FindLiveObjects: 0.033975 ms CreateObjectMapping: 0.032395 ms MarkObjects: 0.692147 ms  DeleteObjects: 0.031604 ms)
 
 Setting up 1 worker threads for Enlighten.
-  Thread -> id: 520 -> priority: 1 
+  Thread -> id: 2158 -> priority: 1 

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class Projectile : MonoBehaviour {
+public class Projectile : NetworkBehaviour {
     public float lifetime;
     public float damage = 10.0f;
 	public AudioClip shotS;
