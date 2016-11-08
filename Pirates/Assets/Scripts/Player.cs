@@ -10,7 +10,7 @@ public class Player : NetworkBehaviour {
 
     public const float firingDelay = 0.3f;
     public const float rotationSpeed = 25.0f;
-    public const float moveSpeed = 3.0f;
+    public const float moveSpeed = 10.0f;
     [SyncVar(hook = "OnChangePlayer")]
     public float currentHealth = maxHealth;
     public int resources = 1000;
@@ -20,9 +20,11 @@ public class Player : NetworkBehaviour {
     public KeyCode down;
     public KeyCode left;
     public KeyCode right;
-    public KeyCode fire;
+    public KeyCode fireLeft;
+    public KeyCode fireRight;
     public KeyCode menu;
-    public Transform projectileSpawn;
+    public Transform leftSpawn;
+    public Transform rightSpawn;
     public GameObject projectile;
 
     private float firingTimer;
@@ -37,6 +39,7 @@ public class Player : NetworkBehaviour {
     private Sprite menuBackground;
     private Rigidbody2D rb;
     private bool menuActive = false;
+    private bool anchorDown = false;
 
 
     // Use this for initialization
@@ -68,9 +71,12 @@ public class Player : NetworkBehaviour {
         firingTimer -= Time.deltaTime;
         if (firingTimer < 0) {
             // fire cannons
-            if (Input.GetKeyDown(fire))
-            {
-                CmdFireCannons();
+            if (Input.GetKeyDown(fireLeft)) {
+                CmdFireLeft();
+                firingTimer = firingDelay;
+            }
+            if (Input.GetKeyDown(fireRight)) {
+                CmdFireRight();
                 firingTimer = firingDelay;
             }
         }
@@ -78,9 +84,15 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
     }
     [Command]   
-	void CmdFireCannons () {
-		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, projectileSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(new Vector2(0, projectileSpeed + rb.velocity.magnitude));
+	void CmdFireLeft () {
+		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawn.position, Quaternion.identity);
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawn.up * projectileSpeed;
+        NetworkServer.Spawn(instantiatedProjectile);
+    }
+    [Command]
+    void CmdFireRight() {
+        GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawn.position, Quaternion.identity);
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * projectileSpeed;
         NetworkServer.Spawn(instantiatedProjectile);
     }
 
@@ -102,18 +114,20 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
-        if (Input.GetKey(up)) {
-            rb.AddForce(transform.up * moveSpeed);
-        }
-        if (Input.GetKey(down)) {
-            rb.AddForce(-transform.up * moveSpeed / 4);
-        }
         if (Input.GetKey(left)) {
-            rb.AddTorque(rotationSpeed * Time.deltaTime);
+            transform.Rotate(new Vector3(0.0f, 0.0f, rotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(right)) {
-            rb.AddTorque(-rotationSpeed * Time.deltaTime);
+            transform.Rotate(new Vector3(0.0f, 0.0f, -rotationSpeed * Time.deltaTime));
         }
+        if (Input.GetKey(up)) {
+            transform.Translate(0.0f, moveSpeed * Time.deltaTime, 0.0f);
+            //rb.AddForce(transform.up * moveSpeed);
+        }
+        if (Input.GetKey(down)) {
+            //rb.AddForce(-transform.up * moveSpeed / 4);
+        }
+
     }
     public void ApplyDamage(float damage) {
         if (!isServer) {
@@ -153,6 +167,6 @@ public class Player : NetworkBehaviour {
     }
 
     public override void OnStartLocalPlayer() {
-        GetComponent<SpriteRenderer>().color = Color.red;
+        //GetComponent<SpriteRenderer>().color = Color.red;
     }
 }

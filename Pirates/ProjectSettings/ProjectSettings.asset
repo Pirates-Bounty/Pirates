@@ -513,7 +513,7 @@ PlayerSettings:
   XboxOne::VR::enabledDevices: []
   iOS::VR::enabledDevices: []
   tvOS::VR::enabledDevices: []
-  cloudProjectId: 891857d7-7346-4787-924b-29ed27ed0558
+  cloudProjectId: 39d27249-9acf-4597-b4ec-5bf5eccac032
   projectName: Pirates
-  organizationId: jeffrey-araki
+  organizationId: quinn-2734922
   cloudEnabled: 0
