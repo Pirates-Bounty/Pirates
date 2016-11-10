@@ -89,8 +89,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifetime: 5
   damage: 10
-  shotS: {fileID: 8300000, guid: 827d756022a6fed40969c9d0d9c55b70, type: 3}
-  hitS: {fileID: 8300000, guid: 693dce4daac0cf24c828c80de6673957, type: 3}
+  shot: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
+  hit: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
 --- !u!114 &114000012211375010
 MonoBehaviour:
   m_ObjectHideFlags: 1
