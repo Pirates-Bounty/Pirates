@@ -111,16 +111,16 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(fireLeft)) {
                 // left cannon
                 CmdFireLeft();
+                // reset timer
+                firingTimer = currFiringDelay;
             }
             if (Input.GetKeyDown(fireRight)) {
                 // right cannon
                 CmdFireRight();
-                
+                // reset timer
+                firingTimer = currFiringDelay;
             }
-            // reset timer
-            firingTimer = currFiringDelay;
         }
-
         UpdateInterface();
         UpdateVariables();
     }
