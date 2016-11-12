@@ -3,19 +3,30 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-
+public enum Upgrade {
+    MANEUVERABILITY, //rotation speed
+    SPEED, // move speed
+    HULL_STRENGTH, // health
+    CANNON_SPEED, // cannon firing time
+    CANNON_STRENGTH, // cannon damage
+    COUNT //num items in the enum
+}
 public class Player : NetworkBehaviour {
-    public const float maxHealth = 100.0f;
-    public const float projectileSpeed = 50.0f;
+    // const vars
+    public const float MAX_HEALTH = 100.0f;
+    public const float BASE_PROJECTILE_SPEED = 50.0f;
+    public const float BASE_FIRING_DELAY = 0.3f;
+    public const float BASE_ROTATION_SPEED = 25.0f;
+    public const float BASE_MOVE_SPEED = 10.0f;
+    public const int MAX_UPGRADES = 5;
+    public const int UPGRADE_COST = 100;
 
-    public const float firingDelay = 0.3f;
-    public const float rotationSpeed = 25.0f;
-    public const float moveSpeed = 10.0f;
     [SyncVar(hook = "OnChangePlayer")]
-    public float currentHealth = maxHealth;
+    public float currentHealth = MAX_HEALTH;
+    [SyncVar(hook = "OnChangeResources")]
     public int resources = 1000;
 
-
+    // keybinds and prefabs
     public KeyCode up;
     public KeyCode down;
     public KeyCode left;
@@ -23,28 +34,52 @@ public class Player : NetworkBehaviour {
     public KeyCode fireLeft;
     public KeyCode fireRight;
     public KeyCode menu;
+    public KeyCode upgrade;
     public Transform leftSpawn;
     public Transform rightSpawn;
     public GameObject projectile;
 
-    private float firingTimer;
+
     private Camera playerCamera;
     private Canvas canvas;
     private GameObject healthBar;
     private Font font;
     private Sprite sprite;
     private Sprite highlightedSprite;
+    // GameObject references
     private GameObject inGameMenu;
+    private GameObject upgradeMenu;
+    private GameObject[] upgradeTexts = new GameObject[(int)Upgrade.COUNT];
     private GameObject resourcesText;
     private Sprite menuBackground;
     private Rigidbody2D rb;
-    private bool menuActive = false;
+    // upgrade menu ranks
+    private int maneuverabiltyRank = 0;
+    private int speedRank = 0;
+    private int hullStrengthRank = 0;
+    private int cannonSpeedRank = 0;
+    private int cannonStrengthRank = 0;
+    private int[] upgradeRanks = new int[(int)Upgrade.COUNT];
+    // base stats
+    private float currMoveSpeed = BASE_MOVE_SPEED;
+    private float currRotationSpeed = BASE_ROTATION_SPEED;
+    private float currFiringDelay = BASE_FIRING_DELAY;
+    private float currProjectileSpeed = BASE_PROJECTILE_SPEED;
+    private float firingTimer = BASE_FIRING_DELAY;
+    // menu checks
+    private bool inGameMenuActive = false;
+    private bool upgradeMenuActive = false;
     private bool anchorDown = false;
 
 
     // Use this for initialization
     void Start () {
-		firingTimer = firingDelay;
+        upgradeRanks[0] = maneuverabiltyRank;
+        upgradeRanks[1] = speedRank;
+        upgradeRanks[2] = hullStrengthRank;
+        upgradeRanks[3] = cannonSpeedRank;
+        upgradeRanks[4] = cannonStrengthRank;
+
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
@@ -57,9 +92,11 @@ public class Player : NetworkBehaviour {
         }
         RenderInterface();
         CreateInGameMenu();
+        CreateUpgradeMenu();
     }
 
 	void Update () {
+        // networking check
         if (!isLocalPlayer) {
             return;
         }
@@ -72,27 +109,31 @@ public class Player : NetworkBehaviour {
         if (firingTimer < 0) {
             // fire cannons
             if (Input.GetKeyDown(fireLeft)) {
+                // left cannon
                 CmdFireLeft();
-                firingTimer = firingDelay;
             }
             if (Input.GetKeyDown(fireRight)) {
+                // right cannon
                 CmdFireRight();
-                firingTimer = firingDelay;
+                
             }
+            // reset timer
+            firingTimer = currFiringDelay;
         }
 
         UpdateInterface();
+        UpdateVariables();
     }
     [Command]   
 	void CmdFireLeft () {
 		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawn.up * projectileSpeed;
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawn.up * currProjectileSpeed;
         NetworkServer.Spawn(instantiatedProjectile);
     }
     [Command]
     void CmdFireRight() {
         GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * projectileSpeed;
+        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
         NetworkServer.Spawn(instantiatedProjectile);
     }
 
@@ -101,27 +142,39 @@ public class Player : NetworkBehaviour {
             if (!inGameMenu) {
                 CreateInGameMenu();
             }
-            menuActive = !menuActive;
-            inGameMenu.SetActive(menuActive);
+            inGameMenuActive = !inGameMenuActive;
+            inGameMenu.SetActive(inGameMenuActive);
         }
-        resourcesText.GetComponent<Text>().text = "Resources " + resources;
+        if (Input.GetKeyDown(upgrade)) {
+            if (!upgradeMenu) {
+                CreateUpgradeMenu();
+            }
+            upgradeMenuActive = !upgradeMenuActive;
+            upgradeMenu.SetActive(upgradeMenuActive);
+        }
     }
     void OnChangePlayer(float health) {
         if (!isLocalPlayer) {
             return;
         }
-        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (maxHealth - health) / 100.0f, 0.95f);
+        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (MAX_HEALTH - health) / 100.0f, 0.95f);
+    }
+    void OnChangeResources(int resources) {
+        if (!isLocalPlayer) {
+            return;
+        }
+        resourcesText.GetComponent<Text>().text = "Resources " + resources;
     }
 
     private void GetMovement() {
         if (Input.GetKey(left)) {
-            transform.Rotate(new Vector3(0.0f, 0.0f, rotationSpeed * Time.deltaTime));
+            transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(right)) {
-            transform.Rotate(new Vector3(0.0f, 0.0f, -rotationSpeed * Time.deltaTime));
+            transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(up)) {
-            transform.Translate(0.0f, moveSpeed * Time.deltaTime, 0.0f);
+            transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
             //rb.AddForce(transform.up * moveSpeed);
         }
         if (Input.GetKey(down)) {
@@ -162,11 +215,72 @@ public class Player : NetworkBehaviour {
             sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.4f), new Vector2(0.75f, 0.6f), delegate {; });
         GameObject returnButton = UI.CreateButton("Return to Game Button", "Return to Game", font, Color.black, 24, inGameMenu.transform,
             sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.1f), new Vector2(0.75f, 0.3f),
-            delegate { menuActive = !menuActive; inGameMenu.SetActive(menuActive); });
-        inGameMenu.SetActive(menuActive);
+            delegate { inGameMenuActive = !inGameMenuActive; inGameMenu.SetActive(inGameMenuActive); });
+        inGameMenu.SetActive(inGameMenuActive);
+    }
+
+    private void CreateUpgradeMenu() {
+        upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, Color.white, canvas.transform,
+            Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
+        for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
+            // creating this extra variable because delegates don't work on for loop variables for some reason
+            int dupe = i;
+            // Upgrade Minus Button
+            GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
+                sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });
+            // Upgrade Plus Button
+            GameObject upgradePlusButton = UI.CreateButton("Plus Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
+                sprite, highlightedSprite, Vector3.zero, new Vector2(0.8f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.9f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
+            // Upgrade Text
+            upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
+                Vector3.zero, new Vector2(0.3f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+        }
+        upgradeMenu.SetActive(upgradeMenuActive);
+    }
+
+    private void UpgradePlayer(Upgrade upgrade, bool positive) {
+        if (positive) {
+            if (resources >= UPGRADE_COST) {
+                upgradeRanks[(int)upgrade]++;
+                resources -= UPGRADE_COST;
+            }
+        } else {
+            if (upgradeRanks[(int)upgrade] > 0) {
+                upgradeRanks[(int)upgrade]--;
+                resources += UPGRADE_COST;
+            }
+        }
+    }
+
+    public static string UpgradeToString(Upgrade upgrade) {
+        switch (upgrade) {
+            case Upgrade.MANEUVERABILITY:
+                return "Maneuverabilty";
+            case Upgrade.SPEED:
+                return "Speed";
+            case Upgrade.HULL_STRENGTH:
+                return "Hull Strength";
+            case Upgrade.CANNON_SPEED:
+                return "Cannon Speed";
+            case Upgrade.CANNON_STRENGTH:
+                return "Cannon Strength";
+            default:
+                return "";
+        }
     }
 
     public override void OnStartLocalPlayer() {
         //GetComponent<SpriteRenderer>().color = Color.red;
+    }
+
+    private void UpdateVariables() {
+        currMoveSpeed = BASE_MOVE_SPEED * (1 + (speedRank / 10.0f));
+        currRotationSpeed = BASE_ROTATION_SPEED * (1 + (maneuverabiltyRank / 10.0f));
+        currFiringDelay = BASE_FIRING_DELAY * (1 - (cannonSpeedRank / 10.0f));
+        currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (cannonStrengthRank / 10.0f));
+        for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
+            upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + upgradeRanks[i];
+        }
+        
     }
 }

@@ -290,6 +290,7 @@ MonoBehaviour:
   fireLeft: 113
   fireRight: 101
   menu: 27
+  upgrade: 120
   leftSpawn: {fileID: 4000013092007800}
   rightSpawn: {fileID: 4000014212426460}
   projectile: {fileID: 1000010212112084, guid: 3aca032176df9a7408df6ea6e345a0d2, type: 2}
