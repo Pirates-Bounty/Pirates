@@ -68,19 +68,19 @@ public class MapGenerator : MonoBehaviour {
                 //Mathf.PerlinNoise(x + xOffset, y + yOffset);
                 float noise = PerlinFractal(new Vector2(i+xOffset,j+yOffset), octaves, frequency/1000.0f);
                 
-                if (noise < .6f)
+                if (noise < .45f)
                 {
                     
                     map[i, j] = (int)TileType.GRASS;
                 }
 
-                else if (noise < .65f)
+                else if (noise < .5f)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= .65f)
+                else if (noise >= .5f)
                 {
                     
                     map[i, j] = (int)TileType.WATER;
