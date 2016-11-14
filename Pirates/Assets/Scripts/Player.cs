@@ -13,7 +13,7 @@ public enum Upgrade {
 }
 public class Player : NetworkBehaviour {
     // const vars
-    public const float MAX_HEALTH = 100.0f;
+    public const float BASE_MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 50.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
@@ -23,7 +23,7 @@ public class Player : NetworkBehaviour {
     public const int UPGRADE_COST = 100;
 
     [SyncVar(hook = "OnChangePlayer")]
-    public float currentHealth = MAX_HEALTH;
+	public float currentHealth = BASE_MAX_HEALTH;
     [SyncVar(hook = "OnChangeResources")]
     public int resources = 1000;
 
@@ -69,6 +69,7 @@ public class Player : NetworkBehaviour {
 	public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
+	public float currMaxHealth = BASE_MAX_HEALTH;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
@@ -158,6 +159,26 @@ public class Player : NetworkBehaviour {
 		//instantiatedResource.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
 		NetworkServer.Spawn(instantiatedResource);
 	}
+	[Command]
+	void CmdUpgrade(Upgrade upgrade, bool positive) {
+		if (positive) {
+			if (resources >= UPGRADE_COST) {
+				upgradeRanks[(int)upgrade]++;
+				resources -= UPGRADE_COST;
+			}
+		} else {
+			if (upgradeRanks[(int)upgrade] > 0) {
+				upgradeRanks[(int)upgrade]--;
+				resources += UPGRADE_COST;
+			}
+		}
+	}
+	[Command]
+	void CmdRespawn() {
+		CmdSpawnResources ();
+		transform.position = originalSpawnPos;
+		currentHealth = BASE_MAX_HEALTH;
+	}
 
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
@@ -179,7 +200,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (MAX_HEALTH - health) / 100.0f, 0.95f);
+		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (currMaxHealth - health) / 100.0f, 0.95f);
     }
     void OnChangeResources(int resources) {
         if (!isLocalPlayer) {
@@ -203,14 +224,6 @@ public class Player : NetworkBehaviour {
             //rb.AddForce(-transform.up * moveSpeed / 4);
 			ApplyDamage(10f);
         }
-
-		// respawn the player if they are dead
-		if (currentHealth <= 0.0f) {
-			//Destroy(gameObject);
-			CmdSpawnResources ();
-			transform.position = originalSpawnPos;
-			currentHealth = MAX_HEALTH;
-		}
     }
     public void ApplyDamage(float damage) {
         if (!isServer) {
@@ -218,12 +231,9 @@ public class Player : NetworkBehaviour {
         }
         currentHealth -= damage;
         // respawn the player if they are dead
-        /*if (currentHealth <= 0.0f) {
-            //Destroy(gameObject);
-			CmdSpawnResources ();
-			transform.position = originalSpawnPos;
-			currentHealth = MAX_HEALTH;
-        }*/
+        if (currentHealth <= 0.0f) {
+			CmdRespawn ();
+        }
     }
 	public void AddGold(int gold) {
 		if (!isServer) {
@@ -281,7 +291,7 @@ public class Player : NetworkBehaviour {
 		if (!isServer) {
 			return;
 		}
-		if (positive) {
+		/*if (positive) {
             if (resources >= UPGRADE_COST) {
                 upgradeRanks[(int)upgrade]++;
                 resources -= UPGRADE_COST;
@@ -291,7 +301,8 @@ public class Player : NetworkBehaviour {
                 upgradeRanks[(int)upgrade]--;
                 resources += UPGRADE_COST;
             }
-        }
+        }*/
+		CmdUpgrade (upgrade, positive);
     }
 
     public static string UpgradeToString(Upgrade upgrade) {
