@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour {
     // const vars
     public const float MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 50.0f;
+	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 0.3f;
     public const float BASE_ROTATION_SPEED = 25.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
@@ -38,6 +39,7 @@ public class Player : NetworkBehaviour {
     public Transform leftSpawn;
     public Transform rightSpawn;
     public GameObject projectile;
+	public GameObject resourceObj;
 
 
     private Camera playerCamera;
@@ -54,22 +56,25 @@ public class Player : NetworkBehaviour {
     private Sprite menuBackground;
     private Rigidbody2D rb;
     // upgrade menu ranks
-    private int maneuverabiltyRank = 0;
-    private int speedRank = 0;
+	private int maneuverabiltyRank = 0;
+	private int speedRank = 0;
     private int hullStrengthRank = 0;
     private int cannonSpeedRank = 0;
     private int cannonStrengthRank = 0;
-    private int[] upgradeRanks = new int[(int)Upgrade.COUNT];
+	private int[] upgradeRanks = new int[(int)Upgrade.COUNT];
     // base stats
-    private float currMoveSpeed = BASE_MOVE_SPEED;
-    private float currRotationSpeed = BASE_ROTATION_SPEED;
-    private float currFiringDelay = BASE_FIRING_DELAY;
-    private float currProjectileSpeed = BASE_PROJECTILE_SPEED;
-    private float firingTimer = BASE_FIRING_DELAY;
+	public float currMoveSpeed = BASE_MOVE_SPEED;
+	public float currRotationSpeed = BASE_ROTATION_SPEED;
+	public float currFiringDelay = BASE_FIRING_DELAY;
+	public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
+	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
+	public float firingTimer = BASE_FIRING_DELAY;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
     private bool anchorDown = false;
+
+	private Vector3 originalSpawnPos;
 
 
     // Use this for initialization
@@ -93,6 +98,8 @@ public class Player : NetworkBehaviour {
         RenderInterface();
         CreateInGameMenu();
         CreateUpgradeMenu();
+
+		originalSpawnPos = transform.position;
     }
 
 	void Update () {
@@ -128,14 +135,22 @@ public class Player : NetworkBehaviour {
 	void CmdFireLeft () {
 		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawn.position, Quaternion.identity);
         instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawn.up * currProjectileSpeed;
+		instantiatedProjectile.GetComponent<Projectile>().damage = currProjectileStrength;
         NetworkServer.Spawn(instantiatedProjectile);
     }
-    [Command]
-    void CmdFireRight() {
-        GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
-        NetworkServer.Spawn(instantiatedProjectile);
-    }
+	[Command]
+	void CmdFireRight() {
+		GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawn.position, Quaternion.identity);
+		instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
+		instantiatedProjectile.GetComponent<Projectile>().damage = currProjectileStrength;
+		NetworkServer.Spawn(instantiatedProjectile);
+	}
+	[Command]
+	void CmdSpawnResources() {
+		GameObject instantiatedResource = (GameObject)Instantiate(resourceObj, transform.position, Quaternion.identity);
+		//instantiatedResource.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
+		NetworkServer.Spawn(instantiatedResource);
+	}
 
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
@@ -177,8 +192,9 @@ public class Player : NetworkBehaviour {
             transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
             //rb.AddForce(transform.up * moveSpeed);
         }
-        if (Input.GetKey(down)) {
+        if (Input.GetKeyDown(down)) {
             //rb.AddForce(-transform.up * moveSpeed / 4);
+			ApplyDamage(10f);
         }
 
     }
@@ -187,11 +203,20 @@ public class Player : NetworkBehaviour {
             return;
         }
         currentHealth -= damage;
-        // destroy the player if they are dead
+        // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
-            Destroy(gameObject);
+            //Destroy(gameObject);
+			CmdSpawnResources ();
+			transform.position = originalSpawnPos;
+			currentHealth = MAX_HEALTH;
         }
     }
+	public void AddGold(int gold) {
+		if (!isServer) {
+			return;
+		}
+		resources += gold;
+	}
 
     private void RenderInterface() {
         UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.8f), new Vector2(0.2f, 0.95f));
@@ -274,10 +299,11 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-        currMoveSpeed = BASE_MOVE_SPEED * (1 + (speedRank / 10.0f));
-        currRotationSpeed = BASE_ROTATION_SPEED * (1 + (maneuverabiltyRank / 10.0f));
-        currFiringDelay = BASE_FIRING_DELAY * (1 - (cannonSpeedRank / 10.0f));
-        currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (cannonStrengthRank / 10.0f));
+		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[0] / 10.0f));
+		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[1] / 10.0f));
+		currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[2] / 10.0f));
+		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[3] / 10.0f));
+		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (upgradeRanks[4] / 1.0f);
         for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
             upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + upgradeRanks[i];
         }

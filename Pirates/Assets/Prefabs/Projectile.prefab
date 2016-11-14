@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c05be25ae9d52b44aca4735a31c6f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 5
+  lifetime: 1
   damage: 10
   shot: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
   hit: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
