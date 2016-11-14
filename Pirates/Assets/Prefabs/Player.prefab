@@ -294,6 +294,14 @@ MonoBehaviour:
   leftSpawn: {fileID: 4000013092007800}
   rightSpawn: {fileID: 4000014212426460}
   projectile: {fileID: 1000010212112084, guid: 3aca032176df9a7408df6ea6e345a0d2, type: 2}
+  resourceObj: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
+    type: 2}
+  currMoveSpeed: 10
+  currRotationSpeed: 25
+  currFiringDelay: 0.3
+  currProjectileSpeed: 50
+  currProjectileStrength: 10
+  firingTimer: 0.3
 --- !u!114 &114000014027217456
 MonoBehaviour:
   m_ObjectHideFlags: 1
