@@ -14,7 +14,7 @@ namespace Prototype.NetworkLobby
         static short MsgKicked = MsgType.Highest + 1;
 
         static public LobbyManager s_Singleton;
-
+        static public int numPlayers;
 
         [Header("Unity UI Lobby")]
         [Tooltip("Time in second between all players ready & match start")]
@@ -37,6 +37,8 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
+
+      
 
         //Client numPlayers from NetworkManager is always 0, so we count (throught connect/destroy in LobbyPlayer) the number
         //of players, so that even client know how many player there is.
@@ -383,7 +385,7 @@ namespace Prototype.NetworkLobby
                     (lobbySlots[i] as LobbyPlayer).RpcUpdateCountdown(0);
                 }
             }
-
+            numPlayers = _playerNumber;
             ServerChangeScene(playScene);
         }
 
