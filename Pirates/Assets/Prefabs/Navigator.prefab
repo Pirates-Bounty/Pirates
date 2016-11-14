@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000013882564918}
   - 114: {fileID: 114000010013190876}
+  - 81: {fileID: 81000013851966286}
   m_Layer: 0
   m_Name: Navigator
   m_TagString: Untagged
@@ -40,6 +41,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!81 &81000013851966286
+AudioListener:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011950072490}
+  m_Enabled: 1
 --- !u!114 &114000010013190876
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -51,3 +59,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 031aa4b2abb290c40b528aad0fef9551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clickS: {fileID: 8300000, guid: 7d528b7453c02934f804392ef040fd1c, type: 3}

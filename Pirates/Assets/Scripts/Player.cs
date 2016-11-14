@@ -73,6 +73,9 @@ public class Player : NetworkBehaviour {
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
     private bool anchorDown = false;
+	// ayy it's dem seagulls
+	//private AudioClip seagullS;
+	private int seagullTimer = 0;
 
 	private Vector3 originalSpawnPos;
 
@@ -128,6 +131,7 @@ public class Player : NetworkBehaviour {
                 firingTimer = currFiringDelay;
             }
         }
+		UpdateSeagulls();
         UpdateInterface();
         UpdateVariables();
     }
@@ -309,4 +313,10 @@ public class Player : NetworkBehaviour {
         }
         
     }
+
+	private void UpdateSeagulls() {
+		if (seagullTimer <= 0) {
+			seagullTimer = 100;
+		}
+	}
 }

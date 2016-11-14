@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
+using Prototype.NetworkLobby;
 
 public class MapGenerator : MonoBehaviour {
 
@@ -13,16 +15,64 @@ public class MapGenerator : MonoBehaviour {
     public string[] tileNames;
     public int octaves = 3;
     public int[,] map;
+    public int quadWidth;
+    public int quadHeight;
     private Transform canvas;
 
+    
 
-    // Use this for initialization
-    void Start () {
+    void Awake()
+    {
         Generate();
         GenerateGameObjects();
 
+        int numPlayers = LobbyManager.numPlayers;
 
+        //Circle radius and degree calculation for spawning spawn points
+        int rad = (width / 2) - 5;
+        float deg = 360 / numPlayers;
+
+
+        //Loop through the players and spawn a spawn point for each player along the circle
+        for (int i = 1; i < numPlayers + 1; i++)
+        {
+            bool spawnable = false;
+            GameObject Spawner = new GameObject();
+            Spawner.AddComponent<NetworkStartPosition>();
+            int x = (int)(rad * Mathf.Cos(deg * i));
+            int y = (int)(rad * Mathf.Cos(deg * i));
+            //Checks to see if a good spot to spawn the spawnPoints
+            while (spawnable)
+            {
+                bool resetLoop = false;
+                for (int j = x - quadWidth / 2; j < x + quadWidth / 2; j++)
+                {
+                    for (int k = y - quadHeight / 2; k < y + quadHeight / 2; k++)
+                    {
+
+                        if (map[j, k] != (int)TileType.WATER)
+                        {
+                            x -= x / Mathf.Abs(x);
+                            y -= y / Mathf.Abs(x);
+                            resetLoop = true;
+                            break;
+                        }
+                        if (resetLoop)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (!resetLoop)
+                {
+                    spawnable = true;
+                }
+            }
+            Spawner.transform.position = new Vector2(x, y);
+        }
     }
+
+    // Use this for initialization
 	
 	// Update is called once per frame
 	void Update () {
@@ -87,6 +137,8 @@ public class MapGenerator : MonoBehaviour {
                 }
             }
         }
+
+
     }
 
 
