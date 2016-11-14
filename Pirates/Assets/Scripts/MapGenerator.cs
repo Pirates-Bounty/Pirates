@@ -40,7 +40,7 @@ public class MapGenerator : MonoBehaviour {
             GameObject Spawner = new GameObject();
             Spawner.AddComponent<NetworkStartPosition>();
             int x = (int)(rad * Mathf.Cos(deg * i));
-            int y = (int)(rad * Mathf.Cos(deg * i));
+            int y = (int)(rad * Mathf.Sin(deg * i));
             //Checks to see if a good spot to spawn the spawnPoints
             while (spawnable)
             {
@@ -69,6 +69,11 @@ public class MapGenerator : MonoBehaviour {
                 }
             }
             Spawner.transform.position = new Vector2(x, y);
+            Vector3 dir = -Spawner.transform.position;
+            dir = dir.normalized;
+            Spawner.transform.up = dir;
+            
+            //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
         }
     }
 

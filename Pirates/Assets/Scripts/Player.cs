@@ -74,8 +74,8 @@ public class Player : NetworkBehaviour {
     private bool upgradeMenuActive = false;
     private bool anchorDown = false;
 	// ayy it's dem seagulls
-	//private AudioClip seagullS;
-	private int seagullTimer = 0;
+	public AudioClip seagullS;
+	private float seagullTimer = 0;
 
 	private Vector3 originalSpawnPos;
 
@@ -131,10 +131,13 @@ public class Player : NetworkBehaviour {
                 firingTimer = currFiringDelay;
             }
         }
-		UpdateSeagulls();
         UpdateInterface();
         UpdateVariables();
     }
+
+	void FixedUpdate () {
+		UpdateSeagulls ();
+	}
     [Command]   
 	void CmdFireLeft () {
 		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawn.position, Quaternion.identity);
@@ -315,8 +318,10 @@ public class Player : NetworkBehaviour {
     }
 
 	private void UpdateSeagulls() {
+		seagullTimer -= Time.deltaTime;
 		if (seagullTimer <= 0) {
-			seagullTimer = 100;
+			seagullTimer = 15 + Random.value * 15;
+			AudioSource.PlayClipAtPoint (seagullS, transform.position, 100.0f);
 		}
 	}
 }
