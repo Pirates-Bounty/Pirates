@@ -16,7 +16,7 @@ public class Player : NetworkBehaviour {
     public const float MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 50.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
-    public const float BASE_FIRING_DELAY = 0.3f;
+    public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 25.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
     public const int MAX_UPGRADES = 5;
@@ -204,6 +204,13 @@ public class Player : NetworkBehaviour {
 			ApplyDamage(10f);
         }
 
+		// respawn the player if they are dead
+		if (currentHealth <= 0.0f) {
+			//Destroy(gameObject);
+			CmdSpawnResources ();
+			transform.position = originalSpawnPos;
+			currentHealth = MAX_HEALTH;
+		}
     }
     public void ApplyDamage(float damage) {
         if (!isServer) {
@@ -211,12 +218,12 @@ public class Player : NetworkBehaviour {
         }
         currentHealth -= damage;
         // respawn the player if they are dead
-        if (currentHealth <= 0.0f) {
+        /*if (currentHealth <= 0.0f) {
             //Destroy(gameObject);
 			CmdSpawnResources ();
 			transform.position = originalSpawnPos;
 			currentHealth = MAX_HEALTH;
-        }
+        }*/
     }
 	public void AddGold(int gold) {
 		if (!isServer) {
@@ -229,7 +236,7 @@ public class Player : NetworkBehaviour {
         UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.8f), new Vector2(0.2f, 0.95f));
         healthBar = UI.CreatePanel("Health Bar", null, Color.green, canvas.transform, Vector3.zero, new Vector2(0.2f, 0.9f), new Vector2(0.5f, 0.95f));
         GameObject bar = UI.CreatePanel("Bar", null, new Color(0.8f, 0.8f, 0.1f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.8f), new Vector2(0.5f, 0.9f));
-        resourcesText = UI.CreateText("Resources Text", "Resources ", font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
+		resourcesText = UI.CreateText("Resources Text", "Resources " + resources, font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
     }
 
     private void CreateInGameMenu() {
@@ -271,7 +278,10 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpgradePlayer(Upgrade upgrade, bool positive) {
-        if (positive) {
+		if (!isServer) {
+			return;
+		}
+		if (positive) {
             if (resources >= UPGRADE_COST) {
                 upgradeRanks[(int)upgrade]++;
                 resources -= UPGRADE_COST;
