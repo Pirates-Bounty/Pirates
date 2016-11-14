@@ -18,6 +18,7 @@ public class Menu : MonoBehaviour {
     private bool positive = true;
 
 	private AudioClip menuM;
+
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").transform;
@@ -51,5 +52,6 @@ public class Menu : MonoBehaviour {
             positive = !positive;
         }
         backgroundPanel.GetComponent<RectTransform>().rotation = Quaternion.Euler(0.0f, 0.0f, currentRotation);
+
 	}
 }
