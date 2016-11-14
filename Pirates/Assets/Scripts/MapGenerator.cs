@@ -18,6 +18,7 @@ public class MapGenerator : MonoBehaviour {
     public int quadWidth;
     public int quadHeight;
     private Transform canvas;
+    private Camera minMap;
 
     
 
@@ -25,6 +26,8 @@ public class MapGenerator : MonoBehaviour {
     {
         Generate();
         GenerateGameObjects();
+        minMap = GameObject.Find("MinCam").GetComponent<Camera>();
+        minMap.orthographicSize = width / 2;
 
         int numPlayers = LobbyManager.numPlayers;
 
