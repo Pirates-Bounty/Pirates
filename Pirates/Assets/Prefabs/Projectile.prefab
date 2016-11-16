@@ -23,6 +23,8 @@ GameObject:
   - 50: {fileID: 50000010964000392}
   - 114: {fileID: 114000010398376730}
   - 58: {fileID: 58000013825617616}
+  - 114: {fileID: 114000013265574350}
+  - 114: {fileID: 114000012211375010}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Projectile
@@ -85,10 +87,62 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c05be25ae9d52b44aca4735a31c6f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 5
+  lifetime: 0.4
   damage: 10
-  shotS: {fileID: 8300000, guid: 827d756022a6fed40969c9d0d9c55b70, type: 3}
-  hitS: {fileID: 8300000, guid: 693dce4daac0cf24c828c80de6673957, type: 3}
+  shot: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
+  hit: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
+--- !u!114 &114000012211375010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010212112084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 2
+  m_SendInterval: 0
+  m_SyncRotationAxis: 3
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
+--- !u!114 &114000013265574350
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010212112084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 58
+    i1: 202
+    i2: 3
+    i3: 33
+    i4: 118
+    i5: 223
+    i6: 154
+    i7: 116
+    i8: 8
+    i9: 223
+    i10: 110
+    i11: 166
+    i12: 227
+    i13: 69
+    i14: 160
+    i15: 210
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!212 &212000011230325264
 SpriteRenderer:
   m_ObjectHideFlags: 1

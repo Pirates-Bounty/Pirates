@@ -1,27 +1,86 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
+using Prototype.NetworkLobby;
 
 public class MapGenerator : MonoBehaviour {
 
     public int width;
     public int height;
     public float frequency;
+    //public float amplitude;
     public Sprite[] sprites;
     public Color[] colors;
     public int seed;
     public string[] tileNames;
-    private Transform canvas;
-    public float perlinMult = 2.5f;
-    public float octaves = 3;
+    public int octaves = 3;
     public int[,] map;
+    public int quadWidth;
+    public int quadHeight;
+    private Transform canvas;
+    private Camera minMap;
 
-    // Use this for initialization
-    void Start () {
+    
+
+    void Awake()
+    {
         Generate();
         GenerateGameObjects();
+        minMap = GameObject.Find("MinCam").GetComponent<Camera>();
+        minMap.orthographicSize = width / 2;
+
+        int numPlayers = LobbyManager.numPlayers;
+
+        //Circle radius and degree calculation for spawning spawn points
+        int rad = (width / 2) - 5;
+        float deg = 360 / numPlayers;
 
 
+        //Loop through the players and spawn a spawn point for each player along the circle
+        for (int i = 1; i < numPlayers + 1; i++)
+        {
+            bool spawnable = false;
+            GameObject Spawner = new GameObject();
+            Spawner.AddComponent<NetworkStartPosition>();
+            int x = (int)(rad * Mathf.Cos(deg * i));
+            int y = (int)(rad * Mathf.Sin(deg * i));
+            //Checks to see if a good spot to spawn the spawnPoints
+            while (spawnable)
+            {
+                bool resetLoop = false;
+                for (int j = x - quadWidth / 2; j < x + quadWidth / 2; j++)
+                {
+                    for (int k = y - quadHeight / 2; k < y + quadHeight / 2; k++)
+                    {
+
+                        if (map[j, k] != (int)TileType.WATER)
+                        {
+                            x -= x / Mathf.Abs(x);
+                            y -= y / Mathf.Abs(x);
+                            resetLoop = true;
+                            break;
+                        }
+                        if (resetLoop)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (!resetLoop)
+                {
+                    spawnable = true;
+                }
+            }
+            Spawner.transform.position = new Vector2(x, y);
+            Vector3 dir = -Spawner.transform.position;
+            dir = dir.normalized;
+            Spawner.transform.up = dir;
+            
+            //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
+        }
     }
+
+    // Use this for initialization
 	
 	// Update is called once per frame
 	void Update () {
@@ -63,61 +122,54 @@ public class MapGenerator : MonoBehaviour {
                     map[i, j] = (int)TileType.WATER;
                     continue;
                 }
-                //Make this less random
-                float x = (float)i * frequency / 1000f;
-                float y = (float)j * frequency / 1000f;
-                float noise = Mathf.PerlinNoise(x + xOffset, y + yOffset);
 
-
-
-                float amplitude = 1f;
-                float range = 1f;
-                for (int o = 1; o < octaves/2; o++)
+                //Mathf.PerlinNoise(x + xOffset, y + yOffset);
+                float noise = PerlinFractal(new Vector2(i+xOffset,j+yOffset), octaves, frequency/1000.0f);
+                
+                if (noise < .45f)
                 {
                     
-                    x *= perlinMult;
-                    y *= perlinMult;
-                    //perlinMult-= .1f;
-                    amplitude = 0.5f;
-                    range += amplitude;
-                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
-                }
-                for (int o = 1; o < octaves / 2; o++)
-                {
-
-                    x /= perlinMult;
-                    y /= perlinMult;
-                    //perlinMult-= .1f;
-                    amplitude = 0.5f;
-                    range += amplitude;
-                    noise += Mathf.PerlinNoise(x + xOffset, y + yOffset) * amplitude;
-                }
-                noise =  noise / range;
-
-
-
-                if (noise < .6f)
-                {
-                    map[i, j] = (int)TileType.WATER;
+                    map[i, j] = (int)TileType.GRASS;
                 }
 
-                else if (noise < .65f)
+                else if (noise < .5f)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= .65f)
+                else if (noise >= .5f)
                 {
-                    map[i, j] = (int)TileType.GRASS;
+                    
+                    map[i, j] = (int)TileType.WATER;
                 }
             }
         }
+
+
     }
 
 
 
+    public static float PerlinFractal(Vector2 v, int octaves, float frequency, float persistence = 0.5f, float lacunarity = 2.0f)
+    {
+        float total = 0.0f;
+        float amplitude = 1.0f;
+        float maxAmp = 0.0f; // keeps track of max possible noise
 
+        for (int i = 0; i < octaves; ++i)
+        {
+            float noise = Mathf.PerlinNoise(v.x * frequency, v.y * frequency);
+            noise = noise * 2 - 1;
+            noise = 1.0f - Mathf.Abs(noise);
+            total += noise * amplitude;
+            maxAmp += amplitude;
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+        //Debug.Log(total);
+        return total/maxAmp;
+    }
 
 
 
@@ -127,7 +179,7 @@ public class MapGenerator : MonoBehaviour {
         {
             for (int j = 0; j < height; j++)
             {
-                Vector2 tilePos = new Vector2(i, j);
+                Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
 
                 int id = map[i, j];
                 GameObject Tile = new GameObject(tileNames[id]);

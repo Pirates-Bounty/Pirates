@@ -11,3 +11,5 @@ EditorBuildSettings:
     path: Assets/Scenes/Main.unity
   - enabled: 1
     path: Assets/Scenes/Instructions.unity
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity

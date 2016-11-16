@@ -19,20 +19,20 @@ public class Game : MonoBehaviour {
             players = new Player[MAX_PLAYERS];
             players[0] = player1;
             players[1] = player2;
-            // Player 1
-            player1.up = KeyCode.W;
-            player1.down = KeyCode.S;
-            player1.right = KeyCode.D;
-            player1.left = KeyCode.A;
-            player1.fire = KeyCode.Q;
-            player1.menu = KeyCode.Escape;
-            //Player 2
-            player2.up = KeyCode.I;
-            player2.down = KeyCode.K;
-            player2.right = KeyCode.L;
-            player2.left = KeyCode.J;
-            player2.fire = KeyCode.U;
-            player2.menu = KeyCode.Delete;
+            //// Player 1
+            //player1.up = KeyCode.W;
+            //player1.down = KeyCode.S;
+            //player1.right = KeyCode.D;
+            //player1.left = KeyCode.A;
+            //player1.fire = KeyCode.Q;
+            //player1.menu = KeyCode.Escape;
+            ////Player 2
+            //player2.up = KeyCode.I;
+            //player2.down = KeyCode.K;
+            //player2.right = KeyCode.L;
+            //player2.left = KeyCode.J;
+            //player2.fire = KeyCode.U;
+            //player2.menu = KeyCode.Delete;
 
         }
         else if (Instance != this)
