@@ -76,7 +76,7 @@ public class Player : NetworkBehaviour {
     private bool anchorDown = false;
 	// ayy it's dem seagulls
 	public AudioClip seagullS;
-	private float seagullTimer = 0;
+	private float seagullTimer = 10;
 
 	private Vector3 originalSpawnPos;
 

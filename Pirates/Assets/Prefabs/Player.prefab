@@ -172,8 +172,8 @@ Rigidbody2D:
   m_GameObject: {fileID: 1000012361358088}
   m_UseAutoMass: 0
   m_Mass: 100
-  m_LinearDrag: 0.05
-  m_AngularDrag: 0.05
+  m_LinearDrag: 0.8
+  m_AngularDrag: 0.8
   m_GravityScale: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -332,6 +332,7 @@ MonoBehaviour:
   currProjectileSpeed: 50
   currProjectileStrength: 10
   firingTimer: 0.3
+  currMaxHealth: 100
   seagullS: {fileID: 8300000, guid: 09e636280fff23342a5f5e3305217153, type: 3}
 --- !u!114 &114000014027217456
 MonoBehaviour:
