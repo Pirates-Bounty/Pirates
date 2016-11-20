@@ -56,12 +56,7 @@ public class Player : NetworkBehaviour {
     private Sprite menuBackground;
     private Rigidbody2D rb;
     // upgrade menu ranks
-	private int maneuverabiltyRank = 0;
-	private int speedRank = 0;
-    private int hullStrengthRank = 0;
-    private int cannonSpeedRank = 0;
-    private int cannonStrengthRank = 0;
-	private int[] upgradeRanks = new int[(int)Upgrade.COUNT];
+	public SyncListInt upgradeRanks = new SyncListInt();
     // base stats
 	public float currMoveSpeed = BASE_MOVE_SPEED;
 	public float currRotationSpeed = BASE_ROTATION_SPEED;
@@ -78,16 +73,24 @@ public class Player : NetworkBehaviour {
 	public AudioClip seagullS;
 	private float seagullTimer = 10;
 
-	private Vector3 originalSpawnPos;
+	private NetworkStartPosition[] spawnPoints;
+
+	public enum UpgradeID
+	{
+		MNV,
+		SPD,
+		HULL,
+		CSPD,
+		CSTR
+	}
 
 
     // Use this for initialization
     void Start () {
-        upgradeRanks[0] = maneuverabiltyRank;
-        upgradeRanks[1] = speedRank;
-        upgradeRanks[2] = hullStrengthRank;
-        upgradeRanks[3] = cannonSpeedRank;
-        upgradeRanks[4] = cannonStrengthRank;
+		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
+		{
+			upgradeRanks.Add (0);
+		}
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -103,7 +106,7 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         CreateUpgradeMenu();
 
-		originalSpawnPos = transform.position;
+		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
     }
 
 	void Update () {
@@ -161,22 +164,32 @@ public class Player : NetworkBehaviour {
 	}
 	[Command]
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
+		//int upgradeMod = 0;
 		if (positive) {
 			if (resources >= UPGRADE_COST) {
+				//upgradeMod++;
 				upgradeRanks[(int)upgrade]++;
 				resources -= UPGRADE_COST;
 			}
 		} else {
 			if (upgradeRanks[(int)upgrade] > 0) {
+				//upgradeMod--;
 				upgradeRanks[(int)upgrade]--;
 				resources += UPGRADE_COST;
 			}
 		}
+		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
-	[Command]
-	void CmdRespawn() {
+	[ClientRpc]
+	void RpcRespawn() {
+		if (!isLocalPlayer) {
+			return;
+		}
 		CmdSpawnResources ();
-		transform.position = originalSpawnPos;
+		transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		Vector3 dir = -transform.position;
+		dir = dir.normalized;
+		transform.up = dir;
 		currentHealth = BASE_MAX_HEALTH;
 	}
 
@@ -224,6 +237,7 @@ public class Player : NetworkBehaviour {
             //rb.AddForce(-transform.up * moveSpeed / 4);
 			ApplyDamage(10f);
         }
+
     }
     public void ApplyDamage(float damage) {
         if (!isServer) {
@@ -232,7 +246,7 @@ public class Player : NetworkBehaviour {
         currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
-			CmdRespawn ();
+			RpcRespawn ();
         }
     }
 	public void AddGold(int gold) {
@@ -288,20 +302,9 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpgradePlayer(Upgrade upgrade, bool positive) {
-		if (!isServer) {
+		if (!isLocalPlayer) {
 			return;
 		}
-		/*if (positive) {
-            if (resources >= UPGRADE_COST) {
-                upgradeRanks[(int)upgrade]++;
-                resources -= UPGRADE_COST;
-            }
-        } else {
-            if (upgradeRanks[(int)upgrade] > 0) {
-                upgradeRanks[(int)upgrade]--;
-                resources += UPGRADE_COST;
-            }
-        }*/
 		CmdUpgrade (upgrade, positive);
     }
 
@@ -327,15 +330,15 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[0] / 10.0f));
-		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[1] / 10.0f));
-		currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[2] / 10.0f));
-		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[3] / 10.0f));
-		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[4] / 1.0f));
+		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 10.0f));
+		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 10.0f));
+		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
+		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 10.0f));
+		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
         for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
             upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + upgradeRanks[i];
         }
-        
+
     }
 
 	private void UpdateSeagulls() {
