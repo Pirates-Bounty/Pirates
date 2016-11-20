@@ -33,7 +33,11 @@ public class MapGenerator : MonoBehaviour {
 
         //Circle radius and degree calculation for spawning spawn points
         int rad = (width / 2) - 5;
-        float deg = 360 / numPlayers;
+		float deg = 90;
+		if (numPlayers != 0)
+		{
+			deg = 360 / numPlayers;
+		}
 
 
         //Loop through the players and spawn a spawn point for each player along the circle
