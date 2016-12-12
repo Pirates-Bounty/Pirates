@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -32,8 +32,9 @@ public class Player : NetworkBehaviour {
     public KeyCode down;
     public KeyCode left;
     public KeyCode right;
-    public KeyCode fireLeft;
-    public KeyCode fireRight;
+    // now uses mouse buttons to fire so no longer needed
+    // public KeyCode fireLeft;
+    // public KeyCode fireRight;
     public KeyCode menu;
     public KeyCode upgrade;
     public Transform leftSpawn;
@@ -50,6 +51,8 @@ public class Player : NetworkBehaviour {
     private Font font;
     private Sprite sprite;
     private Sprite highlightedSprite;
+    private Sprite healthBarSprite;
+    private Sprite resourceBarSprite;
     // GameObject references
     private GameObject inGameMenu;
     private GameObject upgradeMenu;
@@ -101,6 +104,8 @@ public class Player : NetworkBehaviour {
         font = Resources.Load<Font>("Art/Fonts/riesling");
         sprite = Resources.Load<Sprite>("Art/Textures/Button");
         highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
+        resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         if (!isLocalPlayer) {
             return;
         }
@@ -234,7 +239,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        resourcesText.GetComponent<Text>().text = "Resources " + resources;
+        resourcesText.GetComponent<Text>().text = "" + resources;
     }
 
     private void GetMovement() {
@@ -275,10 +280,15 @@ public class Player : NetworkBehaviour {
 	}
 
     private void RenderInterface() {
-        UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.8f), new Vector2(0.2f, 0.95f));
-        healthBar = UI.CreatePanel("Health Bar", null, Color.green, canvas.transform, Vector3.zero, new Vector2(0.2f, 0.9f), new Vector2(0.5f, 0.95f));
-        GameObject bar = UI.CreatePanel("Bar", null, new Color(0.8f, 0.8f, 0.1f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.8f), new Vector2(0.5f, 0.9f));
-		resourcesText = UI.CreateText("Resources Text", "Resources " + resources, font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
+        UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.75f), new Vector2(0.2f, 0.95f));
+        healthBar = UI.CreatePanel("Health", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.85f), new Vector2(0.5f, 0.95f));
+        GameObject healthBarOverlay = UI.CreatePanel("Health Bar", null, Color.green, healthBar.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
+        UI.CreatePanel("Health Bar Overlay", healthBarSprite, Color.white, healthBar.transform, Vector3.zero, Vector2.zero, Vector2.one);
+
+        GameObject barOverlay = UI.CreatePanel("Resources", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.75f), new Vector2(0.5f, 0.85f));
+        GameObject bar = UI.CreatePanel("Resource Bar", null, new Color(0.8f, 0.8f, 0.1f), barOverlay.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
+        UI.CreatePanel("Resource Bar Overlay", resourceBarSprite, Color.white, barOverlay.transform, Vector3.zero, Vector2.zero, Vector2.one);
+        resourcesText = UI.CreateText("Resources Text", "" + resources, font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
     }
 
     private void CreateInGameMenu() {

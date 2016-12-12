@@ -91,6 +91,7 @@ public static class UI {
         image.color = color;
         if (sprite) {
             image.sprite = sprite;
+            
         }
 
         return panelGO;

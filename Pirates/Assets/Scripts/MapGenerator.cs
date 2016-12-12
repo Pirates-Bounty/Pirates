@@ -8,6 +8,7 @@ public class MapGenerator : MonoBehaviour {
     public int width;
     public int height;
     public float frequency;
+    public float centerWeight;
     //public float amplitude;
     public Sprite[] sprites;
     public Color[] colors;
@@ -19,6 +20,7 @@ public class MapGenerator : MonoBehaviour {
     public int quadHeight;
     private Transform canvas;
     private Camera minMap;
+    private Sprite minMapBorder;
 
     
 
@@ -28,6 +30,9 @@ public class MapGenerator : MonoBehaviour {
         GenerateGameObjects();
         minMap = GameObject.Find("MinCam").GetComponent<Camera>();
         minMap.orthographicSize = width / 2;
+        canvas = GameObject.Find("Canvas").transform;
+        minMapBorder = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Mini Map Border");
+        UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
 
         int numPlayers = LobbyManager.numPlayers;
 
@@ -129,7 +134,10 @@ public class MapGenerator : MonoBehaviour {
 
                 //Mathf.PerlinNoise(x + xOffset, y + yOffset);
                 float noise = PerlinFractal(new Vector2(i+xOffset,j+yOffset), octaves, frequency/1000.0f);
-                
+                // change the noise so that it is also weighted based on the euclidean distance from the center of the map
+                // this way, there will be a larger island in the middle of the map
+                // comment this line to go back to the old generation
+                noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width/2, 2) + Mathf.Pow(j - height/2, 2)), 0.5f)/(width/2 + height/2);
                 if (noise < .45f)
                 {
                     
