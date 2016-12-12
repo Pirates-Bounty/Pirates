@@ -17,9 +17,9 @@ public class Player : NetworkBehaviour {
     public const float BASE_PROJECTILE_SPEED = 50.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
-    public const float BASE_ROTATION_SPEED = 25.0f;
+    public const float BASE_ROTATION_SPEED = 35.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
-    public const int MAX_UPGRADES = 5;
+    public const int MAX_UPGRADES = 4;
     public const int UPGRADE_COST = 100;
 
     [SyncVar(hook = "OnChangePlayer")]
@@ -38,6 +38,8 @@ public class Player : NetworkBehaviour {
     public KeyCode upgrade;
     public Transform leftSpawn;
     public Transform rightSpawn;
+	public Transform[] leftSpawners;
+	public Transform[] rightSpawners;
     public GameObject projectile;
 	public GameObject resourceObj;
 
@@ -122,39 +124,45 @@ public class Player : NetworkBehaviour {
         firingTimer -= Time.deltaTime;
         if (firingTimer < 0) {
             // fire cannons
-            if (Input.GetKeyDown(fireLeft)) {
+			if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive) {
                 // left cannon
-                CmdFireLeft();
+				CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
             }
-            if (Input.GetKeyDown(fireRight)) {
+			if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive) {
                 // right cannon
-                CmdFireRight();
+				CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
             }
         }
         UpdateInterface();
         UpdateVariables();
+		//CmdDisplayHealth ();
     }
 
 	void FixedUpdate () {
 		UpdateSeagulls ();
 	}
     [Command]   
-	void CmdFireLeft () {
-		GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawn.position, Quaternion.identity);
-        instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawn.up * currProjectileSpeed;
-		instantiatedProjectile.GetComponent<Projectile>().damage = currProjectileStrength;
-        NetworkServer.Spawn(instantiatedProjectile);
+	void CmdFireLeft (int damageStrength) {
+		//print (damageStrength);
+		for (int i = 0; i < damageStrength/10; i++) {
+			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
+			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * currProjectileSpeed;
+			instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			NetworkServer.Spawn (instantiatedProjectile);
+		}
     }
 	[Command]
-	void CmdFireRight() {
-		GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawn.position, Quaternion.identity);
-		instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
-		instantiatedProjectile.GetComponent<Projectile>().damage = currProjectileStrength;
-		NetworkServer.Spawn(instantiatedProjectile);
+	void CmdFireRight(int damageStrength) {
+		for (int i = 0; i < damageStrength / 10; i++) {
+			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, rightSpawners[i].position, Quaternion.identity);
+			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * currProjectileSpeed;
+			instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			NetworkServer.Spawn (instantiatedProjectile);
+		}
 	}
 	[Command]
 	void CmdSpawnResources() {
@@ -166,7 +174,7 @@ public class Player : NetworkBehaviour {
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
 		//int upgradeMod = 0;
 		if (positive) {
-			if (resources >= UPGRADE_COST) {
+			if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= UPGRADE_COST)) {
 				//upgradeMod++;
 				upgradeRanks[(int)upgrade]++;
 				resources -= UPGRADE_COST;
@@ -180,17 +188,24 @@ public class Player : NetworkBehaviour {
 		}
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
+	[Command]
+	void CmdChangeHealth(float setHealth, bool flatSet) {
+		if (flatSet) {
+			currentHealth = setHealth;
+		} else {
+			currentHealth += setHealth;
+		}
+	}
 	[ClientRpc]
 	void RpcRespawn() {
 		if (!isLocalPlayer) {
 			return;
 		}
-		CmdSpawnResources ();
+		//CmdSpawnResources ();
 		transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
-		currentHealth = BASE_MAX_HEALTH;
 	}
 
     private void UpdateInterface() {
@@ -213,7 +228,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (currMaxHealth - health) / 100.0f, 0.95f);
+		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (currMaxHealth - health) / currMaxHealth, 0.95f);
     }
     void OnChangeResources(int resources) {
         if (!isLocalPlayer) {
@@ -235,7 +250,7 @@ public class Player : NetworkBehaviour {
         }
         if (Input.GetKeyDown(down)) {
             //rb.AddForce(-transform.up * moveSpeed / 4);
-			ApplyDamage(10f);
+			//ApplyDamage(10f);
         }
 
     }
@@ -243,10 +258,13 @@ public class Player : NetworkBehaviour {
         if (!isServer) {
             return;
         }
-        currentHealth -= damage;
+		print ("DAMAGE! " + damage);
+		currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
 			RpcRespawn ();
+			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
+			CmdChangeHealth(currMaxHealth, true);
         }
     }
 	public void AddGold(int gold) {
@@ -330,13 +348,20 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 10.0f));
-		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 10.0f));
+		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 4.0f));
+		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 4.0f));
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
-		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 10.0f));
+		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
 		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
+
+		float oldMaxHealth = currMaxHealth;
+		currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks [(int)UpgradeID.HULL] / 2.0f));
+		if (oldMaxHealth != currMaxHealth) {
+			CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
+		}
+
         for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
-            upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + upgradeRanks[i];
+			upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + (upgradeRanks[i]+1);
         }
 
     }
