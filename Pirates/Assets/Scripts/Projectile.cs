@@ -5,12 +5,10 @@ using UnityEngine.Networking;
 public class Projectile : NetworkBehaviour {
     public float lifetime;
     public float damage = 10.0f;
-	public AudioClip shot;
 	public AudioClip hit;
 
 	// Use this for initialization
 	void Start () {
-		AudioSource.PlayClipAtPoint(shot, transform.position, 65.0f);
 	}
 	
 	// Update is called once per frame
@@ -25,4 +23,6 @@ public class Projectile : NetworkBehaviour {
         }
         Destroy(gameObject);
     }
+
+
 }

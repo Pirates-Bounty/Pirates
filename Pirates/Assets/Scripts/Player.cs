@@ -77,6 +77,8 @@ public class Player : NetworkBehaviour {
 	// ayy it's dem seagulls
 	public AudioClip seagullS;
 	private float seagullTimer = 10;
+	// other sounds
+	public AudioClip shotS;
 
 	private NetworkStartPosition[] spawnPoints;
 
@@ -131,12 +133,14 @@ public class Player : NetworkBehaviour {
             // fire cannons
 			if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive) {
                 // left cannon
+				AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
 				CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
             }
 			if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive) {
                 // right cannon
+				AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
 				CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
