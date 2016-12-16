@@ -127,10 +127,10 @@ GameObject:
   - 4: {fileID: 4000012422776088}
   - 50: {fileID: 50000012053015362}
   - 114: {fileID: 114000013203596488}
-  - 58: {fileID: 58000012769683596}
   - 82: {fileID: 82000011568010352}
   - 114: {fileID: 114000011368179012}
   - 114: {fileID: 114000014027217456}
+  - 60: {fileID: 60000010705179142}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -412,8 +412,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!58 &58000012769683596
-CircleCollider2D:
+--- !u!60 &60000010705179142
+PolygonCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
@@ -424,8 +424,13 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 3
+  m_Points:
+    m_Paths:
+    - - {x: -0.0572052, y: 8.418276}
+      - {x: 2.2585373, y: 2.4193115}
+      - {x: 1.007843, y: -4.8336143}
+      - {x: -1.0465546, y: -4.868866}
+      - {x: -2.256981, y: 2.2463627}
 --- !u!82 &82000011568010352
 AudioSource:
   m_ObjectHideFlags: 1
