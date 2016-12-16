@@ -160,7 +160,7 @@ public class Player : NetworkBehaviour {
 		for (int i = 0; i < damageStrength/10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * currProjectileSpeed;
-			instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
     }
@@ -169,7 +169,7 @@ public class Player : NetworkBehaviour {
 		for (int i = 0; i < damageStrength / 10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, rightSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * currProjectileSpeed;
-			instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
 	}
@@ -366,7 +366,7 @@ public class Player : NetworkBehaviour {
 		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 4.0f));
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
 		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
-		//currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
+		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
 
 		float oldMaxHealth = currMaxHealth;
 		currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks [(int)UpgradeID.HULL] / 2.0f));
