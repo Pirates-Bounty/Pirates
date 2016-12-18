@@ -79,6 +79,7 @@ public class Player : NetworkBehaviour {
 	private float seagullTimer = 10;
 	// other sounds
 	public AudioClip shotS;
+	public AudioClip turnS;
 
 	private NetworkStartPosition[] spawnPoints;
 
@@ -247,10 +248,12 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
-        if (Input.GetKey(left)) {
+		if (Input.GetKey(left)) {
+			if (Input.GetKeyDown(left)) AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(right)) {
+			if (Input.GetKeyDown(right)) AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(up)) {

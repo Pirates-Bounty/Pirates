@@ -6,6 +6,7 @@ public class Projectile : NetworkBehaviour {
     public float lifetime;
     public float damage = 10.0f;
 	public AudioClip hit;
+	public AudioClip splash;
 
 	// Use this for initialization
 	void Start () {
@@ -24,5 +25,7 @@ public class Projectile : NetworkBehaviour {
         Destroy(gameObject);
     }
 
-
+	void OnDestroy() {
+		AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
+	}
 }

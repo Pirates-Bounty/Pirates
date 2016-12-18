@@ -582,6 +582,7 @@ MonoBehaviour:
   currMaxHealth: 100
   seagullS: {fileID: 8300000, guid: 09e636280fff23342a5f5e3305217153, type: 3}
   shotS: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
+  turnS: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
 --- !u!114 &114000014027217456
 MonoBehaviour:
   m_ObjectHideFlags: 1
