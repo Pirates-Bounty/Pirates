@@ -165,13 +165,13 @@ MonoBehaviour:
   frequency: 15
   centerWeight: 7
   sprites:
-  - {fileID: 21300000, guid: 4089652f3920b604183ec6d06c6e07c6, type: 3}
-  - {fileID: 21300000, guid: 4089652f3920b604183ec6d06c6e07c6, type: 3}
-  - {fileID: 21300000, guid: 4089652f3920b604183ec6d06c6e07c6, type: 3}
+  - {fileID: 21300000, guid: 9904567c4169d4d3cafd1a025f376702, type: 3}
+  - {fileID: 21300000, guid: 3eff16a8442f9431991397c7f6a61f36, type: 3}
+  - {fileID: 21300000, guid: 05e95f906f4c24d52bdb94a29d67f39b, type: 3}
   colors:
-  - {r: 0, g: 0, b: 1, a: 1}
-  - {r: 0.15862082, g: 1, b: 0, a: 1}
-  - {r: 0.89705884, g: 0.73775357, b: 0.21766868, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
   seed: 200
   tileNames:
   - water
