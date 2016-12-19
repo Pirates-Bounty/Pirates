@@ -91,6 +91,7 @@ public class Player : NetworkBehaviour {
 	// other sounds
 	public AudioClip shotS;
 	public AudioClip turnS;
+	private float creakTimer = 0;
     public AudioClip ramS;
 
 	private NetworkStartPosition[] spawnPoints;
@@ -166,6 +167,7 @@ public class Player : NetworkBehaviour {
 
 	void FixedUpdate () {
 		UpdateSeagulls ();
+		creakTimer -= Time.deltaTime;
 	}
     [Command]   
 	void CmdFireLeft (int damageStrength) {
@@ -268,11 +270,17 @@ public class Player : NetworkBehaviour {
 
     private void GetMovement() {
 		if (Input.GetKey(left)) {
-			if (Input.GetKeyDown(left)) AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
+				creakTimer = 3.0f;
+				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+			}
             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(right)) {
-			if (Input.GetKeyDown(right)) AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
+				creakTimer = 3.0f;
+				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+			}
             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey(up)) {

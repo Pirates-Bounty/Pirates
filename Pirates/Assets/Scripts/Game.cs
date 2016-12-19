@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Game : MonoBehaviour {
@@ -6,6 +7,7 @@ public class Game : MonoBehaviour {
     public Player player1;
     public Player player2;
     public Player[] players;
+	//private AudioSource lobbyYo;
 
 
     const int MAX_PLAYERS = 2;
@@ -15,6 +17,7 @@ public class Game : MonoBehaviour {
         if (!Instance)
         {
             DontDestroyOnLoad(gameObject);
+			//lobbyYo = GetComponent<AudioSource>();
             Instance = this;
             players = new Player[MAX_PLAYERS];
             players[0] = player1;
@@ -50,7 +53,25 @@ public class Game : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		//if (SceneManager.GetActiveScene().name != "Lobby") {
+		//	lobbyYo.Stop();
+		//} else {
+		//	lobbyYo.UnPause(); // holy guacamole!
+		//}
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ayy its ur boy

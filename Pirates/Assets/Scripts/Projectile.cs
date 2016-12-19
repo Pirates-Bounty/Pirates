@@ -14,7 +14,11 @@ public class Projectile : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Destroy(gameObject, lifetime);
+		lifetime -= Time.deltaTime;
+		if (lifetime <= 0) {
+			AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
+			Destroy(gameObject);
+		}
 	}
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -24,8 +28,4 @@ public class Projectile : NetworkBehaviour {
         }
         Destroy(gameObject);
     }
-
-	void OnDestroy() {
-		AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
-	}
 }
