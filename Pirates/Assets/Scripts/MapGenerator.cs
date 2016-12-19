@@ -4,14 +4,14 @@ using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
 public class MapGenerator : MonoBehaviour {
-
     public int width;
     public int height;
     public float frequency;
     public float centerWeight;
     //public float amplitude;
     public Sprite[] sprites;
-    public Color[] colors;
+    // no longer needed because we have actual art instead of placeholders
+    //public Color[] colors;
     public int seed;
     public string[] tileNames;
     public int octaves = 3;
@@ -197,7 +197,7 @@ public class MapGenerator : MonoBehaviour {
                 GameObject Tile = new GameObject(tileNames[id]);
                 SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
                 sR.sprite = sprites[id];
-                sR.color = colors[id];
+                //sR.color = colors[id];
                 Tile.transform.position = tilePos;
                 Tile.transform.parent = transform;
 

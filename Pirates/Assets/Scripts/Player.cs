@@ -19,14 +19,23 @@ public class Player : NetworkBehaviour {
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
-    public const int MAX_UPGRADES = 4;
+    public const int MAX_UPGRADES = 2;
     public const int UPGRADE_COST = 100;
 
     [SyncVar(hook = "OnChangePlayer")]
 	public float currentHealth = BASE_MAX_HEALTH;
     [SyncVar(hook = "OnChangeResources")]
     public int resources = 1000;
-
+    public Sprite[] bases;
+    public Sprite[] sails;
+    public Sprite[] rudders;
+    public Sprite[] cannons;
+    public Sprite[] rams;
+    public GameObject boatBase;
+    public GameObject sail;
+    public GameObject rudder;
+    public GameObject cannon;
+    public GameObject ram;
     // keybinds and prefabs
     public KeyCode up;
     public KeyCode down;
@@ -196,6 +205,7 @@ public class Player : NetworkBehaviour {
 				resources += UPGRADE_COST;
 			}
 		}
+        UpdateSprites();
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
 	[Command]
@@ -217,7 +227,13 @@ public class Player : NetworkBehaviour {
 		dir = dir.normalized;
 		transform.up = dir;
 	}
-
+    void UpdateSprites() {
+        boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.CSTR]];
+        sail.GetComponent<SpriteRenderer>().sprite = sails[upgradeRanks[(int) UpgradeID.SPD]];
+        rudder.GetComponent<SpriteRenderer>().sprite = rudders[upgradeRanks[(int)UpgradeID.MNV]];
+        cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)UpgradeID.CSPD]];
+        ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)UpgradeID.HULL]];
+    }
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
             if (!inGameMenu) {
@@ -362,6 +378,7 @@ public class Player : NetworkBehaviour {
 
     public override void OnStartLocalPlayer() {
         //GetComponent<SpriteRenderer>().color = Color.red;
+        UpdateSprites();
     }
 
     private void UpdateVariables() {
