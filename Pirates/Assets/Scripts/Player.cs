@@ -22,6 +22,8 @@ public class Player : NetworkBehaviour {
     public const int MAX_UPGRADES = 2;
     public const int UPGRADE_COST = 100;
 
+    public const float RAM_DAMAGE = 20.0f;
+
     [SyncVar(hook = "OnChangePlayer")]
 	public float currentHealth = BASE_MAX_HEALTH;
     [SyncVar(hook = "OnChangeResources")]
@@ -89,6 +91,7 @@ public class Player : NetworkBehaviour {
 	// other sounds
 	public AudioClip shotS;
 	public AudioClip turnS;
+    public AudioClip ramS;
 
 	private NetworkStartPosition[] spawnPoints;
 
@@ -293,6 +296,16 @@ public class Player : NetworkBehaviour {
 			RpcRespawn ();
 			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
 			CmdChangeHealth(currMaxHealth, true);
+        }
+    }
+    public void OnCollisionEnter2D(Collision2D collision) {
+
+        //if rammed
+        if (collision.gameObject.CompareTag("Player")) {
+            if(collision.collider.GetType() == typeof(BoxCollider2D)) {
+                ApplyDamage(RAM_DAMAGE);
+                AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            }
         }
     }
 	public void AddGold(int gold) {
