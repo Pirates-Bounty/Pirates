@@ -15,7 +15,7 @@ public enum Upgrade {
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
-    public const float BASE_PROJECTILE_SPEED = 75.0f;
+    public const float BASE_PROJECTILE_SPEED = 140.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
