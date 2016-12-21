@@ -194,11 +194,14 @@ public class Player : NetworkBehaviour {
 		}
 	}
 	[Command]
-	void CmdSpawnResources() {
-		GameObject instantiatedResource = (GameObject)Instantiate(resourceObj, transform.position, Quaternion.identity);
-		//instantiatedResource.GetComponent<Rigidbody2D>().velocity = rightSpawn.up * currProjectileSpeed;
-		NetworkServer.Spawn(instantiatedResource);
-	}
+	void CmdSpawnResources(Vector3 pos) {
+        if (!isServer)
+        {
+            return;
+        }
+        GameObject instantiatedResource = Instantiate(resourceObj,pos,Quaternion.identity) as GameObject;
+        NetworkServer.Spawn(instantiatedResource);
+    }
 	[Command]
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
 		//int upgradeMod = 0;
@@ -231,9 +234,11 @@ public class Player : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			return;
 		}
-		//CmdSpawnResources ();
+        
+        Vector3 pos = transform.position;
 		transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-		Vector3 dir = -transform.position;
+        CmdSpawnResources(pos);
+        Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
 	}
