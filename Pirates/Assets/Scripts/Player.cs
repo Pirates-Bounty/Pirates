@@ -193,12 +193,12 @@ public class Player : NetworkBehaviour {
 		}
 	}
 	[Command]
-	void CmdSpawnResources() {
+	void CmdSpawnResources(Vector3 pos) {
         if (!isServer)
         {
             return;
         }
-        GameObject instantiatedResource = Instantiate(resourceObj,transform.position,Quaternion.identity) as GameObject;
+        GameObject instantiatedResource = Instantiate(resourceObj,pos,Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
 	[Command]
@@ -236,7 +236,7 @@ public class Player : NetworkBehaviour {
         
         Vector3 pos = transform.position;
 		transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-        CmdSpawnResources();
+        CmdSpawnResources(pos);
         Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
