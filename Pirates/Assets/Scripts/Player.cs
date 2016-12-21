@@ -7,22 +7,22 @@ public enum Upgrade {
     MANEUVERABILITY, //rotation speed
     SPEED, // move speed
     HULL_STRENGTH, // health
-    CANNON_SPEED, // cannon firing time
+    //CANNON_SPEED, // cannon firing time
+	RAM_STRENGTH, // ram damage
     CANNON_STRENGTH, // cannon damage
     COUNT //num items in the enum
 }
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
-    public const float BASE_PROJECTILE_SPEED = 50.0f;
+    public const float BASE_PROJECTILE_SPEED = 75.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
-    public const int MAX_UPGRADES = 2;
+    public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
-
-    public const float RAM_DAMAGE = 20.0f;
+	public const float BASE_RAM_DAMAGE = 20.0f;
 
     [SyncVar(hook = "OnChangePlayer")]
 	public float currentHealth = BASE_MAX_HEALTH;
@@ -77,7 +77,8 @@ public class Player : NetworkBehaviour {
 	public float currMoveSpeed = BASE_MOVE_SPEED;
 	public float currRotationSpeed = BASE_ROTATION_SPEED;
 	public float currFiringDelay = BASE_FIRING_DELAY;
-	public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
+	//public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
+	public float currRamDamage = BASE_RAM_DAMAGE;
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
@@ -101,7 +102,7 @@ public class Player : NetworkBehaviour {
 		MNV,
 		SPD,
 		HULL,
-		CSPD,
+		RSTR,
 		CSTR
 	}
 
@@ -180,7 +181,7 @@ public class Player : NetworkBehaviour {
 		//print (damageStrength);
 		for (int i = 0; i < damageStrength/10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
-			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * currProjectileSpeed;
+			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED;
 			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
@@ -189,7 +190,7 @@ public class Player : NetworkBehaviour {
 	void CmdFireRight(int damageStrength) {
 		for (int i = 0; i < damageStrength / 10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, rightSpawners[i].position, Quaternion.identity);
-			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * currProjectileSpeed;
+			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * BASE_PROJECTILE_SPEED;
 			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
@@ -241,11 +242,11 @@ public class Player : NetworkBehaviour {
 		transform.up = dir;
 	}
     void UpdateSprites() {
-        boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.CSTR]];
+		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
         sail.GetComponent<SpriteRenderer>().sprite = sails[upgradeRanks[(int) UpgradeID.SPD]];
         rudder.GetComponent<SpriteRenderer>().sprite = rudders[upgradeRanks[(int)UpgradeID.MNV]];
-        cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)UpgradeID.CSPD]];
-        ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)UpgradeID.HULL]];
+        cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)UpgradeID.CSTR]];
+		ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)UpgradeID.RSTR]];
     }
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
@@ -331,7 +332,7 @@ public class Player : NetworkBehaviour {
         //if rammed
         if (collision.gameObject.CompareTag("Player")) {
             if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-                ApplyDamage(RAM_DAMAGE);
+				ApplyDamage(currRamDamage);
                 AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
                 //3 second invulnerability before you can take ram damage again
                 coroutine = RamInvuln();
@@ -418,8 +419,8 @@ public class Player : NetworkBehaviour {
                 return "Speed";
             case Upgrade.HULL_STRENGTH:
                 return "Hull Strength";
-            case Upgrade.CANNON_SPEED:
-                return "Cannon Speed";
+			case Upgrade.RAM_STRENGTH:
+                return "Ram Strength";
             case Upgrade.CANNON_STRENGTH:
                 return "Cannon Strength";
             default:
@@ -433,10 +434,11 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 4.0f));
-		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 4.0f));
+		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
+		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 3.0f));
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
-		currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
+		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
+		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)UpgradeID.RSTR] / 1.5f));
 		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
 
 		float oldMaxHealth = currMaxHealth;
@@ -446,7 +448,7 @@ public class Player : NetworkBehaviour {
 		}
 
         for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
-			upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + (upgradeRanks[i]+1);
+			upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + (upgradeRanks[i]);
         }
 
     }
