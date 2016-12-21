@@ -105,6 +105,10 @@ public class Player : NetworkBehaviour {
 		CSTR
 	}
 
+    //ramming cooldown
+    private IEnumerator coroutine;
+    private bool invuln = false;
+
 
     // Use this for initialization
     void Start () {
@@ -307,15 +311,24 @@ public class Player : NetworkBehaviour {
         }
     }
     public void OnCollisionEnter2D(Collision2D collision) {
-
         //if rammed
         if (collision.gameObject.CompareTag("Player")) {
-            if(collision.collider.GetType() == typeof(BoxCollider2D)) {
+            if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
                 ApplyDamage(RAM_DAMAGE);
                 AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+                //3 second invulnerability before you can take ram damage again
+                coroutine = RamInvuln();
+                StartCoroutine(coroutine);
             }
         }
     }
+    private IEnumerator RamInvuln() {
+        //make player invulnerable to ramming for X seconds (currently 3)
+         invuln = true;
+         yield return new WaitForSeconds(3);
+         invuln = false;
+    }
+
 	public void AddGold(int gold) {
 		if (!isServer) {
 			return;
