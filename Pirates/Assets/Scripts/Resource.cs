@@ -15,12 +15,13 @@ public class Resource : NetworkBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		Destroy(gameObject, lifetime);
+		//Destroy(gameObject, lifetime);
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {
 		if (collision.gameObject.CompareTag("Player")) {
 			collision.gameObject.SendMessage("AddGold", gold);
+            GameObject.Find("MapGenerator").SendMessage("CmdSpawnResource");
 			//AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
 		}
 		Destroy(gameObject);

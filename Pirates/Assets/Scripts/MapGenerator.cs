@@ -3,13 +3,14 @@ using System.Collections;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
-public class MapGenerator : MonoBehaviour {
+public class MapGenerator : NetworkBehaviour {
     public int width;
     public int height;
     public float frequency;
     public float centerWeight;
     //public float amplitude;
     public Sprite[] sprites;
+    public GameObject resourcePrefab;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
     public int seed;
@@ -18,14 +19,18 @@ public class MapGenerator : MonoBehaviour {
     public int[,] map;
     public int quadWidth;
     public int quadHeight;
+    private int maxResources;
     private Transform canvas;
     private Camera minMap;
     private Sprite minMapBorder;
+    private bool addResources = false;
 
     
 
     void Awake()
     {
+
+        maxResources = Mathf.RoundToInt((width + height) / 50);
         Generate();
         GenerateGameObjects();
         minMap = GameObject.Find("MinCam").GetComponent<Camera>();
@@ -87,12 +92,23 @@ public class MapGenerator : MonoBehaviour {
             
             //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
         }
+
+    }
+    void Start()
+    {
+
+        Random.InitState(System.DateTime.Now.Millisecond);
+        for (int i = 0; i < maxResources; i++)
+        {
+
+            CmdSpawnResource();
+        }
     }
 
     // Use this for initialization
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
 
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -101,8 +117,19 @@ public class MapGenerator : MonoBehaviour {
             GenerateGameObjects();
         }
 
+
+
+
 	
 	}
+
+    [Command]
+    void CmdSpawnResource()
+    {
+        ClientScene.RegisterPrefab(resourcePrefab);
+        GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
+        NetworkServer.Spawn(instantiatedResource);
+    }
 
     void DeleteChildren()
     {

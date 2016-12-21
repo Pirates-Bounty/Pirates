@@ -142,6 +142,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 134104758}
   - 114: {fileID: 134104757}
+  - 114: {fileID: 134104759}
   m_Layer: 0
   m_Name: MapGenerator
   m_TagString: Untagged
@@ -168,18 +169,16 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9904567c4169d4d3cafd1a025f376702, type: 3}
   - {fileID: 21300000, guid: 3eff16a8442f9431991397c7f6a61f36, type: 3}
   - {fileID: 21300000, guid: 05e95f906f4c24d52bdb94a29d67f39b, type: 3}
-  colors:
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
+  resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
+    type: 2}
   seed: 200
   tileNames:
   - water
   - grass
   - sand
   octaves: 4
-  quadWidth: 0
-  quadHeight: 0
+  quadWidth: 5
+  quadHeight: 5
 --- !u!4 &134104758
 Transform:
   m_ObjectHideFlags: 0
@@ -193,6 +192,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
+--- !u!114 &134104759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 134104756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 0
+    i1: 0
+    i2: 0
+    i3: 0
+    i4: 0
+    i5: 0
+    i6: 0
+    i7: 0
+    i8: 0
+    i9: 0
+    i10: 0
+    i11: 0
+    i12: 0
+    i13: 0
+    i14: 0
+    i15: 0
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!1 &233450272
 GameObject:
   m_ObjectHideFlags: 0
