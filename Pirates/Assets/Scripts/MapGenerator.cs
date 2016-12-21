@@ -126,6 +126,10 @@ public class MapGenerator : NetworkBehaviour {
     [Command]
     void CmdSpawnResource()
     {
+        if (!isServer)
+        {
+            return;
+        }
         ClientScene.RegisterPrefab(resourcePrefab);
         GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
