@@ -138,6 +138,8 @@ public class Player : NetworkBehaviour {
     }
 
 	void Update () {
+        
+
         // networking check
         if (!isLocalPlayer) {
             return;
@@ -234,10 +236,7 @@ public class Player : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			return;
 		}
-        
-        Vector3 pos = transform.position;
-		transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-        CmdSpawnResources(pos);
+        StartCoroutine(Death());
         Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
@@ -303,6 +302,19 @@ public class Player : NetworkBehaviour {
         }
 
     }
+
+    IEnumerator Death()
+    {
+        GetComponent<Collider2D>().enabled = false;
+        CmdSpawnResources(transform.position);
+        yield return new WaitForSeconds(2f);
+        transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+        GetComponent<Collider2D>().enabled = true;
+        Debug.Log("Die2");
+    }
+
+
+
     public void ApplyDamage(float damage) {
         if (!isServer) {
             return;
