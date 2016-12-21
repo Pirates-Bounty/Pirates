@@ -96,6 +96,7 @@ public class Player : NetworkBehaviour {
     public AudioClip ramS;
 
 	private NetworkStartPosition[] spawnPoints;
+    private bool dead;
 
 	public enum UpgradeID
 	{
@@ -117,6 +118,7 @@ public class Player : NetworkBehaviour {
 		{
 			upgradeRanks.Add (0);
 		}
+        dead = false;
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -137,39 +139,53 @@ public class Player : NetworkBehaviour {
 		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
     }
 
-	void Update () {
-        
+    void Update()
+    {
+        //if (Input.GetKeyDown(KeyCode.V))
+        //{
+        //    RpcRespawn();
+        //}
 
         // networking check
-        if (!isLocalPlayer) {
+        if (!isLocalPlayer)
+        {
             return;
         }
+
+        if (!dead)
+        {
+
+        
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
         // get player's movement
         GetMovement();
 
         firingTimer -= Time.deltaTime;
-        if (firingTimer < 0) {
+        if (firingTimer < 0)
+        {
             // fire cannons
-			if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive) {
+            if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive)
+            {
                 // left cannon
-				AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
-				CmdFireLeft((int)currProjectileStrength);
+                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
             }
-			if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive) {
+            if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive)
+            {
                 // right cannon
-				AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
-				CmdFireRight((int)currProjectileStrength);
+                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
             }
         }
         UpdateInterface();
         UpdateVariables();
-		//CmdDisplayHealth ();
+        //CmdDisplayHealth ();
+    }
     }
 
 	void FixedUpdate () {
@@ -305,12 +321,15 @@ public class Player : NetworkBehaviour {
 
     IEnumerator Death()
     {
+        dead = true;
         GetComponent<Collider2D>().enabled = false;
         CmdSpawnResources(transform.position);
+        
         yield return new WaitForSeconds(2f);
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
         GetComponent<Collider2D>().enabled = true;
-        Debug.Log("Die2");
+        CmdChangeHealth(currMaxHealth, true);
+        dead = false;
     }
 
 
