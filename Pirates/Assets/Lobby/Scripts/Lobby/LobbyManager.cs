@@ -263,6 +263,7 @@ namespace Prototype.NetworkLobby
         public void OnPlayersNumberModified(int count)
         {
             _playerNumber += count;
+            numPlayers = _playerNumber;
 
             int localPlayerCount = 0;
             foreach (PlayerController p in ClientScene.localPlayers)
@@ -386,6 +387,7 @@ namespace Prototype.NetworkLobby
                 }
             }
             numPlayers = _playerNumber;
+            Debug.Log(numPlayers);
             ServerChangeScene(playScene);
         }
 
