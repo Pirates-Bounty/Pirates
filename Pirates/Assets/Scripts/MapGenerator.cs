@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
@@ -24,6 +25,7 @@ public class MapGenerator : NetworkBehaviour {
     private Camera minMap;
     private Sprite minMapBorder;
     private bool addResources = false;
+    private  List<GameObject> spawns = new List<GameObject>();
 
     
 
@@ -56,6 +58,8 @@ public class MapGenerator : NetworkBehaviour {
             bool spawnable = false;
             GameObject Spawner = new GameObject();
             Spawner.AddComponent<NetworkStartPosition>();
+            Spawner.AddComponent<NetworkIdentity>();
+            Spawner.AddComponent<NetworkTransform>();
             int x = (int)(rad * Mathf.Cos(deg * i));
             int y = (int)(rad * Mathf.Sin(deg * i));
             //Checks to see if a good spot to spawn the spawnPoints
@@ -89,6 +93,8 @@ public class MapGenerator : NetworkBehaviour {
             Vector3 dir = -Spawner.transform.position;
             dir = dir.normalized;
             Spawner.transform.up = dir;
+            spawns.Add(Spawner);
+            
             
             //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
         }
@@ -102,6 +108,10 @@ public class MapGenerator : NetworkBehaviour {
         {
 
             CmdSpawnResource();
+        }
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            NetworkServer.Spawn(spawns[i]);
         }
     }
 

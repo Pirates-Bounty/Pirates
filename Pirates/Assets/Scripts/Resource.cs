@@ -22,8 +22,9 @@ public class Resource : NetworkBehaviour {
 		if (collision.gameObject.CompareTag("Player")) {
 			collision.gameObject.SendMessage("AddGold", gold);
             GameObject.Find("MapGenerator").SendMessage("CmdSpawnResource");
-			//AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
-		}
-		Destroy(gameObject);
+            Destroy(gameObject);
+            //AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
+        }
+		
 	}
 }

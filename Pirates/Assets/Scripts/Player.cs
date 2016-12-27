@@ -1,5 +1,6 @@
 ﻿ using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
@@ -94,9 +95,10 @@ public class Player : NetworkBehaviour {
 	public AudioClip turnS;
 	private float creakTimer = 0;
     public AudioClip ramS;
+    private List<NetworkStartPosition> spawnPoints = new List<NetworkStartPosition>();
 
-	private NetworkStartPosition[] spawnPoints;
-    private bool dead;
+    [SyncVar]
+    public bool dead;
 
 	public enum UpgradeID
 	{
@@ -118,6 +120,11 @@ public class Player : NetworkBehaviour {
 		{
 			upgradeRanks.Add (0);
 		}
+
+        foreach (NetworkStartPosition n in FindObjectsOfType<NetworkStartPosition>())
+        {
+            spawnPoints.Add(n);
+        }
         dead = false;
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
@@ -136,15 +143,15 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         CreateUpgradeMenu();
 
-		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
     }
+
 
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.V))
-        //{
-        //    RpcRespawn();
-        //}
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            RpcRespawn();
+        }
 
         // networking check
         if (!isLocalPlayer)
@@ -152,14 +159,13 @@ public class Player : NetworkBehaviour {
             return;
         }
 
-        if (!dead)
-        {
 
-        
-        // update the camera's position
-        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
+
+
+            // update the camera's position
+            playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
         // get player's movement
-        GetMovement();
+            GetMovement();
 
         firingTimer -= Time.deltaTime;
         if (firingTimer < 0)
@@ -185,7 +191,6 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
-    }
     }
 
 	void FixedUpdate () {
@@ -236,7 +241,7 @@ public class Player : NetworkBehaviour {
 				resources += UPGRADE_COST;
 			}
 		}
-        UpdateSprites();
+        //UpdateSprites();
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
 	[Command]
@@ -249,14 +254,27 @@ public class Player : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcRespawn() {
-		if (!isLocalPlayer) {
+		if (!isServer) {
 			return;
 		}
-        StartCoroutine(Death());
+        Vector3 pos = transform.position;
+        Debug.Log("Respawn");
+        Debug.Log(spawnPoints.Count);
+        Debug.Log(spawnPoints[Random.Range(0, spawnPoints.Count)]);
+        transform.position = spawnPoints[Random.Range(0, spawnPoints.Count)].transform.position;
+        Debug.Log("move");
+        //CmdSpawnResources(pos);
+        //StartCoroutine(Death(pos));
+        
         Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
+        Debug.Log("Done");
 	}
+
+   
+
+
     void UpdateSprites() {
 		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
         sail.GetComponent<SpriteRenderer>().sprite = sails[upgradeRanks[(int) UpgradeID.SPD]];
@@ -319,20 +337,34 @@ public class Player : NetworkBehaviour {
 
     }
 
-    IEnumerator Death()
+    
+    IEnumerator Death(Vector3 pos)
     {
-        dead = true;
-        GetComponent<Collider2D>().enabled = false;
-        CmdSpawnResources(transform.position);
+        //dead = true;
+        //string tag = gameObject.tag;
+        //gameObject.tag = "deadPlayer";
+        //GetComponent<Collider2D>().enabled = false;
+        //GetComponent<Rigidbody2D>().isKinematic = true;
+       
         
         yield return new WaitForSeconds(2f);
-        transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-        GetComponent<Collider2D>().enabled = true;
-        CmdChangeHealth(currMaxHealth, true);
-        dead = false;
+        
+        //GetComponent<Collider2D>().enabled = true;
+        //CmdChangeHealth(currMaxHealth, true);
+        //GetComponent<Rigidbody2D>().isKinematic = false;
+        //gameObject.tag = tag;
+        //dead = false;
     }
 
-
+    //[ClientRpc]
+    //public void RpcMoveObjectOverNetwork(Vector3 pos)
+    //{
+    //    if (!isServer)
+    //    {
+    //        return;
+    //    }
+    //    transform.position = pos;
+    //}
 
     public void ApplyDamage(float damage) {
         if (!isServer) {
@@ -449,7 +481,10 @@ public class Player : NetworkBehaviour {
 
     public override void OnStartLocalPlayer() {
         //GetComponent<SpriteRenderer>().color = Color.red;
-        UpdateSprites();
+        //UpdateSprites();
+        base.OnStartLocalPlayer();
+
+
     }
 
     private void UpdateVariables() {
