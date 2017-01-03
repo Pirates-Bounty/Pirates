@@ -52,6 +52,7 @@ public class Player : NetworkBehaviour {
     public Transform rightSpawn;
 	public Transform[] leftSpawners;
 	public Transform[] rightSpawners;
+    public Transform[] frontSpawners;
     public GameObject projectile;
 	public GameObject resourceObj;
 
@@ -183,19 +184,27 @@ public class Player : NetworkBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradeMenuActive)
             {
-                // triple volley
+                // triple volley - fire all at once
                 AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
-                firingTimer = currFiringDelay;
+                firingTimer = currFiringDelay; //+2.0f;
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradeMenuActive)
             {
-                // triple volley
+                // triple shotgun spray
                 AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
-                firingTimer = currFiringDelay;
+                firingTimer = currFiringDelay; //+2.0f;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradeMenuActive)
+            {
+                // front shot
+                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                CmdFireBowChaser((int)currProjectileStrength);
+                // reset timer
+                firingTimer = currFiringDelay+0.7f; //+2.0f;
             }
         }
         UpdateInterface();
@@ -256,6 +265,16 @@ public class Player : NetworkBehaviour {
             instantiatedProjectile3.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
             NetworkServer.Spawn (instantiatedProjectile3);
+    }
+    [Command]
+    void CmdFireBowChaser (int damageStrength) {
+        //forward firing cannon
+        for (int i = 0; i < damageStrength/10; i++) {
+            GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, frontSpawners[0].position, Quaternion.identity);
+            instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = frontSpawners[0].up * BASE_PROJECTILE_SPEED;
+            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+            NetworkServer.Spawn (instantiatedProjectile);
+        }
     }
 	[Command]
 	void CmdSpawnResources(Vector3 pos) {

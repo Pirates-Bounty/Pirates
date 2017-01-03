@@ -211,7 +211,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000012977446516}
   m_Layer: 9
-  m_Name: Right Spawn (3)
+  m_Name: Front Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -227,6 +227,21 @@ GameObject:
   - 4: {fileID: 4000014116878790}
   m_Layer: 9
   m_Name: Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1000013677100692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000012282985304}
+  m_Layer: 9
+  m_Name: Right Spawn (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -357,6 +372,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4000014116878790}
   m_RootOrder: 0
+--- !u!4 &4000012282985304
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013677100692}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 4.3, y: -2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_Children: []
+  m_Father: {fileID: 4000012422776088}
+  m_RootOrder: 10
 --- !u!4 &4000012422776088
 Transform:
   m_ObjectHideFlags: 1
@@ -378,6 +406,7 @@ Transform:
   - {fileID: 4000013022544964}
   - {fileID: 4000010182058004}
   - {fileID: 4000012956816234}
+  - {fileID: 4000012282985304}
   - {fileID: 4000012977446516}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -426,13 +455,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012899001434}
-  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 4.3, y: -2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.12, y: 9.68, z: 0}
+  m_LocalScale: {x: 1.0000007, y: 1.0000007, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 4000012422776088}
-  m_RootOrder: 10
+  m_RootOrder: 11
 --- !u!4 &4000012986799966
 Transform:
   m_ObjectHideFlags: 1
@@ -732,6 +761,8 @@ MonoBehaviour:
   - {fileID: 4000013022544964}
   - {fileID: 4000010182058004}
   - {fileID: 4000012956816234}
+  - {fileID: 4000012282985304}
+  frontSpawners:
   - {fileID: 4000012977446516}
   projectile: {fileID: 1000010212112084, guid: 3aca032176df9a7408df6ea6e345a0d2, type: 2}
   resourceObj: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
