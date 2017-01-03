@@ -181,6 +181,22 @@ public class Player : NetworkBehaviour {
                 // reset timer
                 firingTimer = currFiringDelay;
             }
+            if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradeMenuActive)
+            {
+                // triple volley
+                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                CmdFireLeftVolley((int)currProjectileStrength);
+                // reset timer
+                firingTimer = currFiringDelay;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradeMenuActive)
+            {
+                // triple volley
+                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                CmdFireLeftTriple((int)currProjectileStrength);
+                // reset timer
+                firingTimer = currFiringDelay;
+            }
         }
         UpdateInterface();
         UpdateVariables();
@@ -211,6 +227,36 @@ public class Player : NetworkBehaviour {
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
 	}
+    [Command]
+    void CmdFireLeftVolley (int damageStrength) {
+        //triple volley shot
+        for (int i = 0; i < 3; i++) {
+            GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
+            instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED/2;
+            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+            NetworkServer.Spawn (instantiatedProjectile);
+        }
+    }
+    [Command]
+    void CmdFireLeftTriple (int damageStrength) {
+        //triple spread shot
+
+            GameObject instantiatedProjectile1 = (GameObject)Instantiate (projectile, leftSpawners[0].position, Quaternion.identity);
+            instantiatedProjectile1.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, 45) * leftSpawners[0].up * BASE_PROJECTILE_SPEED;
+            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+            NetworkServer.Spawn (instantiatedProjectile1);
+
+            //angled 45 degrees backward
+            GameObject instantiatedProjectile2 = (GameObject)Instantiate (projectile, leftSpawners[1].position, Quaternion.identity);
+            instantiatedProjectile2.GetComponent<Rigidbody2D> ().velocity = leftSpawners[1].up * BASE_PROJECTILE_SPEED;
+            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+            NetworkServer.Spawn (instantiatedProjectile2);
+
+            GameObject instantiatedProjectile3 = (GameObject)Instantiate (projectile, leftSpawners[2].position, Quaternion.identity);
+            instantiatedProjectile3.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
+            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+            NetworkServer.Spawn (instantiatedProjectile3);
+    }
 	[Command]
 	void CmdSpawnResources(Vector3 pos) {
         if (!isServer)
