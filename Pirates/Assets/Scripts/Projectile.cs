@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 public class Projectile : NetworkBehaviour {
     public float lifetime;
     public float damage = 10.0f;
+	public int assignedID = -1;
 	public AudioClip hit;
 	public AudioClip splash;
 
@@ -23,7 +24,8 @@ public class Projectile : NetworkBehaviour {
 
     void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Player")) {
-            collision.gameObject.SendMessage("ApplyDamage", damage);
+            //collision.gameObject.SendMessage("ApplyDamage", damage);
+			collision.gameObject.GetComponent<Player>().ApplyDamage(damage, assignedID);
 			AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
         }
         Destroy(gameObject);

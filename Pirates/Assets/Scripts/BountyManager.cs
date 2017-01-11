@@ -1,0 +1,99 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.Networking;
+
+public class BountyManager : NetworkBehaviour {
+
+	public const int BASE_BOUNTY = 100;
+
+	public SyncListInt playerBounties = new SyncListInt();
+	public SyncListInt killStreak = new SyncListInt();
+
+	private GameObject bountyPanel;
+	private List<GameObject> bountyTexts = new List<GameObject>();
+	private Canvas canvas;
+	private Font font;
+
+	// Use this for initialization
+	void Start () {
+		font = Resources.Load<Font>("Art/Fonts/riesling");
+
+		if (!isLocalPlayer) {
+			return;
+		}
+		canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+		if (canvas != null) {
+			CreateBountyPanel ();
+			//print ("makin' a bounty board");
+		}
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		if (canvas == null) {
+			canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+			if (canvas != null) {
+				CreateBountyPanel ();
+				//print ("makin' a bounty board (late)");
+			}
+		}
+
+		if (playerBounties.Count > 0) {
+			Player[] playerList = FindObjectsOfType<Player> ();
+
+			for (int i = 0; i < playerList.Length; i++) {
+				if (isServer) {
+					int upgradeBounty = 10 * (int)Mathf.Floor (playerList [i].lowUpgrades / 2)
+					                   + 25 * playerList [i].midUpgrades
+					                   + 100 * playerList [i].highUpgrades;
+					int killStreakBounty = 50 * killStreak [playerList [i].playerID];
+					playerBounties [playerList [i].playerID] = BASE_BOUNTY + upgradeBounty + killStreakBounty;
+				}
+
+				if (bountyTexts.Count <= i) {
+					if (bountyPanel != null) {
+						//print ("postin' a bounty (late)");
+						bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + i + " | " + playerBounties [i], font, Color.black, 24, bountyPanel.transform,
+							Vector3.zero, new Vector2 (0.1f, 1.0f / 4f * (3-i)), new Vector2 (0.9f, 1.0f / 4f * (4-i)), TextAnchor.MiddleCenter, true));
+					}
+				} else {
+					bountyTexts [i].GetComponent<Text> ().text = "Player " + (i+1) + "  |  " + playerBounties [i];
+				}
+			}
+		}
+	}
+
+	public int AddID () {
+		int newID = playerBounties.Count;
+		playerBounties.Add (100);
+		killStreak.Add (0);
+		if (bountyPanel != null) {
+			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID], font, Color.black, 24, bountyPanel.transform,
+				Vector3.zero, new Vector2 (0.1f, 1.0f / 5f * newID), new Vector2 (0.9f, 1.0f / 5f * (newID+1)), TextAnchor.MiddleCenter, true));
+		}
+		/* need to adjust this later to deal with a more variable number of players */
+		return newID;
+	}
+
+	public void ReportHit (int loser, int winner) {
+		killStreak [winner] += 1;
+		killStreak [loser] = 0;
+		//playerBounties [loser] = 100;
+
+		Player[] playerList = FindObjectsOfType<Player> ();
+		for (int i = 0; i < playerList.Length; i++) {
+			if (playerList [i].playerID == winner) {
+				playerList[i].AddGold(playerBounties[loser]);
+			}
+		}
+	}
+
+
+	private void CreateBountyPanel() {
+		bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(1.0f, 1.0f, 1.0f, 0.65f), canvas.transform,
+			Vector3.zero, new Vector2(0.02f, 0.75f), new Vector3(0.18f, 0.95f));
+	}
+}

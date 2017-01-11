@@ -24,6 +24,13 @@ public class Player : NetworkBehaviour {
     public const int UPGRADE_COST = 100;
 	public const float BASE_RAM_DAMAGE = 20.0f;
 
+	[SyncVar]
+	public int playerID = -2;
+	[SyncVar]
+	public int lowUpgrades = 0;
+	public int midUpgrades = 0;
+	public int highUpgrades = 0;
+
     [SyncVar(hook = "OnChangePlayer")]
 	public float currentHealth = BASE_MAX_HEALTH;
     [SyncVar(hook = "OnChangeResources")]
@@ -69,6 +76,7 @@ public class Player : NetworkBehaviour {
     private GameObject inGameMenu;
     private GameObject upgradeMenu;
     private GameObject[] upgradeTexts = new GameObject[(int)Upgrade.COUNT];
+	private GameObject[] costTexts = new GameObject[(int)Upgrade.COUNT];
     private GameObject resourcesText;
     private Sprite menuBackground;
     private Rigidbody2D rb;
@@ -115,6 +123,14 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
+		if (isServer) {
+			//print ("Adding to bounty manager, here we go.");
+			GameObject bm = GameObject.Find ("BountyManager");
+			if (bm != null) {
+				playerID = bm.GetComponent<BountyManager> ().AddID ();
+			}
+		}
+
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
 		{
 			upgradeRanks.Add (0);
@@ -138,11 +154,20 @@ public class Player : NetworkBehaviour {
         CreateUpgradeMenu();
 
 		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
     }
 
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.V))
+		if (playerID < 0 && isServer) {
+			//print ("Better late than never, adding to bounty manager.");
+			GameObject bm = GameObject.Find ("BountyManager");
+			if (bm != null) {
+				playerID = bm.GetComponent<BountyManager> ().AddID ();
+			}
+		}
+
+		//if (Input.GetKeyDown(KeyCode.V))
         //{
         //    RpcRespawn();
         //}
@@ -224,6 +249,7 @@ public class Player : NetworkBehaviour {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED;
 			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
     }
@@ -233,6 +259,7 @@ public class Player : NetworkBehaviour {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, rightSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * BASE_PROJECTILE_SPEED;
 			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
 	}
@@ -243,6 +270,7 @@ public class Player : NetworkBehaviour {
             GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED/2;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile);
         }
     }
@@ -253,17 +281,20 @@ public class Player : NetworkBehaviour {
             GameObject instantiatedProjectile1 = (GameObject)Instantiate (projectile, leftSpawners[0].position, Quaternion.identity);
             instantiatedProjectile1.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, 45) * leftSpawners[0].up * BASE_PROJECTILE_SPEED;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile1.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile1);
 
             //angled 45 degrees backward
             GameObject instantiatedProjectile2 = (GameObject)Instantiate (projectile, leftSpawners[1].position, Quaternion.identity);
             instantiatedProjectile2.GetComponent<Rigidbody2D> ().velocity = leftSpawners[1].up * BASE_PROJECTILE_SPEED;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile2.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile2);
 
             GameObject instantiatedProjectile3 = (GameObject)Instantiate (projectile, leftSpawners[2].position, Quaternion.identity);
             instantiatedProjectile3.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile3.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile3);
     }
     [Command]
@@ -273,6 +304,7 @@ public class Player : NetworkBehaviour {
             GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, frontSpawners[0].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = frontSpawners[0].up * BASE_PROJECTILE_SPEED;
             //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
+			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile);
         }
     }
@@ -289,18 +321,48 @@ public class Player : NetworkBehaviour {
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
 		//int upgradeMod = 0;
 		if (positive) {
-			if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= UPGRADE_COST)) {
+			int upgradePrice = UPGRADE_COST;
+			switch (upgradeRanks [(int)upgrade]) {
+			case 0:
+				break;
+			case 1:
+				upgradePrice *= 5;
+				break;
+			case 2:
+				upgradePrice *= 20;
+				break;
+			default:
+				upgradePrice *= 50;
+				print ("That's a pricy upgrade...");
+				break;
+			}
+
+			if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= upgradePrice)) {
 				//upgradeMod++;
 				upgradeRanks[(int)upgrade]++;
-				resources -= UPGRADE_COST;
+				resources -= upgradePrice;
+				switch (upgradeRanks [(int)upgrade]) {
+				case 1:
+					lowUpgrades++;
+					break;
+				case 2:
+					midUpgrades++;
+					break;
+				case 3:
+					highUpgrades++;
+					break;
+				default:
+					print ("Erm, unexpected upgrade rank");
+					break;
+				}
 			}
-		} else {
+		} /*else {
 			if (upgradeRanks[(int)upgrade] > 0) {
 				//upgradeMod--;
 				upgradeRanks[(int)upgrade]--;
 				resources += UPGRADE_COST;
 			}
-		}
+		}*/
         UpdateSprites();
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
@@ -379,7 +441,7 @@ public class Player : NetworkBehaviour {
         }
         if (Input.GetKeyDown(down)) {
             //rb.AddForce(-transform.up * moveSpeed / 4);
-			//ApplyDamage(10f);
+			//ApplyDamage(10f, playerID);
         }
 
     }
@@ -399,24 +461,29 @@ public class Player : NetworkBehaviour {
 
 
 
-    public void ApplyDamage(float damage) {
-        if (!isServer) {
+	public void ApplyDamage(float damage, int enemyID) {
+		if (!isServer || dead) {
             return;
         }
-		print ("DAMAGE! " + damage);
+		//print ("DAMAGE! " + damage);
 		currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
 			RpcRespawn ();
 			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
 			CmdChangeHealth(currMaxHealth, true);
+
+			GameObject bm = GameObject.Find ("BountyManager");
+			if (bm != null) {
+				bm.GetComponent<BountyManager> ().ReportHit (playerID, enemyID);
+			}
         }
     }
     public void OnCollisionEnter2D(Collision2D collision) {
         //if rammed
         if (collision.gameObject.CompareTag("Player")) {
             if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-				ApplyDamage(currRamDamage);
+				ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
                 AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
                 //3 second invulnerability before you can take ram damage again
                 coroutine = RamInvuln();
@@ -470,21 +537,24 @@ public class Player : NetworkBehaviour {
     }
 
     private void CreateUpgradeMenu() {
-        upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, Color.white, canvas.transform,
+		upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, new Color(1.0f, 1.0f, 1.0f, 0.85f), canvas.transform,
             Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
         for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
             // creating this extra variable because delegates don't work on for loop variables for some reason
             int dupe = i;
             // Upgrade Minus Button
-            GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
-                sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });
+            /*GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
+                sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });/**/
             // Upgrade Plus Button
             GameObject upgradePlusButton = UI.CreateButton("Plus Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
-                sprite, highlightedSprite, Vector3.zero, new Vector2(0.8f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.9f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
+                sprite, highlightedSprite, Vector3.zero, new Vector2(0.6f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
             // Upgrade Text
             upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
-                Vector3.zero, new Vector2(0.3f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+                Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+			costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
+				Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
         }
+		//UpdateVariables ();
         upgradeMenu.SetActive(upgradeMenuActive);
     }
 
@@ -519,7 +589,7 @@ public class Player : NetworkBehaviour {
 
     private void UpdateVariables() {
 		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
-		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 3.0f));
+		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 2.0f));
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
 		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
 		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)UpgradeID.RSTR] / 1.5f));
@@ -533,6 +603,16 @@ public class Player : NetworkBehaviour {
 
         for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
 			upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + (upgradeRanks[i]);
+			//costTexts [i].GetComponent<Text> ().text = upgradePrices[i] + "g";
+			if (upgradeRanks [i] == 0) {
+				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST + "g";
+			} else if (upgradeRanks [i] == 1) {
+				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST * 5 + "g";
+			} else if (upgradeRanks [i] == 2) {
+				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST * 20 + "g";
+			} else {
+				costTexts [i].GetComponent<Text> ().text = "SOLD OUT";
+			}
         }
 
     }
