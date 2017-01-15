@@ -145,8 +145,8 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        sprite = Resources.Load<Sprite>("Art/Textures/Button");
-        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
+        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         if (!isLocalPlayer) {
