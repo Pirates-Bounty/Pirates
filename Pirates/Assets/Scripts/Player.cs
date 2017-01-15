@@ -15,7 +15,7 @@ public enum Upgrade {
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
-    public const float BASE_PROJECTILE_SPEED = 140.0f;
+    public const float BASE_PROJECTILE_SPEED = 70.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
@@ -93,6 +93,7 @@ public class Player : NetworkBehaviour {
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
+	public float currVelocity = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
@@ -145,8 +146,8 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        sprite = Resources.Load<Sprite>("Art/Textures/Button");
-        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
+        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         if (!isLocalPlayer) {
@@ -314,10 +315,6 @@ public class Player : NetworkBehaviour {
     }
 	[Command]
 	void CmdSpawnResources(Vector3 pos) {
-        if (!isServer)
-        {
-            return;
-        }
         GameObject instantiatedResource = Instantiate(resourceObj,pos,Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
@@ -439,15 +436,23 @@ public class Player : NetworkBehaviour {
 			}
             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
-        if (Input.GetKey(up)) {
-            transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
+		if (Input.GetKey (up)) {
+			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
+			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
-        }
-        else if (Input.GetKey(down)) {
-			transform.Translate(0.0f, -currMoveSpeed/4 * Time.deltaTime, 0.0f);
+		} else if (Input.GetKey (down)) {
+			currVelocity = Mathf.Max(-currMoveSpeed/4f, currVelocity - currMoveSpeed*0.75f * Time.deltaTime);
+			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
-        }
+		} else {
+			if (currVelocity > 0) {
+				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
+			} else if (currVelocity < 0) {
+				currVelocity = Mathf.Min (0f, currVelocity + currMoveSpeed / 2f * Time.deltaTime);
+			}
+		}
+		transform.Translate (0.0f, currVelocity * Time.deltaTime, 0.0f);
 
     }
 
@@ -487,16 +492,46 @@ public class Player : NetworkBehaviour {
     }
     public void OnCollisionEnter2D(Collision2D collision) {
         //if rammed
-        if (collision.gameObject.CompareTag("Player")) {
-            if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-				ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
-                AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-                //3 second invulnerability before you can take ram damage again
-                coroutine = RamInvuln();
-                StartCoroutine(coroutine);
-            }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
+        // Debug.Log(transform.position + " " + hit.point);
+        // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
+
+        // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
+        // print(hit.collider.tag);
+        if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage, playerID);
+            AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            //3 second invulnerability before you can take ram damage again
+            collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
+            collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
         }
-    }
+
+        //latest version, doesnt work tho
+       // RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
+       //  // Debug.Log(transform.position + " " + hit.point);
+       //  // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
+
+       //  // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
+       //  print(hit.collider.tag);
+       //  if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+       //      Player enemy = collision.gameObject.GetComponent<Player>();
+       //      enemy.ApplyDamage(currRamDamage, playerID);
+       //      AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+       //      //3 second invulnerability before you can take ram damage again
+       //      enemy.StartCoroutine(enemy.RamInvuln());
+       //  }
+
+
+    //     if (collision.gameObject.CompareTag("Player")) {
+    //         if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
+                // ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
+    //             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+    //             //3 second invulnerability before you can take ram damage again
+    //             coroutine = RamInvuln();
+    //             StartCoroutine(coroutine);
+    //         }
+    //     }
     private IEnumerator RamInvuln() {
         //make player invulnerable to ramming for X seconds (currently 3)
          invuln = true;
