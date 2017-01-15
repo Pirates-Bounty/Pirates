@@ -15,7 +15,7 @@ public enum Upgrade {
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
-    public const float BASE_PROJECTILE_SPEED = 140.0f;
+    public const float BASE_PROJECTILE_SPEED = 70.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
@@ -93,6 +93,7 @@ public class Player : NetworkBehaviour {
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
+	public float currVelocity = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
@@ -313,10 +314,6 @@ public class Player : NetworkBehaviour {
     }
 	[Command]
 	void CmdSpawnResources(Vector3 pos) {
-        if (!isServer)
-        {
-            return;
-        }
         GameObject instantiatedResource = Instantiate(resourceObj,pos,Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
@@ -438,15 +435,23 @@ public class Player : NetworkBehaviour {
 			}
             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
-        if (Input.GetKey(up)) {
-            transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
+		if (Input.GetKey (up)) {
+			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
+			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
-        }
-        else if (Input.GetKey(down)) {
-			transform.Translate(0.0f, -currMoveSpeed/4 * Time.deltaTime, 0.0f);
+		} else if (Input.GetKey (down)) {
+			currVelocity = Mathf.Max(-currMoveSpeed/4f, currVelocity - currMoveSpeed*0.75f * Time.deltaTime);
+			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
-        }
+		} else {
+			if (currVelocity > 0) {
+				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
+			} else if (currVelocity < 0) {
+				currVelocity = Mathf.Min (0f, currVelocity + currMoveSpeed / 2f * Time.deltaTime);
+			}
+		}
+		transform.Translate (0.0f, currVelocity * Time.deltaTime, 0.0f);
 
     }
 
