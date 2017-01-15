@@ -105,6 +105,7 @@ public class Player : NetworkBehaviour {
 	public AudioClip turnS;
 	private float creakTimer = 0;
     public AudioClip ramS;
+    public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
     private bool dead;
@@ -473,6 +474,7 @@ public class Player : NetworkBehaviour {
 		currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
+            AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
 			RpcRespawn ();
 			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
 			CmdChangeHealth(currMaxHealth, true);
