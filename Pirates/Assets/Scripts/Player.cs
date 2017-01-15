@@ -64,6 +64,7 @@ public class Player : NetworkBehaviour {
     public Transform[] frontSpawners;
     public GameObject projectile;
 	public GameObject resourceObj;
+	public GameObject deathExplode;
 
 
     private Camera playerCamera;
@@ -108,7 +109,7 @@ public class Player : NetworkBehaviour {
     public AudioClip ramS;
 
 	private NetworkStartPosition[] spawnPoints;
-    private bool dead;
+    public bool dead;
 
 	public enum UpgradeID
 	{
@@ -177,14 +178,10 @@ public class Player : NetworkBehaviour {
 
 		UpdateSprites ();
         // networking check
-        if (!isLocalPlayer)
+        if (!isLocalPlayer || dead)
         {
             return;
         }
-
-        if (!dead)
-        {
-
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
@@ -239,7 +236,6 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
-    }
     }
 
 	void FixedUpdate () {
@@ -380,9 +376,8 @@ public class Player : NetworkBehaviour {
 			return;
 		}
         StartCoroutine(Death());
-        Vector3 dir = -transform.position;
-		dir = dir.normalized;
-		transform.up = dir;
+		GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
+		NetworkServer.Spawn(instantiatedResource);
 	}
     void UpdateSprites() {
 		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
@@ -459,12 +454,17 @@ public class Player : NetworkBehaviour {
     {
         dead = true;
         GetComponent<Collider2D>().enabled = false;
-        CmdSpawnResources(transform.position);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+        //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		Vector3 dir = -transform.position;
+		dir = dir.normalized;
+		transform.up = dir;
         GetComponent<Collider2D>().enabled = true;
         CmdChangeHealth(currMaxHealth, true);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
         dead = false;
     }
 
@@ -479,8 +479,6 @@ public class Player : NetworkBehaviour {
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
 			RpcRespawn ();
-			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
-			CmdChangeHealth(currMaxHealth, true);
 
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
