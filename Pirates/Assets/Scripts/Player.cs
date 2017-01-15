@@ -106,6 +106,7 @@ public class Player : NetworkBehaviour {
 	public AudioClip turnS;
 	private float creakTimer = 0;
     public AudioClip ramS;
+    public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
     private bool dead;
@@ -145,8 +146,8 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        sprite = Resources.Load<Sprite>("Art/Textures/Button");
-        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
+        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         if (!isLocalPlayer) {
@@ -489,6 +490,7 @@ public class Player : NetworkBehaviour {
 		currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
+            AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
 			RpcRespawn ();
 			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
 			CmdChangeHealth(currMaxHealth, true);
@@ -501,14 +503,19 @@ public class Player : NetworkBehaviour {
     }
     public void OnCollisionEnter2D(Collision2D collision) {
         //if rammed
-        if (collision.gameObject.CompareTag("Player")) {
-            if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-				ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
-                AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-                //3 second invulnerability before you can take ram damage again
-                coroutine = RamInvuln();
-                StartCoroutine(coroutine);
-            }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
+        // Debug.Log(transform.position + " " + hit.point);
+        // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
+
+        // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
+        // print(hit.collider.tag);
+        if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage, playerID);
+            AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            //3 second invulnerability before you can take ram damage again
+            collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
+            collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
         }
     }
     private IEnumerator RamInvuln() {
