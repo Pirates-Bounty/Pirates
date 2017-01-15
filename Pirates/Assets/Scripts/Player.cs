@@ -28,7 +28,9 @@ public class Player : NetworkBehaviour {
 	public int playerID = -2;
 	[SyncVar]
 	public int lowUpgrades = 0;
+	[SyncVar]
 	public int midUpgrades = 0;
+	[SyncVar]
 	public int highUpgrades = 0;
 
     [SyncVar(hook = "OnChangePlayer")]
@@ -172,6 +174,7 @@ public class Player : NetworkBehaviour {
         //    RpcRespawn();
         //}
 
+		UpdateSprites ();
         // networking check
         if (!isLocalPlayer)
         {
@@ -363,7 +366,7 @@ public class Player : NetworkBehaviour {
 				resources += UPGRADE_COST;
 			}
 		}*/
-        UpdateSprites();
+        //UpdateSprites();
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
 	[Command]
@@ -437,10 +440,11 @@ public class Player : NetworkBehaviour {
         }
         if (Input.GetKey(up)) {
             transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
-            //rb.AddForce(transform.up * moveSpeed);
+			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
         }
-        if (Input.GetKeyDown(down)) {
-            //rb.AddForce(-transform.up * moveSpeed / 4);
+        else if (Input.GetKey(down)) {
+			transform.Translate(0.0f, -currMoveSpeed/4 * Time.deltaTime, 0.0f);
+			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
         }
 
@@ -563,6 +567,7 @@ public class Player : NetworkBehaviour {
 			return;
 		}
 		CmdUpgrade (upgrade, positive);
+		//UpdateSprites ();
     }
 
     public static string UpgradeToString(Upgrade upgrade) {
@@ -584,7 +589,7 @@ public class Player : NetworkBehaviour {
 
     public override void OnStartLocalPlayer() {
         //GetComponent<SpriteRenderer>().color = Color.red;
-        UpdateSprites();
+        //UpdateSprites();
     }
 
     private void UpdateVariables() {

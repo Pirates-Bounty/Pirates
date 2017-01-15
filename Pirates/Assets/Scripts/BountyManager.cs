@@ -56,7 +56,7 @@ public class BountyManager : NetworkBehaviour {
 				if (bountyTexts.Count <= i) {
 					if (bountyPanel != null) {
 						//print ("postin' a bounty (late)");
-						bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + i + " | " + playerBounties [i], font, Color.black, 24, bountyPanel.transform,
+						bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + i + " | " + playerBounties [i] + "g", font, Color.black, 24, bountyPanel.transform,
 							Vector3.zero, new Vector2 (0.1f, 1.0f / 4f * (3-i)), new Vector2 (0.9f, 1.0f / 4f * (4-i)), TextAnchor.MiddleCenter, true));
 					}
 				} else {
@@ -71,7 +71,7 @@ public class BountyManager : NetworkBehaviour {
 		playerBounties.Add (100);
 		killStreak.Add (0);
 		if (bountyPanel != null) {
-			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID], font, Color.black, 24, bountyPanel.transform,
+			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
 				Vector3.zero, new Vector2 (0.1f, 1.0f / 5f * newID), new Vector2 (0.9f, 1.0f / 5f * (newID+1)), TextAnchor.MiddleCenter, true));
 		}
 		/* need to adjust this later to deal with a more variable number of players */
