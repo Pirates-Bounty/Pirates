@@ -30,4 +30,6 @@ public class Projectile : NetworkBehaviour {
         }
         Destroy(gameObject);
     }
+
+    
 }

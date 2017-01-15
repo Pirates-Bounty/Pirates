@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 49bdba789343dbf4991e9a1f7521dcd4
+timeCreated: 1484455319
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - highlightAudio: {fileID: 8300000, guid: 7d528b7453c02934f804392ef040fd1c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
