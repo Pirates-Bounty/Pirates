@@ -421,26 +421,37 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
-		if (Input.GetKey(left)) {
+		if (Input.GetKey(left)) { // click left
 			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity*0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
+
         if (Input.GetKey(right)) {
 			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
-		if (Input.GetKey (up)) {
+        if (Input.GetKey (up)) {
 			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
 			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			currVelocity = Mathf.Max(-currMoveSpeed/4f, currVelocity - currMoveSpeed*0.75f * Time.deltaTime);
+			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
