@@ -504,32 +504,7 @@ public class Player : NetworkBehaviour {
             collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
             collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
         }
-
-        //latest version, doesnt work tho
-       // RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
-       //  // Debug.Log(transform.position + " " + hit.point);
-       //  // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
-
-       //  // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
-       //  print(hit.collider.tag);
-       //  if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-       //      Player enemy = collision.gameObject.GetComponent<Player>();
-       //      enemy.ApplyDamage(currRamDamage, playerID);
-       //      AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-       //      //3 second invulnerability before you can take ram damage again
-       //      enemy.StartCoroutine(enemy.RamInvuln());
-       //  }
-
-
-    //     if (collision.gameObject.CompareTag("Player")) {
-    //         if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-                // ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
-    //             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-    //             //3 second invulnerability before you can take ram damage again
-    //             coroutine = RamInvuln();
-    //             StartCoroutine(coroutine);
-    //         }
-    //     }
+    }
     private IEnumerator RamInvuln() {
         //make player invulnerable to ramming for X seconds (currently 3)
          invuln = true;
