@@ -311,7 +311,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000013770813618}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.13, y: -0, z: 0}
+  m_LocalPosition: {x: -4.65, y: -0, z: 0}
   m_LocalScale: {x: 1.0000005, y: 1.0000005, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
@@ -492,7 +492,7 @@ Transform:
   m_GameObject: {fileID: 1000013763186498}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8, y: 1.8, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 4000014116878790}
@@ -543,7 +543,7 @@ PolygonCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -1.59}
   m_Points:
     m_Paths:
     - - {x: -0.0572052, y: 8.418276}
@@ -675,30 +675,30 @@ MonoBehaviour:
   currentHealth: 100
   resources: 1000
   bases:
-  - {fileID: 21300000, guid: aa779f1000a6a8547b9b20f830b4aa72, type: 3}
-  - {fileID: 21300000, guid: 11f71cb4b154b274c90484d237c93e2f, type: 3}
-  - {fileID: 21300000, guid: 6ff48628abc2e3540ac2af26e115fb6b, type: 3}
-  - {fileID: 21300000, guid: 7457ed2c8ebc534499e61ef8637426fa, type: 3}
+  - {fileID: 21300000, guid: 84006ae870dc442649385f311c99b558, type: 3}
+  - {fileID: 21300000, guid: 19824cbeb66b14df1980429ef4a785c6, type: 3}
+  - {fileID: 21300000, guid: 4adfe2075b324481294fe21f66b78a73, type: 3}
+  - {fileID: 21300000, guid: 2e53fe3da8eeb4a0d97d5c17548ab954, type: 3}
   sails:
   - {fileID: 0}
-  - {fileID: 21300000, guid: dd4a1d09aa7039a4ca1d288d88ce80c3, type: 3}
-  - {fileID: 21300000, guid: 32703bc6758021848a06811603a29f14, type: 3}
-  - {fileID: 21300000, guid: 74c30e0b621aabb44a46694ac55c3780, type: 3}
+  - {fileID: 21300000, guid: b78956acc5129443ca500ee737671c3f, type: 3}
+  - {fileID: 21300000, guid: 05661d08214be4110b7f177f2f613164, type: 3}
+  - {fileID: 21300000, guid: 93c59194892b043ff98f9469e14d06f1, type: 3}
   rudders:
   - {fileID: 0}
-  - {fileID: 21300000, guid: e5b9807d680649a449c1fde1049ac392, type: 3}
-  - {fileID: 21300000, guid: ce47b471f144723479995df693e228d2, type: 3}
-  - {fileID: 21300000, guid: ce47b471f144723479995df693e228d2, type: 3}
+  - {fileID: 21300000, guid: ab86bf69380b44b1c9b54abcf9b38635, type: 3}
+  - {fileID: 21300000, guid: 9fa875509e7c1432690ae0abee960679, type: 3}
+  - {fileID: 21300000, guid: 10eeaf97626aa4fbf9f6e83ac856f11b, type: 3}
   cannons:
-  - {fileID: 21300000, guid: 073b6cffcc4e7b143bde39f715df2d39, type: 3}
-  - {fileID: 21300000, guid: 8e76cad6c33eb454493f9ad486912dee, type: 3}
-  - {fileID: 21300000, guid: c4d1f0ae8ed5898428d3e340f06cb6bb, type: 3}
-  - {fileID: 21300000, guid: a83dffff8168c254cad3d01665657272, type: 3}
+  - {fileID: 21300000, guid: b8783f367d363435d8acb0bc7f52abc0, type: 3}
+  - {fileID: 21300000, guid: 975f2aa8e923f442d93694981e63b998, type: 3}
+  - {fileID: 21300000, guid: ecf57d98ef749454c9c4315044786dc5, type: 3}
+  - {fileID: 21300000, guid: dfba9456ead9f4136ab02e5e975aad02, type: 3}
   rams:
   - {fileID: 0}
-  - {fileID: 21300000, guid: e7433ca95387667449deb02acecdc199, type: 3}
-  - {fileID: 21300000, guid: 868bd8aeedd677c4eac2119acd5caf7b, type: 3}
-  - {fileID: 21300000, guid: 868bd8aeedd677c4eac2119acd5caf7b, type: 3}
+  - {fileID: 21300000, guid: 4a541d0e5ace9468185b98bba8536d9b, type: 3}
+  - {fileID: 21300000, guid: d82c4c604c6b946aea172087cc745a3c, type: 3}
+  - {fileID: 21300000, guid: 4f043f733fc794874b9a96955bee550f, type: 3}
   boatBase: {fileID: 1000010675962168}
   sail: {fileID: 1000012704796274}
   rudder: {fileID: 1000010882218576}
@@ -727,6 +727,7 @@ MonoBehaviour:
   projectile: {fileID: 1000010212112084, guid: 3aca032176df9a7408df6ea6e345a0d2, type: 2}
   resourceObj: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
+  deathExplode: {fileID: 0}
   currMoveSpeed: 10
   currRotationSpeed: 25
   currFiringDelay: 0.3
@@ -740,6 +741,7 @@ MonoBehaviour:
   turnS: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
   ramS: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
+  dead: 0
 --- !u!114 &114000014027217456
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -789,7 +791,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4a541d0e5ace9468185b98bba8536d9b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -822,7 +824,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: aa779f1000a6a8547b9b20f830b4aa72, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 84006ae870dc442649385f311c99b558, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -855,7 +857,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: ab86bf69380b44b1c9b54abcf9b38635, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -888,7 +890,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 8e76cad6c33eb454493f9ad486912dee, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 975f2aa8e923f442d93694981e63b998, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -921,7 +923,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: b78956acc5129443ca500ee737671c3f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
