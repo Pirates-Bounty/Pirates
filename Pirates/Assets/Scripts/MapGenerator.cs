@@ -225,38 +225,51 @@ public class MapGenerator : NetworkBehaviour {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
 
                 int id = map[i, j];
-                GameObject Tile = new GameObject(tileNames[id]);
-                SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
-                sR.sprite = sprites[id];
-                //sR.color = colors[id];
-                Tile.transform.position = tilePos;
-                Tile.transform.parent = transform;
 
-
-
-                switch (map[i, j])
+                //Don't want to spawn water tiles if we don't need to
+                //We already have seperate water tile background so only spawn water tiles that create
+                //boundary for the map
+                if (map[i, j] != (int)TileType.WATER || (i == 0 || j == 0 || i == width - 1 || j == height - 1))
                 {
-                    case (int)TileType.WATER:
-                        if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                    GameObject Tile = new GameObject(tileNames[id]);
+
+                    //Don't add a sprite renderer to boundary water tiles
+                    if(map[i,j] != (int)TileType.WATER)
+                    {
+                        SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                        sR.sprite = sprites[id];
+                    }
+                    //sR.color = colors[id];
+                    Tile.transform.position = tilePos;
+                    Tile.transform.parent = transform;
+
+
+
+
+                    switch (map[i, j])
+                    {
+                        case (int)TileType.WATER:
+                            {
+                                Tile.AddComponent<BoxCollider2D>();
+                            }
+                            //Change Sprite
+
+                            //Move parts out, only have switch for gameObject
+                            break;
+
+
+                        case (int)TileType.GRASS:
                             Tile.AddComponent<BoxCollider2D>();
-                        }
-                        //Change Sprite
-
-                        //Move parts out, only have switch for gameObject
-                        break;
+                            break;
 
 
-                    case (int)TileType.GRASS:
-                        Tile.AddComponent<BoxCollider2D>();
-                        break;
+                        case (int)TileType.SAND:
+                            Tile.AddComponent<BoxCollider2D>();
+                            break;
+                        default:
 
-
-                    case (int)TileType.SAND:
-                        Tile.AddComponent<BoxCollider2D>();
-                        break;
-                    default:
-                        
-                        break;
+                            break;
+                    }
                 }
                 
             }
