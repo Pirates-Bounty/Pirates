@@ -3253,6 +3253,7 @@ MonoBehaviour:
   m_LobbyScene: Lobby
   m_PlayScene: Main
   lobbySlots: []
+  MapGen: {fileID: 0}
   prematchCountdown: 3
   topPanel: {fileID: 11424994}
   mainMenuPanel: {fileID: 22442386}

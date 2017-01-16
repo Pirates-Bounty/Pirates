@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using Prototype.NetworkLobby;
 public enum Upgrade {
     MANEUVERABILITY, //rotation speed
     SPEED, // move speed
@@ -133,7 +134,13 @@ public class Player : NetworkBehaviour {
 			if (bm != null) {
 				playerID = bm.GetComponent<BountyManager> ().AddID ();
 			}
-		}
+
+
+
+
+
+        }
+
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
 		{
@@ -157,26 +164,60 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         CreateUpgradeMenu();
 
-		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
+
+
+
+
+       
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        
+        if (!isLocalPlayer)
+        {
+            spawnPlayer(0);
+        }
+        
+    }
+
+    public void spawnPlayer(int ind)
+    {
+        if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
+        {
+            transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
+            GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
+        }
+        else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
+        {
+            return;
+        }
+        else
+        {
+            spawnPlayer(ind + 1);
+        }
     }
 
     void Update()
     {
-		if (playerID < 0 && isServer) {
-			//print ("Better late than never, adding to bounty manager.");
-			GameObject bm = GameObject.Find ("BountyManager");
-			if (bm != null) {
-				playerID = bm.GetComponent<BountyManager> ().AddID ();
-			}
-		}
+        if (playerID < 0 && isServer)
+        {
+            //print ("Better late than never, adding to bounty manager.");
+            GameObject bm = GameObject.Find("BountyManager");
+            if (bm != null)
+            {
+                playerID = bm.GetComponent<BountyManager>().AddID();
+            }
+        }
 
-		//if (Input.GetKeyDown(KeyCode.V))
+        //if (Input.GetKeyDown(KeyCode.V))
         //{
         //    RpcRespawn();
         //}
 
-		UpdateSprites ();
+        UpdateSprites ();
         // networking check
         if (!isLocalPlayer)
         {

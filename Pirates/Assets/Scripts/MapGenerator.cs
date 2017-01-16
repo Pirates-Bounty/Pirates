@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
-public class MapGenerator : NetworkBehaviour {
+public class MapGenerator : MonoBehaviour {
     public int width;
     public int height;
     public float frequency;
@@ -25,19 +25,21 @@ public class MapGenerator : NetworkBehaviour {
     private Sprite minMapBorder;
     private bool addResources = false;
 
+
+
     
 
     void Awake()
     {
-
+        DontDestroyOnLoad(gameObject);
         maxResources = Mathf.RoundToInt((width + height) / 50);
         Generate();
         GenerateGameObjects();
-        minMap = GameObject.Find("MinCam").GetComponent<Camera>();
-        minMap.orthographicSize = width / 2;
-        canvas = GameObject.Find("Canvas").transform;
-        minMapBorder = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Mini Map Border");
-        UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
+        //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
+        //minMap.orthographicSize = width / 2;
+        //canvas = GameObject.Find("Canvas").transform;
+        //minMapBorder = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Mini Map Border");
+        //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
 
         int numPlayers = LobbyManager.numPlayers;
 
@@ -55,7 +57,10 @@ public class MapGenerator : NetworkBehaviour {
         {
             bool spawnable = false;
             GameObject Spawner = new GameObject();
+            DontDestroyOnLoad(Spawner);
             Spawner.AddComponent<NetworkStartPosition>();
+            Spawner.AddComponent<SpawnScript>();
+            Spawner.tag = "spawner";
             int x = (int)(rad * Mathf.Cos(deg * i));
             int y = (int)(rad * Mathf.Sin(deg * i));
             //Checks to see if a good spot to spawn the spawnPoints
@@ -89,7 +94,8 @@ public class MapGenerator : NetworkBehaviour {
             Vector3 dir = -Spawner.transform.position;
             dir = dir.normalized;
             Spawner.transform.up = dir;
-            
+            NetworkManager.RegisterStartPosition(Spawner.transform);
+
             //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
         }
 
@@ -101,7 +107,7 @@ public class MapGenerator : NetworkBehaviour {
         for (int i = 0; i < maxResources; i++)
         {
 
-            CmdSpawnResource();
+            //CmdSpawnResource();
         }
     }
 
@@ -123,17 +129,17 @@ public class MapGenerator : NetworkBehaviour {
 	
 	}
 
-    [Command]
-    void CmdSpawnResource()
-    {
-        if (!isServer)
-        {
-            return;
-        }
-        ClientScene.RegisterPrefab(resourcePrefab);
-        GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
-        NetworkServer.Spawn(instantiatedResource);
-    }
+    //[Command]
+    //void CmdSpawnResource()
+    //{
+    //    if (!isServer)
+    //    {
+    //        return;
+    //    }
+    //    ClientScene.RegisterPrefab(resourcePrefab);
+    //    GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
+    //    NetworkServer.Spawn(instantiatedResource);
+    //}
 
     void DeleteChildren()
     {
