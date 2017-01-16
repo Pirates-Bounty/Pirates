@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using Prototype.NetworkLobby;
 public enum Upgrade {
     MANEUVERABILITY, //rotation speed
     SPEED, // move speed
@@ -64,6 +65,7 @@ public class Player : NetworkBehaviour {
     public Transform[] frontSpawners;
     public GameObject projectile;
 	public GameObject resourceObj;
+	public GameObject deathExplode;
 
 
     private Camera playerCamera;
@@ -109,7 +111,7 @@ public class Player : NetworkBehaviour {
     public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
-    private bool dead;
+    public bool dead;
 
 	public enum UpgradeID
 	{
@@ -133,7 +135,13 @@ public class Player : NetworkBehaviour {
 			if (bm != null) {
 				playerID = bm.GetComponent<BountyManager> ().AddID ();
 			}
-		}
+
+
+
+
+
+        }
+
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
 		{
@@ -157,35 +165,65 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         CreateUpgradeMenu();
 
-		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
+
+
+
+
+       
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        
+        if (!isLocalPlayer)
+        {
+            spawnPlayer(0);
+        }
+        
+    }
+
+    public void spawnPlayer(int ind)
+    {
+        if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
+        {
+            transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
+            GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
+        }
+        else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
+        {
+            return;
+        }
+        else
+        {
+            spawnPlayer(ind + 1);
+        }
     }
 
     void Update()
     {
-		if (playerID < 0 && isServer) {
-			//print ("Better late than never, adding to bounty manager.");
-			GameObject bm = GameObject.Find ("BountyManager");
-			if (bm != null) {
-				playerID = bm.GetComponent<BountyManager> ().AddID ();
-			}
-		}
+        if (playerID < 0 && isServer)
+        {
+            //print ("Better late than never, adding to bounty manager.");
+            GameObject bm = GameObject.Find("BountyManager");
+            if (bm != null)
+            {
+                playerID = bm.GetComponent<BountyManager>().AddID();
+            }
+        }
 
-		//if (Input.GetKeyDown(KeyCode.V))
+        //if (Input.GetKeyDown(KeyCode.V))
         //{
         //    RpcRespawn();
         //}
 
-		UpdateSprites ();
+        UpdateSprites ();
         // networking check
-        if (!isLocalPlayer)
+        if (!isLocalPlayer || dead)
         {
             return;
         }
-
-        if (!dead)
-        {
-
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
@@ -240,7 +278,6 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
-    }
     }
 
 	void FixedUpdate () {
@@ -381,9 +418,8 @@ public class Player : NetworkBehaviour {
 			return;
 		}
         StartCoroutine(Death());
-        Vector3 dir = -transform.position;
-		dir = dir.normalized;
-		transform.up = dir;
+		GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
+		NetworkServer.Spawn(instantiatedResource);
 	}
     void UpdateSprites() {
 		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
@@ -422,26 +458,37 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
-		if (Input.GetKey(left)) {
+		if (Input.GetKey(left)) { // click left
 			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity*0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
+
         if (Input.GetKey(right)) {
 			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
-		if (Input.GetKey (up)) {
+        if (Input.GetKey (up)) {
 			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
 			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			currVelocity = Mathf.Max(-currMoveSpeed/4f, currVelocity - currMoveSpeed*0.75f * Time.deltaTime);
+			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
@@ -460,12 +507,17 @@ public class Player : NetworkBehaviour {
     {
         dead = true;
         GetComponent<Collider2D>().enabled = false;
-        CmdSpawnResources(transform.position);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+        //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		Vector3 dir = -transform.position;
+		dir = dir.normalized;
+		transform.up = dir;
         GetComponent<Collider2D>().enabled = true;
         CmdChangeHealth(currMaxHealth, true);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
         dead = false;
     }
 
@@ -481,8 +533,6 @@ public class Player : NetworkBehaviour {
         if (currentHealth <= 0.0f) {
             AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
 			RpcRespawn ();
-			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
-			CmdChangeHealth(currMaxHealth, true);
 
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -506,32 +556,7 @@ public class Player : NetworkBehaviour {
             collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
             collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
         }
-
-        //latest version, doesnt work tho
-       // RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
-       //  // Debug.Log(transform.position + " " + hit.point);
-       //  // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
-
-       //  // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
-       //  print(hit.collider.tag);
-       //  if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-       //      Player enemy = collision.gameObject.GetComponent<Player>();
-       //      enemy.ApplyDamage(currRamDamage, playerID);
-       //      AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-       //      //3 second invulnerability before you can take ram damage again
-       //      enemy.StartCoroutine(enemy.RamInvuln());
-       //  }
-
-
-    //     if (collision.gameObject.CompareTag("Player")) {
-    //         if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-                // ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
-    //             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-    //             //3 second invulnerability before you can take ram damage again
-    //             coroutine = RamInvuln();
-    //             StartCoroutine(coroutine);
-    //         }
-    //     }
+    }
     private IEnumerator RamInvuln() {
         //make player invulnerable to ramming for X seconds (currently 3)
          invuln = true;
