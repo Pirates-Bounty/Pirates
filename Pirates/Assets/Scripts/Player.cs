@@ -13,6 +13,10 @@ public enum Upgrade {
     CANNON_STRENGTH, // cannon damage
     COUNT //num items in the enum
 }
+public enum DamageType {
+    CANNON,
+    RAM
+}
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
@@ -550,7 +554,7 @@ public class Player : NetworkBehaviour {
         // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
         // print(hit.collider.tag);
         if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage, playerID);
+            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage*(currVelocity/currMoveSpeed), playerID);
             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
             //3 second invulnerability before you can take ram damage again
             collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
