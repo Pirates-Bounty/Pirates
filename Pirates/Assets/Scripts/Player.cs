@@ -451,8 +451,11 @@ public class Player : NetworkBehaviour {
         dead = true;
         GetComponent<Collider2D>().enabled = false;
         CmdSpawnResources(transform.position);
-        
-        yield return new WaitForSeconds(2f);
+        //RIGHT HERE - ANIMATION & SOUND
+        //-- before death
+        yield return new WaitForSeconds(2f); //respawn time
+        //-- after respawn
+        //IN CASE YOU WANT ONCE THE SHIP RESPAWN!!!
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
         GetComponent<Collider2D>().enabled = true;
         CmdChangeHealth(currMaxHealth, true);
@@ -545,9 +548,14 @@ public class Player : NetworkBehaviour {
             // Upgrade Minus Button
             /*GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
                 sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });/**/
-            // Upgrade Plus Button
+            // Upgrade Plus Buttofn
             GameObject upgradePlusButton = UI.CreateButton("Plus Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
                 sprite, highlightedSprite, Vector3.zero, new Vector2(0.6f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
+            //NOTE - ADD SOUNDS HERE!!!
+            UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
+            entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
+            //entry_highlight.callback.AddListener((data) => playAudio(highlightAudio)); //call function=> playAudio(...)
+            upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
             // Upgrade Text
             upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
                 Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
