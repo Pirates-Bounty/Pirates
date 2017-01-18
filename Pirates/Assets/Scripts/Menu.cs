@@ -25,22 +25,22 @@ public class Menu : MonoBehaviour {
     void Start () {
         canvas = GameObject.Find("Canvas").transform;
         font = Resources.Load<Font>("Art/Fonts/Angel Tears");
-        sprite = Resources.Load<Sprite>("Art/Textures/Button");
-        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
+        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
         //Background
         backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.45f), delegate { Navigator.Instance.LoadLevel("Lobby"); });
+            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.5f), delegate { Navigator.Instance.LoadLevel("Lobby"); });
 
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.2f), new Vector2(0.9f, 0.3f), delegate { Navigator.Instance.LoadLevel("Instructions"); });
+            Vector3.zero, new Vector2(0.6f, 0.2f), new Vector2(0.9f, 0.35f), delegate { Navigator.Instance.LoadLevel("Instructions"); });
 
         // Quit Button
         quitButton = UI.CreateButton("Quit", "Quit", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.05f), new Vector2(0.9f, 0.15f), delegate { Navigator.Instance.LoadLevel("Quit"); });
+            Vector3.zero, new Vector2(0.6f, 0.05f), new Vector2(0.9f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
 
         //=== SOUND SECTION - BEGIN ===
         //variable initialization

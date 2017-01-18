@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using Prototype.NetworkLobby;
 public enum Upgrade {
     MANEUVERABILITY, //rotation speed
     SPEED, // move speed
@@ -15,7 +16,7 @@ public enum Upgrade {
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
-    public const float BASE_PROJECTILE_SPEED = 140.0f;
+    public const float BASE_PROJECTILE_SPEED = 70.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
     public const float BASE_ROTATION_SPEED = 35.0f;
@@ -28,7 +29,9 @@ public class Player : NetworkBehaviour {
 	public int playerID = -2;
 	[SyncVar]
 	public int lowUpgrades = 0;
+	[SyncVar]
 	public int midUpgrades = 0;
+	[SyncVar]
 	public int highUpgrades = 0;
 
     [SyncVar(hook = "OnChangePlayer")]
@@ -62,6 +65,7 @@ public class Player : NetworkBehaviour {
     public Transform[] frontSpawners;
     public GameObject projectile;
 	public GameObject resourceObj;
+	public GameObject deathExplode;
 
 
     private Camera playerCamera;
@@ -91,6 +95,7 @@ public class Player : NetworkBehaviour {
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
+	public float currVelocity = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
@@ -103,9 +108,10 @@ public class Player : NetworkBehaviour {
 	public AudioClip turnS;
 	private float creakTimer = 0;
     public AudioClip ramS;
+    public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
-    private bool dead;
+    public bool dead;
 
 	public enum UpgradeID
 	{
@@ -129,7 +135,13 @@ public class Player : NetworkBehaviour {
 			if (bm != null) {
 				playerID = bm.GetComponent<BountyManager> ().AddID ();
 			}
-		}
+
+
+
+
+
+        }
+
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
 		{
@@ -142,8 +154,8 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        sprite = Resources.Load<Sprite>("Art/Textures/Button");
-        highlightedSprite = Resources.Load<Sprite>("Art/Textures/HighlightedButton");
+        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
+        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         if (!isLocalPlayer) {
@@ -153,34 +165,65 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         CreateUpgradeMenu();
 
-		spawnPoints = FindObjectsOfType<NetworkStartPosition>();
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
+
+
+
+
+       
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        
+        if (!isLocalPlayer)
+        {
+            spawnPlayer(0);
+        }
+        
+    }
+
+    public void spawnPlayer(int ind)
+    {
+        if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
+        {
+            transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
+            GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
+        }
+        else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
+        {
+            return;
+        }
+        else
+        {
+            spawnPlayer(ind + 1);
+        }
     }
 
     void Update()
     {
-		if (playerID < 0 && isServer) {
-			//print ("Better late than never, adding to bounty manager.");
-			GameObject bm = GameObject.Find ("BountyManager");
-			if (bm != null) {
-				playerID = bm.GetComponent<BountyManager> ().AddID ();
-			}
-		}
+        if (playerID < 0 && isServer)
+        {
+            //print ("Better late than never, adding to bounty manager.");
+            GameObject bm = GameObject.Find("BountyManager");
+            if (bm != null)
+            {
+                playerID = bm.GetComponent<BountyManager>().AddID();
+            }
+        }
 
-		//if (Input.GetKeyDown(KeyCode.V))
+        //if (Input.GetKeyDown(KeyCode.V))
         //{
         //    RpcRespawn();
         //}
 
+        UpdateSprites ();
         // networking check
-        if (!isLocalPlayer)
+        if (!isLocalPlayer || dead)
         {
             return;
         }
-
-        if (!dead)
-        {
-
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
@@ -235,7 +278,6 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
-    }
     }
 
 	void FixedUpdate () {
@@ -310,10 +352,6 @@ public class Player : NetworkBehaviour {
     }
 	[Command]
 	void CmdSpawnResources(Vector3 pos) {
-        if (!isServer)
-        {
-            return;
-        }
         GameObject instantiatedResource = Instantiate(resourceObj,pos,Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
@@ -363,7 +401,7 @@ public class Player : NetworkBehaviour {
 				resources += UPGRADE_COST;
 			}
 		}*/
-        UpdateSprites();
+        //UpdateSprites();
 		//upgradeRanks [(int)upgrade] += upgradeMod;
 	}
 	[Command]
@@ -380,9 +418,8 @@ public class Player : NetworkBehaviour {
 			return;
 		}
         StartCoroutine(Death());
-        Vector3 dir = -transform.position;
-		dir = dir.normalized;
-		transform.up = dir;
+		GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
+		NetworkServer.Spawn(instantiatedResource);
 	}
     void UpdateSprites() {
 		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
@@ -421,28 +458,48 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
-		if (Input.GetKey(left)) {
+		if (Input.GetKey(left)) { // click left
 			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity*0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
+
         if (Input.GetKey(right)) {
 			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
 				creakTimer = 3.0f;
 				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
 			}
-            transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
+
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
+
+            transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
+
+            //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
-        if (Input.GetKey(up)) {
-            transform.Translate(0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
-            //rb.AddForce(transform.up * moveSpeed);
-        }
-        if (Input.GetKeyDown(down)) {
-            //rb.AddForce(-transform.up * moveSpeed / 4);
+        if (Input.GetKey (up)) {
+			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
+			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
+			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
+		} else if (Input.GetKey (down)) {
+			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
+			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
+			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//ApplyDamage(10f, playerID);
-        }
+		} else {
+			if (currVelocity > 0) {
+				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
+			} else if (currVelocity < 0) {
+				currVelocity = Mathf.Min (0f, currVelocity + currMoveSpeed / 2f * Time.deltaTime);
+			}
+		}
+		transform.Translate (0.0f, currVelocity * Time.deltaTime, 0.0f);
 
     }
 
@@ -450,15 +507,17 @@ public class Player : NetworkBehaviour {
     {
         dead = true;
         GetComponent<Collider2D>().enabled = false;
-        CmdSpawnResources(transform.position);
-        //RIGHT HERE - ANIMATION & SOUND
-        //-- before death
-        yield return new WaitForSeconds(2f); //respawn time
-        //-- after respawn
-        //IN CASE YOU WANT ONCE THE SHIP RESPAWN!!!
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+        //CmdSpawnResources(transform.position);
+        
+        yield return new WaitForSeconds(2f);
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+		Vector3 dir = -transform.position;
+		dir = dir.normalized;
+		transform.up = dir;
         GetComponent<Collider2D>().enabled = true;
         CmdChangeHealth(currMaxHealth, true);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
         dead = false;
     }
 
@@ -472,9 +531,8 @@ public class Player : NetworkBehaviour {
 		currentHealth -= damage;
         // respawn the player if they are dead
         if (currentHealth <= 0.0f) {
+            AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
 			RpcRespawn ();
-			print ("Respawning " + (currMaxHealth-currentHealth) + " health");
-			CmdChangeHealth(currMaxHealth, true);
 
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -484,14 +542,19 @@ public class Player : NetworkBehaviour {
     }
     public void OnCollisionEnter2D(Collision2D collision) {
         //if rammed
-        if (collision.gameObject.CompareTag("Player")) {
-            if(collision.collider.GetType() == typeof(BoxCollider2D) && !invuln) {
-				ApplyDamage(currRamDamage, collision.gameObject.GetComponent<Player>().playerID);
-                AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
-                //3 second invulnerability before you can take ram damage again
-                coroutine = RamInvuln();
-                StartCoroutine(coroutine);
-            }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
+        // Debug.Log(transform.position + " " + hit.point);
+        // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
+
+        // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
+        // print(hit.collider.tag);
+        if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage, playerID);
+            AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            //3 second invulnerability before you can take ram damage again
+            collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
+            collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
         }
     }
     private IEnumerator RamInvuln() {
@@ -548,14 +611,9 @@ public class Player : NetworkBehaviour {
             // Upgrade Minus Button
             /*GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
                 sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });/**/
-            // Upgrade Plus Buttofn
+            // Upgrade Plus Button
             GameObject upgradePlusButton = UI.CreateButton("Plus Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
                 sprite, highlightedSprite, Vector3.zero, new Vector2(0.6f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
-            //NOTE - ADD SOUNDS HERE!!!
-            UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
-            entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-            //entry_highlight.callback.AddListener((data) => playAudio(highlightAudio)); //call function=> playAudio(...)
-            upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
             // Upgrade Text
             upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
                 Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
@@ -571,6 +629,7 @@ public class Player : NetworkBehaviour {
 			return;
 		}
 		CmdUpgrade (upgrade, positive);
+		//UpdateSprites ();
     }
 
     public static string UpgradeToString(Upgrade upgrade) {
@@ -592,7 +651,7 @@ public class Player : NetworkBehaviour {
 
     public override void OnStartLocalPlayer() {
         //GetComponent<SpriteRenderer>().color = Color.red;
-        UpdateSprites();
+        //UpdateSprites();
     }
 
     private void UpdateVariables() {

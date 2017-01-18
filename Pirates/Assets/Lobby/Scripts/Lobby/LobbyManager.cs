@@ -16,6 +16,8 @@ namespace Prototype.NetworkLobby
         static public LobbyManager s_Singleton;
         static public int numPlayers;
 
+        public GameObject MapGen;
+
         [Header("Unity UI Lobby")]
         [Tooltip("Time in second between all players ready & match start")]
         public float prematchCountdown = 5.0f;
@@ -388,8 +390,24 @@ namespace Prototype.NetworkLobby
             }
             numPlayers = _playerNumber;
             Debug.Log(numPlayers);
-            ServerChangeScene(playScene);
+            MapGen.SetActive(true);
+            StartCoroutine(WaitForLoad());
+           
         }
+
+        public IEnumerator WaitForLoad()
+        {
+            yield return new WaitForSeconds(4);
+            ServerChangeScene(playScene);
+            
+        }
+
+        //public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+        //{
+        //    GameObject player = (GameObject)GameObject.Instantiate(playerPrefab, GameObject.FindGameObjectsWithTag("spawner")[Random.Range(1,numPlayers)].transform.position, Quaternion.identity);
+        //    NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+        //}
+
 
         // ----------------- Client callbacks ------------------
 
