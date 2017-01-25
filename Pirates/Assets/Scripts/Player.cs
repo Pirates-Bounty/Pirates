@@ -13,19 +13,26 @@ public enum Upgrade {
     CANNON_STRENGTH, // cannon damage
     COUNT //num items in the enum
 }
+public enum DamageType {
+    CANNON,
+    RAM
+}
 public class Player : NetworkBehaviour {
     // const vars
     public const float BASE_MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 70.0f;
 	public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
+    public const float BASE_BOOST_DELAY = 5.0f;
+    public const float BASE_BOOST = 1.2f;
     public const float BASE_ROTATION_SPEED = 35.0f;
     public const float BASE_MOVE_SPEED = 10.0f;
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
 	public const float BASE_RAM_DAMAGE = 20.0f;
 
-	[SyncVar]
+
+    [SyncVar]
 	public int playerID = -2;
 	[SyncVar]
 	public int lowUpgrades = 0;
@@ -91,10 +98,12 @@ public class Player : NetworkBehaviour {
 	public float currMoveSpeed = BASE_MOVE_SPEED;
 	public float currRotationSpeed = BASE_ROTATION_SPEED;
 	public float currFiringDelay = BASE_FIRING_DELAY;
+    public float currBoostDelay = BASE_BOOST_DELAY;
 	//public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
 	public float currRamDamage = BASE_RAM_DAMAGE;
 	public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
 	public float firingTimer = BASE_FIRING_DELAY;
+    public float boostTimer = BASE_BOOST_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
 	public float currVelocity = 0.0f;
     // menu checks
@@ -113,6 +122,8 @@ public class Player : NetworkBehaviour {
 
 	private NetworkStartPosition[] spawnPoints;
     public bool dead;
+    public bool gofast = false;
+    public float boost = BASE_BOOST;
 
     public GameObject MapGen;
 
@@ -246,6 +257,30 @@ public class Player : NetworkBehaviour {
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
+
+        boostTimer -= Time.deltaTime;
+        if (boostTimer < 0)
+        {
+            print("ready to speed boost!!");
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                CmdSpeedBoost();
+                gofast = true;
+                boostTimer = BASE_BOOST_DELAY;
+            }
+        }
+
+        if (gofast == true && boost > 0)
+        {
+           boost -= Time.deltaTime;
+            currMoveSpeed -= Time.deltaTime * currMoveSpeed;
+        }
+        else if (boost < 0)
+        {
+            gofast = false;
+            boost = BASE_BOOST;
+        }
+
         // get player's movement
         GetMovement();
 
@@ -303,6 +338,16 @@ public class Player : NetworkBehaviour {
 		UpdateSeagulls ();
 		creakTimer -= Time.deltaTime;
 	}
+
+    [Command]
+    void CmdSpeedBoost()
+    {
+        print(currMoveSpeed);
+        print("SPEEED BOOOST");
+        currMoveSpeed *= 5;
+        print(currMoveSpeed);
+    }
+
     [Command]   
 	void CmdFireLeft (int damageStrength) {
 		//print (damageStrength);
@@ -503,7 +548,7 @@ public class Player : NetworkBehaviour {
             //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey (up)) {
-			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
+ 			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
 			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
@@ -571,7 +616,7 @@ public class Player : NetworkBehaviour {
         // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
         // print(hit.collider.tag);
         if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage, playerID);
+            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage*(currVelocity/currMoveSpeed), playerID);
             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
             //3 second invulnerability before you can take ram damage again
             collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
@@ -677,7 +722,10 @@ public class Player : NetworkBehaviour {
 
     private void UpdateVariables() {
 		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
-		currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 2.0f));
+        if (gofast == false) // only update movement speed if not in boost mode
+        {
+            currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 2.0f));
+        }
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
 		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
 		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)UpgradeID.RSTR] / 1.5f));
