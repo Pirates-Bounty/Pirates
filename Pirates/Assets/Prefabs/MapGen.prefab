@@ -20,10 +20,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000010342813736}
   - 114: {fileID: 114000010229539288}
-  - 114: {fileID: 114000012501028486}
   m_Layer: 0
   m_Name: MapGen
-  m_TagString: Untagged
+  m_TagString: mapGen
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -70,35 +69,6 @@ MonoBehaviour:
   octaves: 4
   quadWidth: 5
   quadHeight: 5
---- !u!114 &114000012501028486
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010902933306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 32
-    i1: 186
-    i2: 66
-    i3: 124
-    i4: 12
-    i5: 119
-    i6: 132
-    i7: 244
-    i8: 136
-    i9: 131
-    i10: 147
-    i11: 231
-    i12: 153
-    i13: 6
-    i14: 198
-    i15: 34
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  Instance: {fileID: 0}
+  Spawner: {fileID: 1000010141130924, guid: 4106d905dedfae047aa67ddaa0383d52, type: 2}
+  Sync: {fileID: 0}

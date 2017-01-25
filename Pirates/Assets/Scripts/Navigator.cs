@@ -7,18 +7,25 @@ public class Navigator : MonoBehaviour {
     public static Navigator Instance;
 	public AudioClip clickS;
 
-    void Awake() {
-        if (!Instance) {
+    void Start()
+    {
+        if (!Instance)
+        {
             DontDestroyOnLoad(gameObject);
             Instance = this;
-        } else if (Instance != this) {
+        }
+        else if (Instance != this)
+        {
             Destroy(gameObject);
         }
     }
 
     void Update() {
-
+        
     }
+
+
+
 
     public void LoadLevel(string action) {
 		// Loads the scene based on the given string, or exits the game if the string is Quit

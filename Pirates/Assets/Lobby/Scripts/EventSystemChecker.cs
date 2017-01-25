@@ -10,7 +10,7 @@ namespace Prototype.NetworkLobby
         //public GameObject eventSystem;
 
         // Use this for initialization
-        void Awake()
+        public void Start()
         {
             if (!FindObjectOfType<EventSystem>())
             {

@@ -743,6 +743,7 @@ MonoBehaviour:
   ramS: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
   dead: 0
+  MapGen: {fileID: 1000010902933306, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
 --- !u!114 &114000014027217456
 MonoBehaviour:
   m_ObjectHideFlags: 1
