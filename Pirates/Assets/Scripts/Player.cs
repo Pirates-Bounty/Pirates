@@ -76,6 +76,7 @@ public class Player : NetworkBehaviour {
     private Sprite highlightedSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
+    private bool spawned = false;
     // GameObject references
     private GameObject inGameMenu;
     private GameObject upgradeMenu;
@@ -113,6 +114,8 @@ public class Player : NetworkBehaviour {
 	private NetworkStartPosition[] spawnPoints;
     public bool dead;
 
+    public GameObject MapGen;
+
 	public enum UpgradeID
 	{
 		MNV,
@@ -121,6 +124,9 @@ public class Player : NetworkBehaviour {
 		RSTR,
 		CSTR
 	}
+
+
+
 
     //ramming cooldown
     private IEnumerator coroutine;
@@ -137,10 +143,14 @@ public class Player : NetworkBehaviour {
 			}
 
 
+            
+
+
 
 
 
         }
+
 
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
@@ -169,40 +179,49 @@ public class Player : NetworkBehaviour {
 
 
 
-
        
     }
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
+    //public override void OnStartClient()
+    //{
+    //    base.OnStartClient();
         
-        if (!isLocalPlayer)
-        {
-            spawnPlayer(0);
-        }
+    //    if (!isLocalPlayer)
+    //    {
+    //        spawnPlayer(0);
+    //    }
         
-    }
+    //}
 
-    public void spawnPlayer(int ind)
-    {
-        if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
-        {
-            transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
-            GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
-        }
-        else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
-        {
-            return;
-        }
-        else
-        {
-            spawnPlayer(ind + 1);
-        }
-    }
+    //public void spawnPlayer(int ind)
+    //{
+    //    if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
+    //    {
+    //        transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
+    //        GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
+    //    }
+    //    else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
+    //    {
+    //        return;
+    //    }
+    //    else
+    //    {
+    //        spawnPlayer(ind + 1);
+    //    }
+    //}
 
     void Update()
     {
+
+        if (!spawned)
+        {
+            if (GameObject.FindGameObjectsWithTag("spawner").Length > 0)
+            {
+                spawned = true;
+                GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
+                transform.position = sl[Random.Range(0, LobbyManager.numPlayers)].transform.position;
+            }
+        }
         if (playerID < 0 && isServer)
         {
             //print ("Better late than never, adding to bounty manager.");
@@ -511,7 +530,9 @@ public class Player : NetworkBehaviour {
         //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
-        transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+        Debug.Log(LobbyManager.numPlayers);
+        GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
+        transform.position = sl[Random.Range(0,sl.Length)].transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
