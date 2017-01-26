@@ -11,6 +11,7 @@ public class MapGenerator : MonoBehaviour {
     public static bool gameStart = false;
     //public float amplitude;
     public Sprite[] sprites;
+    public Sprite[] plantSprites;
     public GameObject resourcePrefab;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
@@ -181,8 +182,15 @@ public class MapGenerator : MonoBehaviour {
                 noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width/2, 2) + Mathf.Pow(j - height/2, 2)), 0.5f)/(width/2 + height/2);
                 if (noise < .45f)
                 {
+                    if (noise > Random.Range(0,40f))
+                    {
+                        map[i, j] = (int)TileType.TREE;
+                    }
+                    else
+                    {
+                        map[i, j] = (int)TileType.GRASS;
+                    }
                     
-                    map[i, j] = (int)TileType.GRASS;
                 }
 
                 else if (noise < .5f)
@@ -248,6 +256,7 @@ public class MapGenerator : MonoBehaviour {
                     {
                         SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
                         sR.sprite = sprites[id];
+                        sR.sortingOrder = 0;
                     }
                     //sR.color = colors[id];
                     Tile.transform.position = tilePos;
@@ -270,6 +279,16 @@ public class MapGenerator : MonoBehaviour {
 
                         case (int)TileType.GRASS:
                             Tile.AddComponent<BoxCollider2D>();
+                            break;
+
+                        case (int)TileType.TREE:
+                            Tile.AddComponent<BoxCollider2D>();
+                            GameObject plant = new GameObject();
+                            plant.transform.parent = Tile.transform;
+                            plant.transform.localPosition = Vector3.zero;
+                            SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();
+                            sP.sprite = plantSprites[Random.Range(0, plantSprites.Length)];
+                            sP.sortingOrder = 1;
                             break;
 
 
