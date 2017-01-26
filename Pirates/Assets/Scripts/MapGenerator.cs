@@ -8,6 +8,7 @@ public class MapGenerator : MonoBehaviour {
     public int height;
     public float frequency;
     public float centerWeight;
+    public static bool gameStart = false;
     //public float amplitude;
     public Sprite[] sprites;
     public GameObject resourcePrefab;
@@ -25,7 +26,6 @@ public class MapGenerator : MonoBehaviour {
     private Sprite minMapBorder;
     private bool addResources = false;
     public MapGenerator Instance;
-    public GameObject Spawner;
     public GameObject Sync;
 
 
@@ -117,7 +117,6 @@ public class MapGenerator : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-
 
         
 

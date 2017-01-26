@@ -121,9 +121,12 @@ public class Player : NetworkBehaviour {
     public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
+    [SyncVar]
     public bool dead;
     public bool gofast = false;
     public float boost = BASE_BOOST;
+    [SyncVar]
+    public int pSpawned = 0;
 
     public GameObject MapGen;
 
@@ -196,12 +199,12 @@ public class Player : NetworkBehaviour {
     //public override void OnStartClient()
     //{
     //    base.OnStartClient();
-        
+
     //    if (!isLocalPlayer)
     //    {
     //        spawnPlayer(0);
     //    }
-        
+
     //}
 
     //public void spawnPlayer(int ind)
@@ -221,17 +224,34 @@ public class Player : NetworkBehaviour {
     //    }
     //}
 
+
+    [ClientRpc]
+    public void RpcIncrement()
+    {
+        pSpawned++;
+    }
+
+    [Command]
+    public void CmdIncrement()
+    {
+        RpcIncrement();
+    }
+
+
     void Update()
     {
-
+        
         if (!spawned)
         {
-            if (GameObject.FindGameObjectsWithTag("spawner").Length > 0)
+            
+            GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
+            if (spawners.Length >= LobbyManager.numPlayers)
             {
                 spawned = true;
-                GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
-                transform.position = sl[Random.Range(0, LobbyManager.numPlayers)].transform.position;
+                transform.position = spawners[pSpawned].transform.position;
+                CmdIncrement();
             }
+            
         }
         if (playerID < 0 && isServer)
         {
@@ -261,7 +281,6 @@ public class Player : NetworkBehaviour {
         boostTimer -= Time.deltaTime;
         if (boostTimer < 0)
         {
-            print("ready to speed boost!!");
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 CmdSpeedBoost();
@@ -333,6 +352,7 @@ public class Player : NetworkBehaviour {
         UpdateVariables();
         //CmdDisplayHealth ();
     }
+
 
 	void FixedUpdate () {
 		UpdateSeagulls ();
