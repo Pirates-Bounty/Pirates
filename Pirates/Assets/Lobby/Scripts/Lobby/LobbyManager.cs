@@ -35,6 +35,7 @@ namespace Prototype.NetworkLobby
         public LobbyInfoPanel infoPanel;
         public LobbyCountdownPanel countdownPanel;
         public GameObject addPlayerButton;
+        public GameObject mapGen;
 
         protected RectTransform currentPanel;
 
@@ -224,7 +225,6 @@ namespace Prototype.NetworkLobby
             {
                 StopMatchMaker();
             }
-
             ChangeTo(mainMenuPanel);
         }
 
@@ -406,7 +406,8 @@ namespace Prototype.NetworkLobby
                 }
             }
             numPlayers = _playerNumber;
-            
+
+            mapGen.SetActive(true);
             ServerChangeScene(playScene);
 
         }

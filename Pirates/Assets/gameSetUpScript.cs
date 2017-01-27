@@ -45,8 +45,6 @@ public class gameSetUpScript : MonoBehaviour {
             GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
             int x = (int)(rad * Mathf.Cos(deg * i));
             int y = (int)(rad * Mathf.Sin(deg * i));
-            Debug.Log(x);
-            Debug.Log(y);
             //Checks to see if a good spot to spawn the spawnPoints
             while (spawnable)
             {

@@ -3202,7 +3202,6 @@ MonoBehaviour:
   - {fileID: 1000012361358088, guid: 54d9292a44d2ef44384740929086fdf7, type: 2}
   - {fileID: 1000013251136846, guid: 9e8ef88156c21184480fd64b5ef2fe03, type: 2}
   - {fileID: 1000010141130924, guid: 4106d905dedfae047aa67ddaa0383d52, type: 2}
-  - {fileID: 1000010902933306, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
@@ -3256,8 +3255,7 @@ MonoBehaviour:
   m_LobbyScene: Lobby
   m_PlayScene: Main
   lobbySlots: []
-  MapGen: {fileID: 1000010902933306, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
-  spawnPoint: {fileID: 1000010141130924, guid: 4106d905dedfae047aa67ddaa0383d52, type: 2}
+  gameSetUp: {fileID: 0}
   prematchCountdown: 3
   topPanel: {fileID: 11424994}
   mainMenuPanel: {fileID: 22442386}
@@ -3265,6 +3263,7 @@ MonoBehaviour:
   infoPanel: {fileID: 11442006}
   countdownPanel: {fileID: 11413810}
   addPlayerButton: {fileID: 144256}
+  mapGen: {fileID: 1000010510580402}
   backButton: {fileID: 11477488}
   statusInfo: {fileID: 11403930}
   hostInfo: {fileID: 11415712}
@@ -5141,6 +5140,8 @@ RectTransform:
   - {fileID: 22443498}
   - {fileID: 22429152}
   - {fileID: 22452766}
+  - {fileID: 4000012693694270}
+  - {fileID: 4000010690068480}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
@@ -5683,3 +5684,136 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 155310}
   m_IsPrefabParent: 1
+--- !u!1 &1000010510580402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000012693694270}
+  - 114: {fileID: 114000012240236644}
+  m_Layer: 0
+  m_Name: MapGen
+  m_TagString: mapGen
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!1 &1000011681485244
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000010690068480}
+  - 114: {fileID: 114000014161532986}
+  - 114: {fileID: 114000010910861704}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4000010690068480
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011681485244}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1243.742, y: -540, z: 0}
+  m_LocalScale: {x: 3.483871, y: 3.483871, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 22459552}
+  m_RootOrder: 7
+--- !u!4 &4000012693694270
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010510580402}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1243.742, y: -540, z: 0}
+  m_LocalScale: {x: 3.483871, y: 3.483871, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 22459552}
+  m_RootOrder: 6
+--- !u!114 &114000010910861704
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011681485244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1077351063, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &114000012240236644
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010510580402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0df42657c9aa847a246f5815a62813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 300
+  height: 300
+  frequency: 15
+  centerWeight: 7
+  sprites:
+  - {fileID: 21300000, guid: 3123cec5d298f47a583b27249e4d90cf, type: 3}
+  - {fileID: 21300000, guid: 3eff16a8442f9431991397c7f6a61f36, type: 3}
+  - {fileID: 21300000, guid: 05e95f906f4c24d52bdb94a29d67f39b, type: 3}
+  - {fileID: 21300000, guid: 3eff16a8442f9431991397c7f6a61f36, type: 3}
+  plantSprites:
+  - {fileID: 21300000, guid: 78f1414dbd8aaa6408a2ea367debaaca, type: 3}
+  - {fileID: 21300000, guid: 926b72b843961ed4ba4ec87b68163abc, type: 3}
+  - {fileID: 21300000, guid: 0b1bcd99125611046b0de01bc3737182, type: 3}
+  - {fileID: 21300000, guid: 0cc7c1f5ab5b80c45aeac326f2b44789, type: 3}
+  - {fileID: 21300000, guid: 4f6ec4728cf83e042be37288d5b030a8, type: 3}
+  - {fileID: 21300000, guid: f12c5ecb7f87b95429228b256c9a7e7d, type: 3}
+  - {fileID: 21300000, guid: ffd315337e476934fa8f87fad0472a0d, type: 3}
+  - {fileID: 21300000, guid: f8c0bd4ceec930149b5a6b8f4da1e860, type: 3}
+  resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
+    type: 2}
+  seed: 200
+  tileNames:
+  - water
+  - grass
+  - sand
+  - tree
+  octaves: 4
+  quadWidth: 5
+  quadHeight: 5
+  Instance: {fileID: 0}
+  Sync: {fileID: 0}
+--- !u!114 &114000014161532986
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011681485244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -619905303, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 5

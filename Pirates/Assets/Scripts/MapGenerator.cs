@@ -45,6 +45,10 @@ public class MapGenerator : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+        if (GameObject.FindGameObjectsWithTag("mapGen").Length >= 2)
+        {
+            Destroy(gameObject);
+        }
 
             
             Generate();
