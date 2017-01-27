@@ -241,7 +241,7 @@ GameObject:
   - 114: {fileID: 800447154}
   m_Layer: 0
   m_Name: BountyManager
-  m_TagString: Untagged
+  m_TagString: bountyManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -8,6 +8,7 @@ public class SpawnScript : MonoBehaviour {
     // Use this for initialization
 	void Start () {
         DontDestroyOnLoad(gameObject);
+        Debug.Log("spawn Point");
     }
 	
 	// Update is called once per frame

@@ -22,6 +22,7 @@ namespace Prototype.NetworkLobby
 
         //public GameObject Sync;
         public GameObject spawnPoint;
+        public GameObject gameSetUp;
 
         [Header("Unity UI Lobby")]
         [Tooltip("Time in second between all players ready & match start")]
@@ -417,6 +418,8 @@ namespace Prototype.NetworkLobby
                 }
             }
 
+            gameSetUp.SetActive(true);
+
             for (int i = 0; i < lobbySlots.Length; ++i)
             {
                 if (lobbySlots[i] != null)
@@ -425,28 +428,9 @@ namespace Prototype.NetworkLobby
                 }
             }
             numPlayers = _playerNumber;
-            //Sync.GetComponent<SyncMapGeneration>().CmdChangeStartGen();
-            StartCoroutine(WaitForLoad());
-           
-        }
-
-        public IEnumerator WaitForLoad()
-        {
-            yield return new WaitForSeconds(1);
+            
             ServerChangeScene(playScene);
-            
-        }
 
-        public override void OnServerReady(NetworkConnection conn)
-        {
-
-
-            
-            //GameObject mg = Instantiate(MapGen, Vector3.zero, Quaternion.identity)as GameObject;
-            
-            
-            MapGenerator.gameStart = true;
-            base.OnServerReady(conn);
         }
 
 

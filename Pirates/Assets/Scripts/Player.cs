@@ -150,6 +150,7 @@ public class Player : NetworkBehaviour {
     // Use this for initialization
     void Start () {
 		if (isServer) {
+            Debug.Log("spawn Player");
 			//print ("Adding to bounty manager, here we go.");
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -232,16 +233,16 @@ public class Player : NetworkBehaviour {
     void Update()
     {
         
-        if (!spawned)
-        {
-            GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
-			if (spawners.Length >= LobbyManager.numPlayers && playerID >= 0)
-            {
-                spawned = true;
-				transform.position = spawners[playerID].transform.position;
-                //CmdIncrement();
-            }
-        }
+   //     if (!spawned)
+   //     {
+   //         GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
+			//if (spawners.Length >= LobbyManager.numPlayers && playerID >= 0)
+   //         {
+   //             spawned = true;
+			//	transform.position = spawners[playerID].transform.position;
+   //             //CmdIncrement();
+   //         }
+   //     }
         if (playerID < 0 && isServer)
         {
             //print ("Better late than never, adding to bounty manager.");

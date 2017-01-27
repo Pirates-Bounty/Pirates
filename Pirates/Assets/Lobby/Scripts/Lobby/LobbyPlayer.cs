@@ -23,6 +23,7 @@ namespace Prototype.NetworkLobby
 
         public GameObject localIcone;
         public GameObject remoteIcone;
+        
 
         //OnMyName function will be invoked on clients when server change the value of playerName
         [SyncVar(hook = "OnMyName")]
@@ -236,6 +237,7 @@ namespace Prototype.NetworkLobby
         {
             LobbyManager.s_Singleton.countdownPanel.UIText.text = "Match Starting in " + countdown;
             LobbyManager.s_Singleton.countdownPanel.gameObject.SetActive(countdown != 0);
+            
         }
 
         [ClientRpc]
