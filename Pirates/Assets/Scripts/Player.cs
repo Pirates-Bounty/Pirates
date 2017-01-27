@@ -216,7 +216,7 @@ public class Player : NetworkBehaviour {
     //}
 
 
-    [ClientRpc]
+    /*[ClientRpc]
     public void RpcIncrement()
     {
         pSpawned++;
@@ -226,7 +226,7 @@ public class Player : NetworkBehaviour {
     public void CmdIncrement()
     {
         RpcIncrement();
-    }
+    }*/
 
 
     void Update()
@@ -234,15 +234,13 @@ public class Player : NetworkBehaviour {
         
         if (!spawned)
         {
-            
             GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
-            if (spawners.Length >= LobbyManager.numPlayers)
+			if (spawners.Length >= LobbyManager.numPlayers && playerID >= 0)
             {
                 spawned = true;
-                transform.position = spawners[pSpawned].transform.position;
-                CmdIncrement();
+				transform.position = spawners[playerID].transform.position;
+                //CmdIncrement();
             }
-            
         }
         if (playerID < 0 && isServer)
         {
@@ -499,6 +497,7 @@ public class Player : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcRespawn () {
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
 		if (!isLocalPlayer) {
 			return;
 		}
@@ -605,9 +604,9 @@ public class Player : NetworkBehaviour {
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
-        GetComponent<Collider2D>().enabled = true;
-        
-		/*CmdChangeHealth(currMaxHealth, true);
+        CmdChangeHealth(currMaxHealth, true);
+
+		/*GetComponent<Collider2D>().enabled = true;
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
         dead = false;*/
 
