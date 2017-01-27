@@ -46,13 +46,7 @@ public class MapGenerator : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        Random.InitState(System.DateTime.Now.Millisecond);
-        for (int i = 0; i < maxResources; i++)
-        {
-
-            //CmdSpawnResource();
-        }
-            maxResources = Mathf.RoundToInt((width + height) / 50);
+            
             Generate();
             GenerateGameObjects();
             //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
@@ -134,17 +128,7 @@ public class MapGenerator : MonoBehaviour {
 	
 	}
 
-    //[Command]
-    //void CmdSpawnResource()
-    //{
-    //    if (!isServer)
-    //    {
-    //        return;
-    //    }
-    //    ClientScene.RegisterPrefab(resourcePrefab);
-    //    GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
-    //    NetworkServer.Spawn(instantiatedResource);
-    //}
+
 
     void DeleteChildren()
     {

@@ -18,22 +18,50 @@ public class BountyManager : NetworkBehaviour {
 	private Canvas canvas;
 	private Font font;
     public GameObject spawnPoint;
+    public int maxResources = 40;
+    public GameObject resourcePrefab;
+    private GameObject MapGen;
 
 	// Use this for initialization
 	void Start () {
-        spawnPoints(GameObject.FindGameObjectWithTag("mapGen").GetComponent<MapGenerator>());
+
+        MapGen = GameObject.FindGameObjectWithTag("mapGen");
+        //maxResources = Mathf.RoundToInt((width + height) / 50);
+        spawnPoints(MapGen.GetComponent<MapGenerator>());
 		font = Resources.Load<Font>("Art/Fonts/riesling");
 
-		if (!isLocalPlayer) {
+        Random.InitState(System.DateTime.Now.Millisecond);
+        for (int i = 0; i < maxResources; i++)
+        {
+            CmdSpawnResource();
+        }
+
+        if (!isLocalPlayer) {
 			return;
 		}
-		canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+
+
+
+
+        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 		if (canvas != null) {
 			CreateBountyPanel ();
 			//print ("makin' a bounty board");
 		}
 	}
 
+
+    [Command]
+    void CmdSpawnResource()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        ClientScene.RegisterPrefab(resourcePrefab);
+        GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-MapGen.GetComponent<MapGenerator>().width / 2, MapGen.GetComponent<MapGenerator>().width / 2), Random.Range(-MapGen.GetComponent<MapGenerator>().height / 2, MapGen.GetComponent<MapGenerator>().height / 2)), Quaternion.identity) as GameObject;
+        NetworkServer.Spawn(instantiatedResource);
+    }
 
 
     public void spawnPoints(MapGenerator mg)
