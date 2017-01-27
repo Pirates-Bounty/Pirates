@@ -155,16 +155,7 @@ public class Player : NetworkBehaviour {
 			if (bm != null) {
 				playerID = bm.GetComponent<BountyManager> ().AddID ();
 			}
-
-
-            
-
-
-
-
-
         }
-
 
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
@@ -225,7 +216,7 @@ public class Player : NetworkBehaviour {
     //}
 
 
-    [ClientRpc]
+    /*[ClientRpc]
     public void RpcIncrement()
     {
         pSpawned++;
@@ -235,7 +226,7 @@ public class Player : NetworkBehaviour {
     public void CmdIncrement()
     {
         RpcIncrement();
-    }
+    }*/
 
 
     void Update()
@@ -243,15 +234,13 @@ public class Player : NetworkBehaviour {
         
         if (!spawned)
         {
-            
             GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
-            if (spawners.Length >= LobbyManager.numPlayers)
+			if (spawners.Length >= LobbyManager.numPlayers && playerID >= 0)
             {
                 spawned = true;
-                transform.position = spawners[pSpawned].transform.position;
-                CmdIncrement();
+				transform.position = spawners[playerID].transform.position;
+                //CmdIncrement();
             }
-            
         }
         if (playerID < 0 && isServer)
         {
@@ -283,7 +272,7 @@ public class Player : NetworkBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                CmdSpeedBoost();
+                SpeedBoost();
                 gofast = true;
                 boostTimer = BASE_BOOST_DELAY;
             }
@@ -359,13 +348,9 @@ public class Player : NetworkBehaviour {
 		creakTimer -= Time.deltaTime;
 	}
 
-    [Command]
-    void CmdSpeedBoost()
+    void SpeedBoost()
     {
-        print(currMoveSpeed);
-        print("SPEEED BOOOST");
         currMoveSpeed *= 5;
-        print(currMoveSpeed);
     }
 
     [Command]   
@@ -496,14 +481,32 @@ public class Player : NetworkBehaviour {
 			currentHealth += setHealth;
 		}
 	}
+	[Command]
+	void CmdDeath (bool isDead) {
+		dead = isDead;
+		if (isDead) {
+			GetComponent<Collider2D>().enabled = false;
+			gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+			GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
+			NetworkServer.Spawn(instantiatedResource);
+		} else {
+			GetComponent<Collider2D>().enabled = true;
+			gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
+			RpcFinishRespawn ();
+		}
+	}
 	[ClientRpc]
-	void RpcRespawn() {
+	void RpcRespawn () {
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
 		if (!isLocalPlayer) {
 			return;
 		}
-        StartCoroutine(Death());
-		GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
-		NetworkServer.Spawn(instantiatedResource);
+		CmdDeath (true);
+		StartCoroutine(Death());
+	}
+	[ClientRpc]
+	void RpcFinishRespawn () {
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
 	}
     void UpdateSprites() {
 		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
@@ -589,28 +592,31 @@ public class Player : NetworkBehaviour {
 
     IEnumerator Death()
     {
-        dead = true;
+        /*dead = true;
         GetComponent<Collider2D>().enabled = false;
-		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);*/
         //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
-        Debug.Log(LobbyManager.numPlayers);
+        //Debug.Log(LobbyManager.numPlayers);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         transform.position = sl[Random.Range(0,sl.Length)].transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
-        GetComponent<Collider2D>().enabled = true;
         CmdChangeHealth(currMaxHealth, true);
+
+		/*GetComponent<Collider2D>().enabled = true;
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
-        dead = false;
+        dead = false;*/
+
+		CmdDeath (false);
     }
 
 
 
 	public void ApplyDamage(float damage, int enemyID) {
-		if (!isServer || dead) {
+		if (!isServer || dead || currentHealth <= 0) {
             return;
         }
 		//print ("DAMAGE! " + damage);
