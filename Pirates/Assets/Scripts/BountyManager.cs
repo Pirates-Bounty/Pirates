@@ -57,6 +57,10 @@ public class BountyManager : NetworkBehaviour {
 					playerBounties [playerList [i].playerID] = (int)((BASE_BOUNTY + upgradeBounty + killStreakBounty)*bonusMod);
 				}
 
+				if (playerBounties [playerList [i].playerID] >= 1000) {
+					DeclareVictory (playerList [i].playerID);
+				}
+
 				if (bountyTexts.Count <= i) {
 					if (bountyPanel != null) {
 						//print ("postin' a bounty (late)");
@@ -113,5 +117,10 @@ public class BountyManager : NetworkBehaviour {
 			}
 		}
 		return highestID;
+	}
+
+
+	private IEnumerator DeclareVictory(int playerID) {
+		// delcare the winning player to be the pirate king
 	}
 }
