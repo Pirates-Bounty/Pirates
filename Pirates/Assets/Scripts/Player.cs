@@ -545,7 +545,15 @@ public class Player : NetworkBehaviour {
         yield return new WaitForSeconds(2f);
         //Debug.Log(LobbyManager.numPlayers);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
-        transform.position = sl[Random.Range(0,sl.Length)].transform.position;
+        GameObject farthestSpawn = sl[0];
+        foreach (GameObject g in sl)
+        {
+            if ((g.transform.position - transform.position).sqrMagnitude > (farthestSpawn.transform.position - transform.position).sqrMagnitude)
+            {
+                farthestSpawn = g; 
+            }
+        }
+        transform.position = farthestSpawn.transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
