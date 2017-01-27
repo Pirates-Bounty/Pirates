@@ -43,18 +43,16 @@ public class Menu : MonoBehaviour {
             Vector3.zero, new Vector2(0.6f, 0.05f), new Vector2(0.9f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
 
         //=== SOUND SECTION - BEGIN ===
-        //variable initialization
-        highlightAudio = Resources.Load<AudioClip>("Sound/SFX/ButtonHighlight");
-        selectAudio = Resources.Load<AudioClip>("Sound/SFX/ButtonSelect");
         //preparing highlight entries
         UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
         entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-        entry_highlight.callback.AddListener((data) => playAudio(highlightAudio)); //call function=> playAudio(...)
+        entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio)); //call function=> playAudio(...)
         //adding highlight entries
         playButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         instructionsButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         quitButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         //adding onclick audio
+        selectAudio = Resources.Load<AudioClip>("Sound/SFX/ButtonSelect");
         playButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
         instructionsButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
         quitButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
@@ -78,6 +76,6 @@ public class Menu : MonoBehaviour {
     //function to play audio
     public void playAudio(AudioClip audio)
     {
-        AudioSource.PlayClipAtPoint(audio, transform.position, 100.0f);
+        AudioSource.PlayClipAtPoint(audio, transform.position, 1.0f);
     }
 }
