@@ -74,7 +74,6 @@ public class gameSetUpScript : MonoBehaviour {
             Vector3 dir = -spawn.transform.position;
             dir = dir.normalized;
             spawn.transform.up = dir;
-            spawn.GetComponent<SpawnScript>().spawned = true;
             NetworkServer.Spawn(spawn);
         }
 
