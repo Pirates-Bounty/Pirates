@@ -283,7 +283,7 @@ public class Player : NetworkBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                CmdSpeedBoost();
+                SpeedBoost();
                 gofast = true;
                 boostTimer = BASE_BOOST_DELAY;
             }
@@ -359,13 +359,9 @@ public class Player : NetworkBehaviour {
 		creakTimer -= Time.deltaTime;
 	}
 
-    [Command]
-    void CmdSpeedBoost()
+    void SpeedBoost()
     {
-        print(currMoveSpeed);
-        print("SPEEED BOOOST");
         currMoveSpeed *= 5;
-        print(currMoveSpeed);
     }
 
     [Command]   
