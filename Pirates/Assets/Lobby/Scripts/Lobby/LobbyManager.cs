@@ -88,7 +88,6 @@ namespace Prototype.NetworkLobby
             {
                 gameStart = false;
                 GameObject[] gl = GameObject.FindGameObjectsWithTag("mapGen");
-                GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
                 if (gl.Length > 1)
                 {
                     int count = 0;
@@ -100,71 +99,13 @@ namespace Prototype.NetworkLobby
                         }
                         count++;
                     }
-
-                    if (sl.Length == 0)
-                    {
-                        spawnPoints(gl[0].GetComponent<MapGenerator>());
-                    }
                 }
 
             }
         }
 
         
-        public void spawnPoints(MapGenerator mg)
-        {
-            int rad = (mg.width / 2) - 5;
-            float deg = 90;
-            if (numPlayers != 0)
-            {
-                deg = 360 / numPlayers;
-            }
 
-
-            //Loop through the players and spawn a spawn point for each player along the circle
-            for (int i = 0; i < numPlayers; i++)
-            {
-                bool spawnable = false;
-                GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
-                int x = (int)(rad * Mathf.Cos(deg * i));
-                int y = (int)(rad * Mathf.Sin(deg * i));
-                //Checks to see if a good spot to spawn the spawnPoints
-                while (spawnable)
-                {
-                    bool resetLoop = false;
-                    for (int j = x - mg.quadWidth / 2; j < x + mg.quadWidth / 2; j++)
-                    {
-                        for (int k = y - mg.quadHeight / 2; k < y + mg.quadHeight / 2; k++)
-                        {
-
-                            if (mg.map[j, k] != (int)TileType.WATER)
-                            {
-                                x -= x / Mathf.Abs(x);
-                                y -= y / Mathf.Abs(x);
-                                resetLoop = true;
-                                break;
-                            }
-                            if (resetLoop)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (!resetLoop)
-                    {
-                        spawnable = true;
-                    }
-                }
-                spawn.transform.position = new Vector2(x, y);
-                Vector3 dir = -spawn.transform.position;
-                dir = dir.normalized;
-                spawn.transform.up = dir;
-                spawn.GetComponent<SpawnScript>().spawned = true;
-                NetworkServer.Spawn(spawn);
-            }
-
-
-        }
 
         public override void OnLobbyClientSceneChanged(NetworkConnection conn)
         {
@@ -491,7 +432,7 @@ namespace Prototype.NetworkLobby
 
         public IEnumerator WaitForLoad()
         {
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(1);
             ServerChangeScene(playScene);
             
         }
@@ -503,7 +444,8 @@ namespace Prototype.NetworkLobby
             
             //GameObject mg = Instantiate(MapGen, Vector3.zero, Quaternion.identity)as GameObject;
             
-            spawnPoints(mg.GetComponent<MapGenerator>());
+            
+            MapGenerator.gameStart = true;
             base.OnServerReady(conn);
         }
 

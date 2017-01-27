@@ -121,10 +121,12 @@ public class Player : NetworkBehaviour {
     public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
-	[SyncVar]
-	public bool dead;
+    [SyncVar]
+    public bool dead;
     public bool gofast = false;
     public float boost = BASE_BOOST;
+    [SyncVar]
+    public int pSpawned = 0;
 
     public GameObject MapGen;
 
@@ -154,6 +156,7 @@ public class Player : NetworkBehaviour {
 				playerID = bm.GetComponent<BountyManager> ().AddID ();
 			}
         }
+
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
 		{
@@ -187,12 +190,12 @@ public class Player : NetworkBehaviour {
     //public override void OnStartClient()
     //{
     //    base.OnStartClient();
-        
+
     //    if (!isLocalPlayer)
     //    {
     //        spawnPlayer(0);
     //    }
-        
+
     //}
 
     //public void spawnPlayer(int ind)
@@ -212,17 +215,34 @@ public class Player : NetworkBehaviour {
     //    }
     //}
 
+
+    [ClientRpc]
+    public void RpcIncrement()
+    {
+        pSpawned++;
+    }
+
+    [Command]
+    public void CmdIncrement()
+    {
+        RpcIncrement();
+    }
+
+
     void Update()
     {
-
+        
         if (!spawned)
         {
-            if (GameObject.FindGameObjectsWithTag("spawner").Length > 0)
+            
+            GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
+            if (spawners.Length >= LobbyManager.numPlayers)
             {
                 spawned = true;
-                GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
-                transform.position = sl[Random.Range(0, LobbyManager.numPlayers)].transform.position;
+                transform.position = spawners[pSpawned].transform.position;
+                CmdIncrement();
             }
+            
         }
         if (playerID < 0 && isServer)
         {
@@ -252,11 +272,9 @@ public class Player : NetworkBehaviour {
         boostTimer -= Time.deltaTime;
         if (boostTimer < 0)
         {
-			//print("ready to speed boost!!");
-			if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-				//CmdSpeedBoost();
-				currMoveSpeed *= 5;
+                CmdSpeedBoost();
                 gofast = true;
                 boostTimer = BASE_BOOST_DELAY;
             }
@@ -325,6 +343,7 @@ public class Player : NetworkBehaviour {
         UpdateVariables();
         //CmdDisplayHealth ();
     }
+
 
 	void FixedUpdate () {
 		UpdateSeagulls ();
@@ -469,10 +488,10 @@ public class Player : NetworkBehaviour {
 		}
 	}
 	[Command]
-	void CmdDeath(bool isDead) {
+	void CmdDeath (bool isDead) {
 		dead = isDead;
 		if (isDead) {
-			GetComponent<Collider2D> ().enabled = false;
+			GetComponent<Collider2D>().enabled = false;
 			gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
 			GameObject instantiatedResource = Instantiate(deathExplode,transform.position,Quaternion.identity) as GameObject;
 			NetworkServer.Spawn(instantiatedResource);
@@ -483,8 +502,7 @@ public class Player : NetworkBehaviour {
 		}
 	}
 	[ClientRpc]
-	void RpcRespawn() {
-		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
+	void RpcRespawn () {
 		if (!isLocalPlayer) {
 			return;
 		}
@@ -492,7 +510,7 @@ public class Player : NetworkBehaviour {
 		StartCoroutine(Death());
 	}
 	[ClientRpc]
-	void RpcFinishRespawn() {
+	void RpcFinishRespawn () {
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
 	}
     void UpdateSprites() {
@@ -579,19 +597,24 @@ public class Player : NetworkBehaviour {
 
     IEnumerator Death()
     {
+        /*dead = true;
+        GetComponent<Collider2D>().enabled = false;
+		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);*/
         //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
         //Debug.Log(LobbyManager.numPlayers);
-
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         transform.position = sl[Random.Range(0,sl.Length)].transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
-		CmdChangeHealth(currMaxHealth, true);
         GetComponent<Collider2D>().enabled = true;
+        
+		/*CmdChangeHealth(currMaxHealth, true);
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
+        dead = false;*/
+
 		CmdDeath (false);
     }
 
