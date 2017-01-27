@@ -12,7 +12,7 @@ public class Game : MonoBehaviour {
 
     const int MAX_PLAYERS = 2;
 
-    void Awake()
+    public void Start()
     {
         if (!Instance)
         {

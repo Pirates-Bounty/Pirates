@@ -11,12 +11,17 @@ namespace Prototype.NetworkLobby
 {
     public class LobbyManager : NetworkLobbyManager 
     {
+
+
+
         static short MsgKicked = MsgType.Highest + 1;
 
         static public LobbyManager s_Singleton;
         static public int numPlayers;
+        public bool gameStart = false;
 
-        public GameObject MapGen;
+        //public GameObject Sync;
+        public GameObject spawnPoint;
 
         [Header("Unity UI Lobby")]
         [Tooltip("Time in second between all players ready & match start")]
@@ -39,6 +44,8 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
+        public MapGenerator mg;
+       
 
       
 
@@ -59,6 +66,7 @@ namespace Prototype.NetworkLobby
 
         void Start()
         {
+            //Sync.SetActive(true);
             s_Singleton = this;
             _lobbyHooks = GetComponent<Prototype.NetworkLobby.LobbyHook>();
             currentPanel = mainMenuPanel;
@@ -69,7 +77,35 @@ namespace Prototype.NetworkLobby
             DontDestroyOnLoad(gameObject);
 
             SetServerInfo("Offline", "None");
+
+    
+
         }
+
+        public void Update()
+        {
+            if (gameStart)
+            {
+                gameStart = false;
+                GameObject[] gl = GameObject.FindGameObjectsWithTag("mapGen");
+                if (gl.Length > 1)
+                {
+                    int count = 0;
+                    foreach (GameObject g in gl)
+                    {
+                        if (count > 0)
+                        {
+                            Destroy(g);
+                        }
+                        count++;
+                    }
+                }
+
+            }
+        }
+
+        
+
 
         public override void OnLobbyClientSceneChanged(NetworkConnection conn)
         {
@@ -389,24 +425,31 @@ namespace Prototype.NetworkLobby
                 }
             }
             numPlayers = _playerNumber;
-            Debug.Log(numPlayers);
-            MapGen.SetActive(true);
+            //Sync.GetComponent<SyncMapGeneration>().CmdChangeStartGen();
             StartCoroutine(WaitForLoad());
            
         }
 
         public IEnumerator WaitForLoad()
         {
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(1);
             ServerChangeScene(playScene);
             
         }
 
-        //public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
-        //{
-        //    GameObject player = (GameObject)GameObject.Instantiate(playerPrefab, GameObject.FindGameObjectsWithTag("spawner")[Random.Range(1,numPlayers)].transform.position, Quaternion.identity);
-        //    NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
-        //}
+        public override void OnServerReady(NetworkConnection conn)
+        {
+
+
+            
+            //GameObject mg = Instantiate(MapGen, Vector3.zero, Quaternion.identity)as GameObject;
+            
+            
+            MapGenerator.gameStart = true;
+            base.OnServerReady(conn);
+        }
+
+
 
 
         // ----------------- Client callbacks ------------------

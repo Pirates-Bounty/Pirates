@@ -8,8 +8,10 @@ public class MapGenerator : MonoBehaviour {
     public int height;
     public float frequency;
     public float centerWeight;
+    public static bool gameStart = false;
     //public float amplitude;
     public Sprite[] sprites;
+    public Sprite[] plantSprites;
     public GameObject resourcePrefab;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
@@ -24,84 +26,25 @@ public class MapGenerator : MonoBehaviour {
     private Camera minMap;
     private Sprite minMapBorder;
     private bool addResources = false;
+    public MapGenerator Instance;
+    public GameObject Sync;
+
 
 
 
     
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-        maxResources = Mathf.RoundToInt((width + height) / 50);
-        Generate();
-        GenerateGameObjects();
-        //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
-        //minMap.orthographicSize = width / 2;
-        //canvas = GameObject.Find("Canvas").transform;
-        //minMapBorder = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Mini Map Border");
-        //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
-
-        int numPlayers = LobbyManager.numPlayers;
-
-        //Circle radius and degree calculation for spawning spawn points
-        int rad = (width / 2) - 5;
-		float deg = 90;
-		if (numPlayers != 0)
-		{
-			deg = 360 / numPlayers;
-		}
-
-
-        //Loop through the players and spawn a spawn point for each player along the circle
-        for (int i = 1; i < numPlayers + 1; i++)
-        {
-            bool spawnable = false;
-            GameObject Spawner = new GameObject();
-            DontDestroyOnLoad(Spawner);
-            Spawner.AddComponent<NetworkStartPosition>();
-            Spawner.AddComponent<SpawnScript>();
-            Spawner.tag = "spawner";
-            int x = (int)(rad * Mathf.Cos(deg * i));
-            int y = (int)(rad * Mathf.Sin(deg * i));
-            //Checks to see if a good spot to spawn the spawnPoints
-            while (spawnable)
-            {
-                bool resetLoop = false;
-                for (int j = x - quadWidth / 2; j < x + quadWidth / 2; j++)
-                {
-                    for (int k = y - quadHeight / 2; k < y + quadHeight / 2; k++)
-                    {
-
-                        if (map[j, k] != (int)TileType.WATER)
-                        {
-                            x -= x / Mathf.Abs(x);
-                            y -= y / Mathf.Abs(x);
-                            resetLoop = true;
-                            break;
-                        }
-                        if (resetLoop)
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (!resetLoop)
-                {
-                    spawnable = true;
-                }
-            }
-            Spawner.transform.position = new Vector2(x, y);
-            Vector3 dir = -Spawner.transform.position;
-            dir = dir.normalized;
-            Spawner.transform.up = dir;
-            NetworkManager.RegisterStartPosition(Spawner.transform);
-
-            //Spawner.transform.LookAt(new Vector3(transform.position.x, transform.position.z, 0));
-        }
-
-    }
     void Start()
     {
+        if (!Instance)
+        {
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
 
         Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < maxResources; i++)
@@ -109,6 +52,66 @@ public class MapGenerator : MonoBehaviour {
 
             //CmdSpawnResource();
         }
+            maxResources = Mathf.RoundToInt((width + height) / 50);
+            Generate();
+            GenerateGameObjects();
+            //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
+            //minMap.orthographicSize = width / 2;
+            //canvas = GameObject.Find("Canvas").transform;
+            //minMapBorder = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Mini Map Border");
+            //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
+
+            int numPlayers = LobbyManager.numPlayers;
+            Debug.Log(numPlayers);
+            //Circle radius and degree calculation for spawning spawn points
+            //int rad = (width / 2) - 5;
+            //float deg = 90;
+            //if (numPlayers != 0)
+            //{
+            //    deg = 360 / numPlayers;
+            //}
+
+
+            ////Loop through the players and spawn a spawn point for each player along the circle
+            //for (int i = 0; i < numPlayers; i++)
+            //{
+            //    Debug.Log(i);
+            //    bool spawnable = false;
+            //    Spawner = Instantiate(Spawner, transform.position, Quaternion.identity) as GameObject;
+            //    int x = (int)(rad * Mathf.Cos(deg * i));
+            //    int y = (int)(rad * Mathf.Sin(deg * i));
+            //    //Checks to see if a good spot to spawn the spawnPoints
+            //    while (spawnable)
+            //    {
+            //        bool resetLoop = false;
+            //        for (int j = x - quadWidth / 2; j < x + quadWidth / 2; j++)
+            //        {
+            //            for (int k = y - quadHeight / 2; k < y + quadHeight / 2; k++)
+            //            {
+
+            //                if (map[j, k] != (int)TileType.WATER)
+            //                {
+            //                    x -= x / Mathf.Abs(x);
+            //                    y -= y / Mathf.Abs(x);
+            //                    resetLoop = true;
+            //                    break;
+            //                }
+            //                if (resetLoop)
+            //                {
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //        if (!resetLoop)
+            //        {
+            //            spawnable = true;
+            //        }
+            //    }
+            //    Spawner.transform.position = new Vector2(x, y);
+            //    Vector3 dir = -Spawner.transform.position;
+            //    dir = dir.normalized;
+            //    Spawner.transform.up = dir;
+            //    }
     }
 
     // Use this for initialization
@@ -116,12 +119,14 @@ public class MapGenerator : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            DeleteChildren();
-            Generate();
-            GenerateGameObjects();
-        }
+        
+
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    DeleteChildren();
+        //    Generate();
+        //    GenerateGameObjects();
+        //}
 
 
 
@@ -177,8 +182,15 @@ public class MapGenerator : MonoBehaviour {
                 noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width/2, 2) + Mathf.Pow(j - height/2, 2)), 0.5f)/(width/2 + height/2);
                 if (noise < .45f)
                 {
+                    if (noise > Random.Range(0,40f))
+                    {
+                        map[i, j] = (int)TileType.TREE;
+                    }
+                    else
+                    {
+                        map[i, j] = (int)TileType.GRASS;
+                    }
                     
-                    map[i, j] = (int)TileType.GRASS;
                 }
 
                 else if (noise < .5f)
@@ -244,6 +256,7 @@ public class MapGenerator : MonoBehaviour {
                     {
                         SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
                         sR.sprite = sprites[id];
+                        sR.sortingOrder = 0;
                     }
                     //sR.color = colors[id];
                     Tile.transform.position = tilePos;
@@ -266,6 +279,16 @@ public class MapGenerator : MonoBehaviour {
 
                         case (int)TileType.GRASS:
                             Tile.AddComponent<BoxCollider2D>();
+                            break;
+
+                        case (int)TileType.TREE:
+                            Tile.AddComponent<BoxCollider2D>();
+                            GameObject plant = new GameObject();
+                            plant.transform.parent = Tile.transform;
+                            plant.transform.localPosition = Vector3.zero;
+                            SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();
+                            sP.sprite = plantSprites[Random.Range(0, plantSprites.Length)];
+                            sP.sortingOrder = 1;
                             break;
 
 

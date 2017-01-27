@@ -83,6 +83,7 @@ public class Player : NetworkBehaviour {
     private Sprite highlightedSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
+    private bool spawned = false;
     // GameObject references
     private GameObject inGameMenu;
     private GameObject upgradeMenu;
@@ -120,9 +121,14 @@ public class Player : NetworkBehaviour {
     public AudioClip deathS;
 
 	private NetworkStartPosition[] spawnPoints;
+    [SyncVar]
     public bool dead;
     public bool gofast = false;
     public float boost = BASE_BOOST;
+    [SyncVar]
+    public int pSpawned = 0;
+
+    public GameObject MapGen;
 
 	public enum UpgradeID
 	{
@@ -132,6 +138,9 @@ public class Player : NetworkBehaviour {
 		RSTR,
 		CSTR
 	}
+
+
+
 
     //ramming cooldown
     private IEnumerator coroutine;
@@ -148,10 +157,14 @@ public class Player : NetworkBehaviour {
 			}
 
 
+            
+
+
 
 
 
         }
+
 
 
 		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
@@ -178,38 +191,68 @@ public class Player : NetworkBehaviour {
 
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
+
+
+       
     }
 
-    public override void OnStartClient()
+    //public override void OnStartClient()
+    //{
+    //    base.OnStartClient();
+
+    //    if (!isLocalPlayer)
+    //    {
+    //        spawnPlayer(0);
+    //    }
+
+    //}
+
+    //public void spawnPlayer(int ind)
+    //{
+    //    if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
+    //    {
+    //        transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
+    //        GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
+    //    }
+    //    else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
+    //    {
+    //        return;
+    //    }
+    //    else
+    //    {
+    //        spawnPlayer(ind + 1);
+    //    }
+    //}
+
+
+    [ClientRpc]
+    public void RpcIncrement()
     {
-        base.OnStartClient();
-        
-        if (!isLocalPlayer)
-        {
-            spawnPlayer(0);
-        }
-        
+        pSpawned++;
     }
 
-    public void spawnPlayer(int ind)
+    [Command]
+    public void CmdIncrement()
     {
-        if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
-        {
-            transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
-            GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
-        }
-        else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
-        {
-            return;
-        }
-        else
-        {
-            spawnPlayer(ind + 1);
-        }
+        RpcIncrement();
     }
+
 
     void Update()
     {
+        
+        if (!spawned)
+        {
+            
+            GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
+            if (spawners.Length >= LobbyManager.numPlayers)
+            {
+                spawned = true;
+                transform.position = spawners[pSpawned].transform.position;
+                CmdIncrement();
+            }
+            
+        }
         if (playerID < 0 && isServer)
         {
             //print ("Better late than never, adding to bounty manager.");
@@ -238,7 +281,6 @@ public class Player : NetworkBehaviour {
         boostTimer -= Time.deltaTime;
         if (boostTimer < 0)
         {
-            print("ready to speed boost!!");
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 CmdSpeedBoost();
@@ -309,9 +351,8 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
-
-        GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
     }
+
 
 	void FixedUpdate () {
 		UpdateSeagulls ();
@@ -326,6 +367,7 @@ public class Player : NetworkBehaviour {
         currMoveSpeed *= 5;
         print(currMoveSpeed);
     }
+
     [Command]   
 	void CmdFireLeft (int damageStrength) {
 		//print (damageStrength);
@@ -553,7 +595,9 @@ public class Player : NetworkBehaviour {
         //CmdSpawnResources(transform.position);
         
         yield return new WaitForSeconds(2f);
-        transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+        Debug.Log(LobbyManager.numPlayers);
+        GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
+        transform.position = sl[Random.Range(0,sl.Length)].transform.position;
 		Vector3 dir = -transform.position;
 		dir = dir.normalized;
 		transform.up = dir;
@@ -661,12 +705,6 @@ public class Player : NetworkBehaviour {
                 Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
 			costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
 				Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
-            //Highlight Sound
-            UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
-            entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-            entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio)); //call function=> playAudio(...)
-            upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
-            
         }
 		//UpdateVariables ();
         upgradeMenu.SetActive(upgradeMenuActive);
