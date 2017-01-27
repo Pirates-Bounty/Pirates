@@ -28,11 +28,13 @@ public class gameSetUpScript : MonoBehaviour {
                 Destroy(g);
             }
         }
-        int rad = (mg.width / 2) - 5;
+        int rad = (mg.width / 2) - 20;
         float deg = 90;
+        deg *= Mathf.Deg2Rad;
         if (LobbyManager.numPlayers != 0)
         {
             deg = 360 / LobbyManager.numPlayers;
+            deg *= Mathf.Deg2Rad;
         }
 
 
@@ -43,6 +45,8 @@ public class gameSetUpScript : MonoBehaviour {
             GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
             int x = (int)(rad * Mathf.Cos(deg * i));
             int y = (int)(rad * Mathf.Sin(deg * i));
+            Debug.Log(x);
+            Debug.Log(y);
             //Checks to see if a good spot to spawn the spawnPoints
             while (spawnable)
             {
