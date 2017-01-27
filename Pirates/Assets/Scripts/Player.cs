@@ -83,7 +83,6 @@ public class Player : NetworkBehaviour {
     private Sprite highlightedSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
-    private bool spawned = false;
     // GameObject references
     private GameObject inGameMenu;
     private GameObject upgradeMenu;
@@ -120,7 +119,6 @@ public class Player : NetworkBehaviour {
     public AudioClip ramS;
     public AudioClip deathS;
 
-	private NetworkStartPosition[] spawnPoints;
     [SyncVar]
     public bool dead;
     public bool gofast = false;
@@ -128,7 +126,6 @@ public class Player : NetworkBehaviour {
     [SyncVar]
     public int pSpawned = 0;
 
-    public GameObject MapGen;
 
 	public enum UpgradeID
 	{
@@ -150,7 +147,6 @@ public class Player : NetworkBehaviour {
     // Use this for initialization
     void Start () {
 		if (isServer) {
-            Debug.Log("spawn Player");
 			//print ("Adding to bounty manager, here we go.");
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -188,61 +184,9 @@ public class Player : NetworkBehaviour {
        
     }
 
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
-
-    //    if (!isLocalPlayer)
-    //    {
-    //        spawnPlayer(0);
-    //    }
-
-    //}
-
-    //public void spawnPlayer(int ind)
-    //{
-    //    if (GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned == false)
-    //    {
-    //        transform.position = GameObject.FindGameObjectsWithTag("spawner")[ind].transform.position;
-    //        GameObject.FindGameObjectsWithTag("spawner")[ind].GetComponent<SpawnScript>().spawned = true;
-    //    }
-    //    else if (ind >= GameObject.FindGameObjectsWithTag("spawner").Length)
-    //    {
-    //        return;
-    //    }
-    //    else
-    //    {
-    //        spawnPlayer(ind + 1);
-    //    }
-    //}
-
-
-    /*[ClientRpc]
-    public void RpcIncrement()
-    {
-        pSpawned++;
-    }
-
-    [Command]
-    public void CmdIncrement()
-    {
-        RpcIncrement();
-    }*/
-
 
     void Update()
     {
-        
-   //     if (!spawned)
-   //     {
-   //         GameObject[] spawners = GameObject.FindGameObjectsWithTag("spawner");
-			//if (spawners.Length >= LobbyManager.numPlayers && playerID >= 0)
-   //         {
-   //             spawned = true;
-			//	transform.position = spawners[playerID].transform.position;
-   //             //CmdIncrement();
-   //         }
-   //     }
         if (playerID < 0 && isServer)
         {
             //print ("Better late than never, adding to bounty manager.");

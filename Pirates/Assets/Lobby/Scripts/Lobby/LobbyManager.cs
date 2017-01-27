@@ -18,10 +18,7 @@ namespace Prototype.NetworkLobby
 
         static public LobbyManager s_Singleton;
         static public int numPlayers;
-        public bool gameStart = false;
 
-        //public GameObject Sync;
-        public GameObject spawnPoint;
         public GameObject gameSetUp;
 
         [Header("Unity UI Lobby")]
@@ -45,7 +42,6 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
-        public MapGenerator mg;
        
 
       
@@ -67,7 +63,7 @@ namespace Prototype.NetworkLobby
 
         void Start()
         {
-            //Sync.SetActive(true);
+            
             s_Singleton = this;
             _lobbyHooks = GetComponent<Prototype.NetworkLobby.LobbyHook>();
             currentPanel = mainMenuPanel;
@@ -85,24 +81,6 @@ namespace Prototype.NetworkLobby
 
         public void Update()
         {
-            if (gameStart)
-            {
-                gameStart = false;
-                GameObject[] gl = GameObject.FindGameObjectsWithTag("mapGen");
-                if (gl.Length > 1)
-                {
-                    int count = 0;
-                    foreach (GameObject g in gl)
-                    {
-                        if (count > 0)
-                        {
-                            Destroy(g);
-                        }
-                        count++;
-                    }
-                }
-
-            }
         }
 
         
