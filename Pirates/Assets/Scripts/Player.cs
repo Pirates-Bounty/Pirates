@@ -178,10 +178,6 @@ public class Player : NetworkBehaviour {
 
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
-
-
-
-       
     }
 
     public override void OnStartClient()
@@ -313,6 +309,8 @@ public class Player : NetworkBehaviour {
         UpdateInterface();
         UpdateVariables();
         //CmdDisplayHealth ();
+
+        GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
     }
 
 	void FixedUpdate () {
@@ -328,7 +326,6 @@ public class Player : NetworkBehaviour {
         currMoveSpeed *= 5;
         print(currMoveSpeed);
     }
-
     [Command]   
 	void CmdFireLeft (int damageStrength) {
 		//print (damageStrength);
@@ -664,6 +661,12 @@ public class Player : NetworkBehaviour {
                 Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
 			costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
 				Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+            //Highlight Sound
+            UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
+            entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
+            entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio)); //call function=> playAudio(...)
+            upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
+            
         }
 		//UpdateVariables ();
         upgradeMenu.SetActive(upgradeMenuActive);

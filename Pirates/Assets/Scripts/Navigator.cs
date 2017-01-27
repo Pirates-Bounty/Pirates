@@ -6,6 +6,7 @@ public class Navigator : MonoBehaviour {
     // singleton
     public static Navigator Instance;
 	public AudioClip clickS;
+    public AudioClip highlightAudio;
 
     void Awake() {
         if (!Instance) {
@@ -14,10 +15,6 @@ public class Navigator : MonoBehaviour {
         } else if (Instance != this) {
             Destroy(gameObject);
         }
-    }
-
-    void Update() {
-
     }
 
     public void LoadLevel(string action) {
@@ -29,6 +26,4 @@ public class Navigator : MonoBehaviour {
             SceneManager.LoadScene(action);
         }
     }
-
-
 }
