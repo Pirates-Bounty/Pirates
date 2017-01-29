@@ -1114,14 +1114,19 @@ Prefab:
       objectReference: {fileID: 8300000, guid: b06047a9e1801c4419394359b6494a34, type: 3}
     - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
         type: 2}
-      propertyPath: volumeBGM
-      value: 20
-      objectReference: {fileID: 0}
+      propertyPath: battleBGM
+      value: 
+      objectReference: {fileID: 8300000, guid: 96c1da1e5d694fb42a981ad584aecc2f, type: 3}
     - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
         type: 2}
-      propertyPath: volumeSFX
-      value: 20
-      objectReference: {fileID: 0}
+      propertyPath: mainBGM
+      value: 
+      objectReference: {fileID: 8300000, guid: 93905775856c5c845950abecc35720ef, type: 3}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: fieldBGM
+      value: 
+      objectReference: {fileID: 8300000, guid: 93905775856c5c845950abecc35720ef, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0eb6815df8606524a8515b095d1b6d32, type: 2}
   m_IsPrefabParent: 0

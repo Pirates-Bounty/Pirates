@@ -179,11 +179,13 @@ public class Player : NetworkBehaviour {
 
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
-
-
-       
+        //SOUND - BGM start & enemyDetector initialization
+        SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
+        CircleCollider2D enemyDetector = gameObject.AddComponent<CircleCollider2D>();
+        enemyDetector.isTrigger = true;
+        enemyDetector.radius = 70;
     }
-
+    
 
     void Update()
     {
@@ -286,7 +288,17 @@ public class Player : NetworkBehaviour {
         UpdateVariables();
         //CmdDisplayHealth ();
 
+        //SOUND - SoundManager reposition & BGMswitch debugger (space key)
         GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
+        if (Input.GetKeyDown("space"))
+        {
+            print("space key was pressed (for BGM test)");
+            if(SoundManager.Instance.trackOnPlay == (int)TrackID.BGM_FIELD)
+                SoundManager.Instance.SwitchBGM((int)TrackID.BGM_BATTLE, 1.0f);
+            else
+                SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
+        }
+
     }
 
 
@@ -746,4 +758,14 @@ public class Player : NetworkBehaviour {
 			AudioSource.PlayClipAtPoint (seagullS, transform.position, 100.0f);
 		}
 	}
+
+    //SOUND - code commented  for now
+    //called by enemyDetector CircleCollider2D from Start function
+    //private void OnTriggerStay2D(Collider2D collision)
+    //{
+    //    if (collision.tag == "Player")
+    //    {
+    //        Debug.Log("Enemy Detected!");
+    //    }
+    //}
 }
