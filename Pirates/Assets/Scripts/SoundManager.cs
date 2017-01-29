@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//order relates to Awake SetBGM
 public enum TrackID
 {
     BGM_FIELD,
@@ -12,24 +13,23 @@ public class SoundManager : MonoBehaviour {
     // singleton
     public static SoundManager Instance;
 
-    //volume control
+    // volume control & current BGM ID
     public float volumeBGM;
     public float volumeSFX;
-
-    // SFX list, value is set from inspector
+    public int trackOnPlay;
+    // audio list, values are set from inspector
     public AudioClip highlightAudio;
     public AudioClip battleBGM;
     public AudioClip fieldBGM;
+
+    // private members
     private AudioSource[] bgm;
-
-    public int trackOnPlay;
-
     private int trackFadeIn;
     private int trackFadeOut;
     private float fadeTime;
     private bool isFade;
-    //private bool[] isPlayed;
 
+    // initializations
     void Awake()
     {
         if (!Instance)
@@ -50,15 +50,15 @@ public class SoundManager : MonoBehaviour {
         fadeTime = 1;
         isFade = false;
 
-        SetBGM(fieldBGM, battleBGM); //orders connected to enum TrackNumber
-    }
-
-    //=== PRIVATE FUNCTIONS ===
-
-    private void Start()
-    {
+        SetBGM(fieldBGM, battleBGM); //order relates to enum TrackID
         transform.position = GameObject.Find("Main Camera").transform.position;
     }
+
+
+
+    //=== PRIVATE FUNCTIONS ===
+    //- Update : fade mechanic
+    //- SetBGM : AudioSource bgm initialization
 
     private void Update()
     {
@@ -87,10 +87,9 @@ public class SoundManager : MonoBehaviour {
         }
     }
 
-    private void SetBGM(params AudioClip[] audio)
+    private void SetBGM(params AudioClip[] audio) //input: BGMList
     {
         bgm = new AudioSource[audio.Length];
-        //isPlayed = new bool[audio.Length];
         for(int i=0; i<bgm.Length; i++)
         {
             bgm[i] = GameObject.Find("SoundManager").AddComponent<AudioSource>();
@@ -99,22 +98,28 @@ public class SoundManager : MonoBehaviour {
         }
     }
 
-    
+
 
     //=== PUBLIC FUNCTIONS ===
+    //- PlayBGM    : play a BGM, stop other BGMs
+    //- SwitchBGM  : gradually switch BGMs
+    //- FadeIn     : gradually play BGM
+    //- FadeOut    : gradually stop BGM
+    //- StopAllBGM : stop all playing BGM
+    //- PlaySFX    : play one shot audio clip
 
-    public void SwitchBGM(int trackSelect, float t)
+    public void PlayBGM(int track) //input: TrackID
+    {
+        StopAllBGM();
+        bgm[track].volume = volumeBGM;
+        bgm[track].Play();
+        trackOnPlay = track;
+    }
+
+    public void SwitchBGM(int trackSelect, float t) //input: TrackID, fadeTime
     {
         
-        if (trackOnPlay == -1)
-        {
-            if (!bgm[trackSelect].isPlaying)
-            {
-                bgm[trackSelect].volume = volumeBGM;
-                bgm[trackSelect].Play();
-            }
-            trackOnPlay = trackSelect;
-        }
+        if (trackOnPlay == -1) PlayBGM(trackSelect);
         else if (trackOnPlay != trackSelect)
         {
             FadeOut(trackOnPlay, t);
@@ -123,12 +128,11 @@ public class SoundManager : MonoBehaviour {
                 bgm[trackSelect].volume = 0;
                 bgm[trackSelect].Play();
             }
-                
             FadeIn(trackSelect, t);
         }
     }
 
-    public void FadeIn(int track, float t)
+    public void FadeIn(int track, float t) //input: TrackID, fadeTime
     {
         if (t <= 0) t = 1;
         if (track < 0 || track >= bgm.Length) track = 0;
@@ -139,7 +143,7 @@ public class SoundManager : MonoBehaviour {
         isFade = true;
     }
 
-    public void FadeOut(int track, float t)
+    public void FadeOut(int track, float t) //input: TrackID, fadeTime
     {
         if (t <= 0) t = 1;
         if (track < 0 || track >= bgm.Length) track = 0;
@@ -148,7 +152,14 @@ public class SoundManager : MonoBehaviour {
         isFade = true;
     }
 
-    public void PlaySFX(AudioClip audio)
+    public void StopAllBGM()
+    {
+        for(int i=0; i<bgm.Length; i++)
+            bgm[i].Stop();
+        trackOnPlay = -1;
+    }
+
+    public void PlaySFX(AudioClip audio) //input: SFXClip
     {
         AudioSource.PlayClipAtPoint(audio, transform.position, volumeSFX);
     }
