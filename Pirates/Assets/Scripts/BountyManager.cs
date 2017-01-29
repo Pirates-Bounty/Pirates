@@ -110,7 +110,7 @@ public class BountyManager : NetworkBehaviour {
 				}
 
 				if (bountyTexts.Count <= i) {
-					int playerCount = playerBounties.Count;
+					int playerCount = playerList.Length;
 					if (bountyPanel != null) {
 						//print ("postin' a bounty (late)");
 						/*bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + i + " | " + playerBounties [i] + "g", font, Color.black, 24, bountyPanel.transform,
@@ -136,7 +136,8 @@ public class BountyManager : NetworkBehaviour {
 		//localID = CmdCreateID ();
 		//return localID;
 
-		int newID = playerBounties.Count;
+		Player[] playerList = FindObjectsOfType<Player> ();
+		int newID = playerList.Length;
 		playerBounties.Add (100);
 		killStreak.Add (0);
 		if (bountyPanel != null) {
