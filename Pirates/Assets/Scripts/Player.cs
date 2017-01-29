@@ -227,8 +227,9 @@ public class Player : NetworkBehaviour {
 
         if (gofast == true && boost > 0)
         {
-           boost -= Time.deltaTime;
+			boost -= Time.deltaTime;
             currMoveSpeed -= Time.deltaTime * currMoveSpeed;
+			currRotationSpeed += Time.deltaTime * currRotationSpeed;
         }
         else if (boost < 0)
         {
@@ -310,6 +311,7 @@ public class Player : NetworkBehaviour {
     void SpeedBoost()
     {
         currMoveSpeed *= 5;
+		currRotationSpeed /= 5;
     }
 
     [Command]   
@@ -719,10 +721,10 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-		currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
         if (gofast == false) // only update movement speed if not in boost mode
         {
             currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 2.0f));
+			currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
         }
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
 		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));

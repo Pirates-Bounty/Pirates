@@ -110,19 +110,26 @@ public class BountyManager : NetworkBehaviour {
 				}
 
 				if (bountyTexts.Count <= i) {
-					int playerCount = playerList.Length;
 					if (bountyPanel != null) {
-						//print ("postin' a bounty (late)");
-						/*bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + i + " | " + playerBounties [i] + "g", font, Color.black, 24, bountyPanel.transform,
-							Vector3.zero, new Vector2 (0.1f, 1.0f / 4f * (3-i)), new Vector2 (0.9f, 1.0f / 4f * (4-i)), TextAnchor.MiddleCenter, true));*/
-						bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + (i+1) + " | " + playerBounties [i] + "g", font, Color.black, 24, bountyPanel.transform,
+						int playerCount = playerList.Length;
+						for (int j=0; j < bountyTexts.Count; j++)
+						{
+							GameObject oldText = bountyTexts [j];
+							Text tx = oldText.GetComponent<Text> ();
+							GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent, 
+								Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(j+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-j)), TextAnchor.UpperLeft, true);
+							bountyTexts [j] = newText;
+							GameObject.Destroy (oldText);
+						}
+
+						bountyTexts.Add (UI.CreateText ("Bounty Text " + i, "Player " + (i+1) + " | " + playerBounties [playerList[i].playerID] + "g", font, Color.black, 24, bountyPanel.transform,
 							Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(i+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-i)), TextAnchor.UpperLeft, true));
 					}
 				} else {
-					bountyTexts [i].GetComponent<Text> ().text = "Player " + (i+1) + "  |  " + playerBounties [i];
-					/*if (i == localID) {
-						bountyTexts [i].GetComponent<Text> ().color = Color.red;
-					}*/
+					bountyTexts [playerList[i].playerID].GetComponent<Text> ().text = "Player " + (i+1) + "  |  " + playerBounties [playerList[i].playerID];
+					if (playerList[i].isLocalPlayer) {
+						bountyTexts [playerList[i].playerID].GetComponent<Text> ().color = Color.red;
+					}
 				}
 			}
 		}
@@ -142,6 +149,17 @@ public class BountyManager : NetworkBehaviour {
 		killStreak.Add (0);
 		if (bountyPanel != null) {
 			int playerCount = playerList.Length;
+
+			for (int j=0; j < bountyTexts.Count; j++)
+			{
+				GameObject oldText = bountyTexts [j];
+				Text tx = oldText.GetComponent<Text> ();
+				GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent, 
+					Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(j+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-j)), TextAnchor.UpperLeft, true);
+				bountyTexts [j] = newText;
+				GameObject.Destroy (oldText);
+			}
+
 			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + (newID+1) + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
 				Vector3.zero, new Vector2 (0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2 (0.9f, 1f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, true));
 			/*bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
