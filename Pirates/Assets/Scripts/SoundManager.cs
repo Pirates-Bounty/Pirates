@@ -161,6 +161,6 @@ public class SoundManager : MonoBehaviour {
 
     public void PlaySFX(AudioClip audio) //input: SFXClip
     {
-        AudioSource.PlayClipAtPoint(audio, transform.position, volumeSFX);
+        AudioSource.PlayClipAtPoint(audio, transform.position, 0.05f);
     }
 }

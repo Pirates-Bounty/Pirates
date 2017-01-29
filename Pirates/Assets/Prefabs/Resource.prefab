@@ -119,6 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifetime: 30
   gold: 100
+  coinS: {fileID: 8300000, guid: 70846e39b61279f499a9cdc361d0a49d, type: 3}
 --- !u!114 &114000011044634902
 MonoBehaviour:
   m_ObjectHideFlags: 1
