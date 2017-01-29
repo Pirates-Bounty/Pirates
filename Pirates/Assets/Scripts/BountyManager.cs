@@ -137,11 +137,11 @@ public class BountyManager : NetworkBehaviour {
 		//return localID;
 
 		Player[] playerList = FindObjectsOfType<Player> ();
-		int newID = playerList.Length;
+		int newID = playerBounties.Count;
 		playerBounties.Add (100);
 		killStreak.Add (0);
 		if (bountyPanel != null) {
-			int playerCount = playerBounties.Count;
+			int playerCount = playerList.Length;
 			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + (newID+1) + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
 				Vector3.zero, new Vector2 (0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2 (0.9f, 1f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, true));
 			/*bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
@@ -169,8 +169,10 @@ public class BountyManager : NetworkBehaviour {
 
 
 	private void CreateBountyPanel() {
+		Player[] playerList = FindObjectsOfType<Player> ();
+		int playerCount = playerList.Length;
 		bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(1.0f, 1.0f, 1.0f, 0.65f), canvas.transform,
-			Vector3.zero, new Vector2(0.02f, 0.95f-0.1f*playerBounties.Count), new Vector3(0.18f, 0.95f));
+			Vector3.zero, new Vector2(0.02f, 0.95f-0.1f*playerCount), new Vector3(0.18f, 0.95f));
 	}
 
 	private int GetHighestBounty() {
