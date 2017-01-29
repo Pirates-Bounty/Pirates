@@ -18,16 +18,32 @@ public class BountyManager : NetworkBehaviour {
 	private Canvas canvas;
 	private Font font;
     public GameObject spawnPoint;
+    public int maxResources = 40;
+    public GameObject resourcePrefab;
+    private GameObject MapGen;
 
 	// Use this for initialization
 	void Start () {
-        spawnPoints(GameObject.FindGameObjectWithTag("mapGen").GetComponent<MapGenerator>());
+
+        MapGen = GameObject.FindGameObjectWithTag("mapGen");
+        //maxResources = Mathf.RoundToInt((width + height) / 50);
+        
 		font = Resources.Load<Font>("Art/Fonts/riesling");
 
-		if (!isLocalPlayer) {
+        Random.InitState(System.DateTime.Now.Millisecond);
+        for (int i = 0; i < maxResources; i++)
+        {
+            CmdSpawnResource();
+        }
+
+        if (!isLocalPlayer) {
 			return;
 		}
-		canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+
+
+
+
+        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 		if (canvas != null) {
 			CreateBountyPanel ();
 			//print ("makin' a bounty board");
@@ -35,68 +51,20 @@ public class BountyManager : NetworkBehaviour {
 	}
 
 
-
-    public void spawnPoints(MapGenerator mg)
+    [Command]
+    void CmdSpawnResource()
     {
-        if (GameObject.FindGameObjectsWithTag("spawner") != null)
+        if (!isServer)
         {
-            foreach (GameObject g in GameObject.FindGameObjectsWithTag("spawner"))
-            {
-                Destroy(g);
-            }
+            return;
         }
-        int rad = (mg.width / 2) - 5;
-        float deg = 90;
-        if (LobbyManager.numPlayers != 0)
-        {
-            deg = 360 / LobbyManager.numPlayers;
-        }
-
-
-        //Loop through the players and spawn a spawn point for each player along the circle
-        for (int i = 0; i < LobbyManager.numPlayers; i++)
-        {
-            bool spawnable = false;
-            GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
-            int x = (int)(rad * Mathf.Cos(deg * i));
-            int y = (int)(rad * Mathf.Sin(deg * i));
-            //Checks to see if a good spot to spawn the spawnPoints
-            while (spawnable)
-            {
-                bool resetLoop = false;
-                for (int j = x - mg.quadWidth / 2; j < x + mg.quadWidth / 2; j++)
-                {
-                    for (int k = y - mg.quadHeight / 2; k < y + mg.quadHeight / 2; k++)
-                    {
-
-                        if (mg.map[j, k] != (int)TileType.WATER)
-                        {
-                            x -= x / Mathf.Abs(x);
-                            y -= y / Mathf.Abs(x);
-                            resetLoop = true;
-                            break;
-                        }
-                        if (resetLoop)
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (!resetLoop)
-                {
-                    spawnable = true;
-                }
-            }
-            spawn.transform.position = new Vector2(x, y);
-            Vector3 dir = -spawn.transform.position;
-            dir = dir.normalized;
-            spawn.transform.up = dir;
-            spawn.GetComponent<SpawnScript>().spawned = true;
-            NetworkServer.Spawn(spawn);
-        }
-
-
+        ClientScene.RegisterPrefab(resourcePrefab);
+        GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-MapGen.GetComponent<MapGenerator>().width / 2, MapGen.GetComponent<MapGenerator>().width / 2), Random.Range(-MapGen.GetComponent<MapGenerator>().height / 2, MapGen.GetComponent<MapGenerator>().height / 2)), Quaternion.identity) as GameObject;
+        NetworkServer.Spawn(instantiatedResource);
     }
+
+
+    
 
 
 
@@ -125,6 +93,10 @@ public class BountyManager : NetworkBehaviour {
 						bonusMod = 1.2f;
 					}
 					playerBounties [playerList [i].playerID] = (int)((BASE_BOUNTY + upgradeBounty + killStreakBounty)*bonusMod);
+				}
+
+				if (playerBounties [playerList [i].playerID] >= 1000) {
+					DeclareVictory (playerList [i].playerID);
 				}
 
 				if (bountyTexts.Count <= i) {
@@ -183,5 +155,11 @@ public class BountyManager : NetworkBehaviour {
 			}
 		}
 		return highestID;
+	}
+
+
+	private IEnumerator DeclareVictory(int playerID) {
+		// delcare the winning player to be the pirate king
+		yield return new WaitForSeconds(0.1f);
 	}
 }

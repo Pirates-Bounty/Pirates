@@ -241,7 +241,7 @@ GameObject:
   - 114: {fileID: 800447154}
   m_Layer: 0
   m_Name: BountyManager
-  m_TagString: Untagged
+  m_TagString: bountyManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -258,6 +258,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 1000010141130924, guid: 4106d905dedfae047aa67ddaa0383d52, type: 2}
+  maxResources: 40
+  resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
+    type: 2}
 --- !u!114 &800447155
 MonoBehaviour:
   m_ObjectHideFlags: 0

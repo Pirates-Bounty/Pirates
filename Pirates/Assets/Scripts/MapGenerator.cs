@@ -45,14 +45,12 @@ public class MapGenerator : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-
-        Random.InitState(System.DateTime.Now.Millisecond);
-        for (int i = 0; i < maxResources; i++)
+        if (GameObject.FindGameObjectsWithTag("mapGen").Length >= 2)
         {
-
-            //CmdSpawnResource();
+            Destroy(gameObject);
         }
-            maxResources = Mathf.RoundToInt((width + height) / 50);
+
+            
             Generate();
             GenerateGameObjects();
             //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
@@ -62,56 +60,6 @@ public class MapGenerator : MonoBehaviour {
             //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
 
             int numPlayers = LobbyManager.numPlayers;
-            Debug.Log(numPlayers);
-            //Circle radius and degree calculation for spawning spawn points
-            //int rad = (width / 2) - 5;
-            //float deg = 90;
-            //if (numPlayers != 0)
-            //{
-            //    deg = 360 / numPlayers;
-            //}
-
-
-            ////Loop through the players and spawn a spawn point for each player along the circle
-            //for (int i = 0; i < numPlayers; i++)
-            //{
-            //    Debug.Log(i);
-            //    bool spawnable = false;
-            //    Spawner = Instantiate(Spawner, transform.position, Quaternion.identity) as GameObject;
-            //    int x = (int)(rad * Mathf.Cos(deg * i));
-            //    int y = (int)(rad * Mathf.Sin(deg * i));
-            //    //Checks to see if a good spot to spawn the spawnPoints
-            //    while (spawnable)
-            //    {
-            //        bool resetLoop = false;
-            //        for (int j = x - quadWidth / 2; j < x + quadWidth / 2; j++)
-            //        {
-            //            for (int k = y - quadHeight / 2; k < y + quadHeight / 2; k++)
-            //            {
-
-            //                if (map[j, k] != (int)TileType.WATER)
-            //                {
-            //                    x -= x / Mathf.Abs(x);
-            //                    y -= y / Mathf.Abs(x);
-            //                    resetLoop = true;
-            //                    break;
-            //                }
-            //                if (resetLoop)
-            //                {
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //        if (!resetLoop)
-            //        {
-            //            spawnable = true;
-            //        }
-            //    }
-            //    Spawner.transform.position = new Vector2(x, y);
-            //    Vector3 dir = -Spawner.transform.position;
-            //    dir = dir.normalized;
-            //    Spawner.transform.up = dir;
-            //    }
     }
 
     // Use this for initialization
@@ -134,17 +82,7 @@ public class MapGenerator : MonoBehaviour {
 	
 	}
 
-    //[Command]
-    //void CmdSpawnResource()
-    //{
-    //    if (!isServer)
-    //    {
-    //        return;
-    //    }
-    //    ClientScene.RegisterPrefab(resourcePrefab);
-    //    GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-width / 2, width / 2), Random.Range(-height / 2, height / 2)), Quaternion.identity) as GameObject;
-    //    NetworkServer.Spawn(instantiatedResource);
-    //}
+
 
     void DeleteChildren()
     {

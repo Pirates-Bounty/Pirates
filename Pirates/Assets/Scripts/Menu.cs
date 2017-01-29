@@ -6,16 +6,21 @@ public class Menu : MonoBehaviour {
     private Font font;
     private Sprite sprite;
     private Sprite highlightedSprite;
-    private Sprite background;
+    //private Sprite background;
     private Color color = Color.black;
 
     private GameObject playButton;
     private GameObject instructionsButton;
     private GameObject quitButton;
-    private GameObject backgroundPanel;
-    private float maxRotation = 0.5f;
+    private GameObject boat;
+    private GameObject leftArm;
+    private GameObject rightArm;
+    private GameObject waves1;
+    private GameObject waves2;
+    private float maxRotation = 2f;
     private float currentRotation = 0.0f;
     private bool positive = true;
+    private bool forward = true;
 
 	private AudioClip menuM;
     private AudioClip highlightAudio;
@@ -24,12 +29,17 @@ public class Menu : MonoBehaviour {
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").transform;
+        boat = GameObject.Find("Boat");
+        waves1 = GameObject.Find("Waves 1");
+        waves2 = GameObject.Find("Waves 2");
+        leftArm = GameObject.Find("leftarm");
+        rightArm = GameObject.Find("rightarm");
         font = Resources.Load<Font>("Art/Fonts/Angel Tears");
         sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
         highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
-        background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
+        //background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
         //Background
-        backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
+        //backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
             Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.5f), delegate { Navigator.Instance.LoadLevel("Lobby"); });
@@ -63,13 +73,31 @@ public class Menu : MonoBehaviour {
 	void Update () {
         // make the background sway back and forth
         if(currentRotation < maxRotation && positive) {
-            currentRotation += Time.deltaTime;
+            currentRotation += 2f*Time.deltaTime;
         } else if(currentRotation > -maxRotation && !positive){
-            currentRotation -= Time.deltaTime;
+            currentRotation -= 2f*Time.deltaTime;
         } else {
             positive = !positive;
         }
-        backgroundPanel.GetComponent<RectTransform>().rotation = Quaternion.Euler(0.0f, 0.0f, currentRotation);
+        boat.transform.rotation = Quaternion.Euler(0.0f, 0.0f, currentRotation);
+        leftArm.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -2f * currentRotation);
+        rightArm.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -2f * currentRotation);
+        if (boat.transform.position.x > 5 || boat.transform.position.x < -5) {
+            forward = !forward;
+        }
+        if (forward) {
+            boat.transform.Translate(new Vector3(1f * Time.deltaTime, 0f, 0f));
+        } else {
+            boat.transform.Translate(new Vector3(-1f * Time.deltaTime, 0f, 0f));
+        }
+        if (positive) {
+            waves1.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
+            waves2.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
+        } else {
+            waves1.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
+            waves2.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
+        }
+
 
 	}
     

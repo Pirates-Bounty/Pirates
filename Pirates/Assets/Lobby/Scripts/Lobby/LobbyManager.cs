@@ -18,10 +18,8 @@ namespace Prototype.NetworkLobby
 
         static public LobbyManager s_Singleton;
         static public int numPlayers;
-        public bool gameStart = false;
 
-        //public GameObject Sync;
-        public GameObject spawnPoint;
+        public GameObject gameSetUp;
 
         [Header("Unity UI Lobby")]
         [Tooltip("Time in second between all players ready & match start")]
@@ -37,6 +35,7 @@ namespace Prototype.NetworkLobby
         public LobbyInfoPanel infoPanel;
         public LobbyCountdownPanel countdownPanel;
         public GameObject addPlayerButton;
+        public GameObject mapGen;
 
         protected RectTransform currentPanel;
 
@@ -44,7 +43,6 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
-        public MapGenerator mg;
        
 
       
@@ -66,7 +64,7 @@ namespace Prototype.NetworkLobby
 
         void Start()
         {
-            //Sync.SetActive(true);
+            
             s_Singleton = this;
             _lobbyHooks = GetComponent<Prototype.NetworkLobby.LobbyHook>();
             currentPanel = mainMenuPanel;
@@ -84,24 +82,6 @@ namespace Prototype.NetworkLobby
 
         public void Update()
         {
-            if (gameStart)
-            {
-                gameStart = false;
-                GameObject[] gl = GameObject.FindGameObjectsWithTag("mapGen");
-                if (gl.Length > 1)
-                {
-                    int count = 0;
-                    foreach (GameObject g in gl)
-                    {
-                        if (count > 0)
-                        {
-                            Destroy(g);
-                        }
-                        count++;
-                    }
-                }
-
-            }
         }
 
         
@@ -245,7 +225,6 @@ namespace Prototype.NetworkLobby
             {
                 StopMatchMaker();
             }
-
             ChangeTo(mainMenuPanel);
         }
 
@@ -417,6 +396,8 @@ namespace Prototype.NetworkLobby
                 }
             }
 
+            gameSetUp.SetActive(true);
+
             for (int i = 0; i < lobbySlots.Length; ++i)
             {
                 if (lobbySlots[i] != null)
@@ -425,28 +406,10 @@ namespace Prototype.NetworkLobby
                 }
             }
             numPlayers = _playerNumber;
-            //Sync.GetComponent<SyncMapGeneration>().CmdChangeStartGen();
-            StartCoroutine(WaitForLoad());
-           
-        }
 
-        public IEnumerator WaitForLoad()
-        {
-            yield return new WaitForSeconds(1);
+            mapGen.SetActive(true);
             ServerChangeScene(playScene);
-            
-        }
 
-        public override void OnServerReady(NetworkConnection conn)
-        {
-
-
-            
-            //GameObject mg = Instantiate(MapGen, Vector3.zero, Quaternion.identity)as GameObject;
-            
-            
-            MapGenerator.gameStart = true;
-            base.OnServerReady(conn);
         }
 
 
