@@ -673,7 +673,7 @@ MonoBehaviour:
   midUpgrades: 0
   highUpgrades: 0
   currentHealth: 100
-  resources: 1000
+  resources: 0
   bases:
   - {fileID: 21300000, guid: 84006ae870dc442649385f311c99b558, type: 3}
   - {fileID: 21300000, guid: 19824cbeb66b14df1980429ef4a785c6, type: 3}
@@ -732,9 +732,11 @@ MonoBehaviour:
   currMoveSpeed: 10
   currRotationSpeed: 25
   currFiringDelay: 0.3
+  currBoostDelay: 5
   currRamDamage: 20
   currProjectileStrength: 10
   firingTimer: 0.3
+  boostTimer: 5
   currMaxHealth: 100
   currVelocity: 0
   seagullS: {fileID: 8300000, guid: 09e636280fff23342a5f5e3305217153, type: 3}
@@ -743,7 +745,9 @@ MonoBehaviour:
   ramS: {fileID: 8300000, guid: 8a81824155d9e3c49b2151f88e72d2c5, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
   dead: 0
-  MapGen: {fileID: 1000010902933306, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
+  gofast: 0
+  boost: 1.2
+  pSpawned: 0
 --- !u!114 &114000014027217456
 MonoBehaviour:
   m_ObjectHideFlags: 1

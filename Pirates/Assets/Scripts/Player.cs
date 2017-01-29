@@ -181,9 +181,9 @@ public class Player : NetworkBehaviour {
 
         //SOUND - BGM start & enemyDetector initialization
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
-        CircleCollider2D enemyDetector = gameObject.AddComponent<CircleCollider2D>();
+        /*CircleCollider2D enemyDetector = gameObject.AddComponent<CircleCollider2D>();
         enemyDetector.isTrigger = true;
-        enemyDetector.radius = 70;
+        enemyDetector.radius = 70;*/
     }
     
 
