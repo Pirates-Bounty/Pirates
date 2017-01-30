@@ -146,7 +146,8 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
-		if (isServer) {
+        StartCoroutine(BoatRepairs());
+        if (isServer) {
 			//print ("Adding to bounty manager, here we go.");
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -189,6 +190,8 @@ public class Player : NetworkBehaviour {
 
     void Update()
     {
+
+
         if (playerID < 0 && isServer)
         {
             //print ("Better late than never, adding to bounty manager.");
@@ -439,7 +442,15 @@ public class Player : NetworkBehaviour {
 		if (flatSet) {
 			currentHealth = setHealth;
 		} else {
-			currentHealth += setHealth;
+            if (currentHealth + setHealth <= currMaxHealth)
+            {
+                currentHealth += setHealth;
+            }
+            else
+            {
+                currentHealth = currMaxHealth;
+            }
+			
 		}
 	}
 	[Command]
@@ -580,6 +591,25 @@ public class Player : NetworkBehaviour {
         dead = false;*/
 
 		CmdDeath (false);
+    }
+
+
+
+    IEnumerator BoatRepairs()
+    {
+        while (true)
+        {
+
+            yield return new WaitForSeconds(2);
+            if (currentHealth != currMaxHealth && !dead)
+            {
+                if (GetComponent<Rigidbody2D>().velocity.SqrMagnitude() >= 0 && GetComponent<Rigidbody2D>().velocity.SqrMagnitude() <= .5)
+                {
+                    CmdChangeHealth(5, false);
+                }
+            }
+        }
+
     }
 
 
