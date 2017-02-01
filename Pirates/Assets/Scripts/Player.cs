@@ -118,6 +118,9 @@ public class Player : NetworkBehaviour {
 	private float creakTimer = 0;
     public AudioClip ramS;
     public AudioClip deathS;
+    //other UI sounds
+    public AudioClip sfx_upgradeMenuOpen;
+    public AudioClip sfx_upgradeMenuClose;
 
     [SyncVar]
     public bool dead;
@@ -171,6 +174,10 @@ public class Player : NetworkBehaviour {
         highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
+
+        sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
+        sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
+
         if (!isLocalPlayer) {
             return;
         }
@@ -180,13 +187,10 @@ public class Player : NetworkBehaviour {
 
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
-        //SOUND - BGM start & enemyDetector initialization
+        
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
-        /*CircleCollider2D enemyDetector = gameObject.AddComponent<CircleCollider2D>();
-        enemyDetector.isTrigger = true;
-        enemyDetector.radius = 70;*/
+        InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
-    
 
     void Update()
     {
@@ -294,14 +298,6 @@ public class Player : NetworkBehaviour {
 
         //SOUND - SoundManager reposition & BGMswitch debugger (space key)
         GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
-        if (Input.GetKeyDown("space"))
-        {
-            print("space key was pressed (for BGM test)");
-            if(SoundManager.Instance.trackOnPlay == (int)TrackID.BGM_FIELD)
-                SoundManager.Instance.SwitchBGM((int)TrackID.BGM_BATTLE, 1.0f);
-            else
-                SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
-        }
 
     }
 
@@ -501,6 +497,11 @@ public class Player : NetworkBehaviour {
             }
             upgradeMenuActive = !upgradeMenuActive;
             upgradeMenu.SetActive(upgradeMenuActive);
+
+            if (upgradeMenuActive)
+                SoundManager.Instance.PlaySFX(sfx_upgradeMenuOpen,0.15f);
+            else
+                SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose,0.15f);
         }
     }
     void OnChangePlayer(float health) {
@@ -681,9 +682,14 @@ public class Player : NetworkBehaviour {
             sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.7f), new Vector2(0.75f, 0.9f),
             delegate {
                 UI.CreateYesNoDialog("Confirmation", "Are you sure?",
-         font, Color.black, 24, menuBackground, sprite, highlightedSprite,
-         Color.white, inGameMenu.transform, Vector3.zero, new Vector2(0.25f, 0.1f),
-         new Vector2(0.75f, 0.9f), delegate { Navigator.Instance.LoadLevel("Menu"); });
+                 font, Color.black, 24, menuBackground, sprite, highlightedSprite,
+                 Color.white, inGameMenu.transform, Vector3.zero, new Vector2(0.25f, 0.1f),
+                 new Vector2(0.75f, 0.9f),
+                 delegate {
+                     CancelInvoke("EnemyDetection");
+                     Navigator.Instance.LoadLevel("Menu");
+
+                 });
             });
         GameObject optionButton = UI.CreateButton("Options Button", "Options", font, Color.black, 24, inGameMenu.transform,
             sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.4f), new Vector2(0.75f, 0.6f), delegate {; });
@@ -791,13 +797,19 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
-    //SOUND - code commented  for now
-    //called by enemyDetector CircleCollider2D from Start function
-    //private void OnTriggerStay2D(Collider2D collision)
-    //{
-    //    if (collision.tag == "Player")
-    //    {
-    //        Debug.Log("Enemy Detected!");
-    //    }
-    //}
+    //SOUND - battle bgm
+    private void EnemyDetection()
+    {
+        LayerMask detectionLayer;
+        Collider2D[] detectionResult = new Collider2D[10];
+
+        detectionLayer = 1 << 9; // layerName: Player
+        int detectionBattle = Physics2D.OverlapCircleNonAlloc(transform.position, 60.0f, detectionResult, detectionLayer);
+        int detectionEscape = Physics2D.OverlapCircleNonAlloc(transform.position, 90.0f, detectionResult, detectionLayer);
+
+        if (detectionBattle > 1 && SoundManager.Instance.NowPlaying() == (int)TrackID.BGM_FIELD)
+            SoundManager.Instance.SwitchBGM((int)TrackID.BGM_BATTLE, 2.0f);
+        if (detectionEscape <= 1)
+            SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 2.0f);
+    }
 }

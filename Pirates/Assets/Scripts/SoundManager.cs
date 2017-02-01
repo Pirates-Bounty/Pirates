@@ -5,7 +5,9 @@ using System.Collections;
 public enum TrackID
 {
     BGM_FIELD,
-    BGM_BATTLE
+    BGM_BATTLE,
+    BGM_MENU,
+    BGM_LOBBY
 }
 
 public class SoundManager : MonoBehaviour {
@@ -13,17 +15,22 @@ public class SoundManager : MonoBehaviour {
     // singleton
     public static SoundManager Instance;
 
-    // volume control & current BGM ID
-    public float volumeBGM;
-    public float volumeSFX;
-    public int trackOnPlay;
+    // volume control
+    public float volumeBGM; //of overall BGM
+    public float volumeSFX; //of overall SFX
+    
     // audio list, values are set from inspector
     public AudioClip highlightAudio;
     public AudioClip battleBGM;
     public AudioClip fieldBGM;
+    public AudioClip menuBGM;
+    public AudioClip lobbyBGM;
 
     // private members
     private AudioSource[] bgm;
+    private float[] vol; //volume multiplier of individual bgm;
+    
+    private int trackOnPlay;
     private int trackFadeIn;
     private int trackFadeOut;
     private float fadeTime;
@@ -43,22 +50,24 @@ public class SoundManager : MonoBehaviour {
         }
 
         volumeBGM = 0.3f;
-        volumeSFX = 0.3f;
+        volumeSFX = 0.05f;
         trackOnPlay = -1;
         trackFadeIn = -1;
         trackFadeOut = -1;
         fadeTime = 1;
         isFade = false;
 
-        SetBGM(fieldBGM, battleBGM); //order relates to enum TrackID
+        SetBGM(fieldBGM, battleBGM, menuBGM, lobbyBGM); //order relates to enum TrackID
+        VolInit();
         transform.position = GameObject.Find("Main Camera").transform.position;
     }
 
 
 
     //=== PRIVATE FUNCTIONS ===
-    //- Update : fade mechanic
-    //- SetBGM : AudioSource bgm initialization
+    //- Update  : fade mechanic
+    //- SetBGM  : AudioSource bgm initialization
+    //- VolInit : individual volumeBGM multiplier initialization
 
     private void Update()
     {
@@ -68,9 +77,9 @@ public class SoundManager : MonoBehaviour {
             if (trackFadeIn >= 0)
             {
                 bgm[trackFadeIn].volume += deltaVolumeBGM;
-                if (bgm[trackFadeIn].volume >= volumeBGM)
+                if (bgm[trackFadeIn].volume >= volumeBGM * vol[trackFadeIn])
                 {
-                    bgm[trackFadeIn].volume = volumeBGM;
+                    bgm[trackFadeIn].volume = volumeBGM * vol[trackFadeIn];
                     trackFadeIn = -1;
                 }
             }
@@ -98,22 +107,40 @@ public class SoundManager : MonoBehaviour {
         }
     }
 
-
+    private void VolInit()
+    {
+        vol = new float[bgm.Length];
+        vol[(int)TrackID.BGM_FIELD] = 1.0f;
+        vol[(int)TrackID.BGM_BATTLE] = 1.0f;
+        vol[(int)TrackID.BGM_MENU] = 0.5f;
+        vol[(int)TrackID.BGM_LOBBY] = 0.3f;
+    }
 
     //=== PUBLIC FUNCTIONS ===
+    //- NowPlaying : returns playing track ID
     //- PlayBGM    : play a BGM, stop other BGMs
     //- SwitchBGM  : gradually switch BGMs
     //- FadeIn     : gradually play BGM
     //- FadeOut    : gradually stop BGM
     //- StopAllBGM : stop all playing BGM
     //- PlaySFX    : play one shot audio clip
+    //- PlaySFXTransition : play sfx with no scene interruption
+
+    public int NowPlaying()
+    {
+        return trackOnPlay;
+    }
 
     public void PlayBGM(int track) //input: TrackID
     {
+        if (track < 0 || track >= bgm.Length) track = -1;
         StopAllBGM();
-        bgm[track].volume = volumeBGM;
-        bgm[track].Play();
         trackOnPlay = track;
+        if (track != -1)
+        {
+            bgm[track].volume = volumeBGM * vol[track];
+            bgm[track].Play();
+        }
     }
 
     public void SwitchBGM(int trackSelect, float t) //input: TrackID, fadeTime
@@ -159,8 +186,19 @@ public class SoundManager : MonoBehaviour {
         trackOnPlay = -1;
     }
 
-    public void PlaySFX(AudioClip audio) //input: SFXClip
+    public void PlaySFX(AudioClip audio, float volume = -1) //input: SFXClip
     {
-        AudioSource.PlayClipAtPoint(audio, transform.position, 0.05f);
+        //still need tweaking later so that it's controllable by volumeSFX
+        if (volume == -1) volume = volumeSFX;
+        AudioSource.PlayClipAtPoint(audio, Camera.main.transform.position, volume);
+    }
+
+    public void PlaySFXTransition(AudioClip audio, float volume = 1.0f)
+    {
+        AudioSource test = GameObject.Find("SoundManager").AddComponent<AudioSource>();
+        test.clip = audio;
+        test.volume = volume;
+        test.Play();
+        Destroy(test, audio.length);
     }
 }
