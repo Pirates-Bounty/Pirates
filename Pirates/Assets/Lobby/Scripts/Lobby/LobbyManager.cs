@@ -31,6 +31,7 @@ namespace Prototype.NetworkLobby
 
         public RectTransform mainMenuPanel;
         public RectTransform lobbyPanel;
+        public GameObject mapPanel;
 
         public LobbyInfoPanel infoPanel;
         public LobbyCountdownPanel countdownPanel;
@@ -76,7 +77,6 @@ namespace Prototype.NetworkLobby
 
             SetServerInfo("Offline", "None");
 
-    
 
         }
 
@@ -200,6 +200,10 @@ namespace Prototype.NetworkLobby
         {
             ChangeTo(mainMenuPanel);
         }
+        public void BackFromMap()
+        {
+            mapPanel.SetActive(false);
+        }
                  
         public void StopHostClbk()
         {
@@ -264,11 +268,13 @@ namespace Prototype.NetworkLobby
 		{
 			base.OnMatchCreate(success, extendedInfo, matchInfo);
             _currentMatchID = (System.UInt64)matchInfo.networkId;
+            mapPanel.SetActive(true);
 		}
 
 		public override void OnDestroyMatch(bool success, string extendedInfo)
 		{
 			base.OnDestroyMatch(success, extendedInfo);
+            mapPanel.SetActive(false);
 			if (_disconnectServer)
             {
                 StopMatchMaker();
@@ -396,7 +402,7 @@ namespace Prototype.NetworkLobby
                 }
             }
 
-            gameSetUp.SetActive(true);
+            Instantiate(gameSetUp, transform.position, Quaternion.identity);
 
             for (int i = 0; i < lobbySlots.Length; ++i)
             {
