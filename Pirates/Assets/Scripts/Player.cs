@@ -293,7 +293,11 @@ public class Player : NetworkBehaviour {
         //CmdDisplayHealth ();
 
         //SOUND - SoundManager reposition & BGMswitch debugger (space key)
-        GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
+        if (GameObject.Find("SoundManager") != null)
+        {
+            GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
+        }
+        
         if (Input.GetKeyDown("space"))
         {
             print("space key was pressed (for BGM test)");

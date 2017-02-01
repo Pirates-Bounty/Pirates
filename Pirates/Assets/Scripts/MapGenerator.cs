@@ -7,6 +7,9 @@ public class MapGenerator : MonoBehaviour {
     public int width;
     public int height;
     public float frequency;
+    public float landFreq;
+    public float waterFreq;
+    public float sandFreq;
     public float centerWeight;
     public static bool gameStart = false;
     //public float amplitude;
@@ -66,21 +69,7 @@ public class MapGenerator : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-
-        
-
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    DeleteChildren();
-        //    Generate();
-        //    GenerateGameObjects();
-        //}
-
-
-
-
-	
-	}
+    }
 
 
 
@@ -118,7 +107,7 @@ public class MapGenerator : MonoBehaviour {
                 // this way, there will be a larger island in the middle of the map
                 // comment this line to go back to the old generation
                 noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width/2, 2) + Mathf.Pow(j - height/2, 2)), 0.5f)/(width/2 + height/2);
-                if (noise < .45f)
+                if (noise < landFreq)
                 {
                     if (noise > Random.Range(0,40f))
                     {
@@ -131,13 +120,13 @@ public class MapGenerator : MonoBehaviour {
                     
                 }
 
-                else if (noise < .5f)
+                else if (noise < sandFreq)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= .5f)
+                else if (noise >= waterFreq)
                 {
                     
                     map[i, j] = (int)TileType.WATER;
@@ -170,6 +159,13 @@ public class MapGenerator : MonoBehaviour {
         return total/maxAmp;
     }
 
+
+    public void reGenerate()
+    {
+        DeleteChildren();
+        Generate();
+        GenerateGameObjects();
+    }
 
 
     void GenerateGameObjects()

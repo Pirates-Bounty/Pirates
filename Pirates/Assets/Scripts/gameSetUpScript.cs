@@ -7,15 +7,16 @@ public class gameSetUpScript : MonoBehaviour {
 
 
     public GameObject spawnPoint;
-    public MapGenerator mapGen;
+    private MapGenerator mapGen;
 	// Use this for initialization
 	void Start () {
+
+        mapGen = GameObject.FindGameObjectWithTag("mapGen").GetComponent<MapGenerator>();
         spawnPoints(mapGen);
     }
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 
 
