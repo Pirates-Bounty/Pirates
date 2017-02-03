@@ -118,6 +118,7 @@ public class Player : NetworkBehaviour {
 	private float creakTimer = 0;
     public AudioClip ramS;
     public AudioClip deathS;
+	public AudioClip whooshS;
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
     public AudioClip sfx_upgradeMenuClose;
@@ -227,6 +228,7 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SpeedBoost();
+				AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
                 gofast = true;
                 boostTimer = BASE_BOOST_DELAY;
             }

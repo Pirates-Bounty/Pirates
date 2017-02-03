@@ -17,6 +17,6 @@ public class HighlightSound : MonoBehaviour {
 
     public void OnMouseEnter()
     {
-        AudioSource.PlayClipAtPoint(highlightAudio, transform.position, 100.0f);
+        AudioSource.PlayClipAtPoint(highlightAudio, transform.position, 0.1f);
     } 
 }

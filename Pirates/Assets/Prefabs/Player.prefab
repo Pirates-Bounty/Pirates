@@ -744,6 +744,9 @@ MonoBehaviour:
   turnS: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
   ramS: {fileID: 8300000, guid: 812801548bde36048b6e157424c3ddf9, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
+  whooshS: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
+  sfx_upgradeMenuOpen: {fileID: 0}
+  sfx_upgradeMenuClose: {fileID: 0}
   dead: 0
   gofast: 0
   boost: 1.2
