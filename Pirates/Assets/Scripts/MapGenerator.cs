@@ -120,13 +120,13 @@ public class MapGenerator : MonoBehaviour {
                     
                 }
 
-                else if (noise < sandFreq)
+                else if (noise < landFreq + .05)
                 {
                     map[i, j] = (int)TileType.SAND;
                 }
 
 
-                else if (noise >= waterFreq)
+                else if (noise >= landFreq + .05)
                 {
                     
                     map[i, j] = (int)TileType.WATER;
