@@ -29,7 +29,7 @@ public class Player : NetworkBehaviour {
     public const float BASE_MOVE_SPEED = 10.0f;
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
-	public const float BASE_RAM_DAMAGE = 20.0f;
+	public const float BASE_RAM_DAMAGE = 5.0f;
 
 
     [SyncVar]
@@ -105,6 +105,8 @@ public class Player : NetworkBehaviour {
     public float boostTimer = BASE_BOOST_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
 	public float currVelocity = 0.0f;
+	[SyncVar]
+	public float appliedRamDamage = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
     private bool upgradeMenuActive = false;
@@ -149,7 +151,7 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
-        StartCoroutine(BoatRepairs());
+        //StartCoroutine(BoatRepairs());
         if (isServer) {
 			//print ("Adding to bounty manager, here we go.");
 			GameObject bm = GameObject.Find ("BountyManager");
@@ -466,6 +468,28 @@ public class Player : NetworkBehaviour {
 			RpcFinishRespawn ();
 		}
 	}
+	[Command]
+	void CmdApplyDamage(float damage, int enemyID) {
+		if (dead || currentHealth <= 0) {
+			return;
+		}
+		print ("DAMAGE! " + damage);
+		currentHealth -= damage;
+		// respawn the player if they are dead
+		if (currentHealth <= 0.0f) {
+			AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
+			RpcRespawn ();
+
+			GameObject bm = GameObject.Find ("BountyManager");
+			if (bm != null) {
+				bm.GetComponent<BountyManager> ().ReportHit (playerID, enemyID);
+			}
+		}
+	}
+	[Command]
+	void CmdSetRamDamage(float ramDam) {
+		appliedRamDamage = ramDam;
+	}
 	[ClientRpc]
 	void RpcRespawn () {
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);
@@ -554,7 +578,7 @@ public class Player : NetworkBehaviour {
 			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
-			//ApplyDamage(10f, playerID);
+			//CmdApplyDamage(10f, playerID);
 		} else {
 			if (currVelocity > 0) {
 				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
@@ -563,18 +587,12 @@ public class Player : NetworkBehaviour {
 			}
 		}
 		transform.Translate (0.0f, currVelocity * Time.deltaTime, 0.0f);
-
+		CmdSetRamDamage (currRamDamage * currVelocity / BASE_MOVE_SPEED);
     }
 
     IEnumerator Death()
     {
-        /*dead = true;
-        GetComponent<Collider2D>().enabled = false;
-		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (false);*/
-        //CmdSpawnResources(transform.position);
-        
         yield return new WaitForSeconds(2f);
-        //Debug.Log(LobbyManager.numPlayers);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
         foreach (GameObject g in sl)
@@ -589,10 +607,6 @@ public class Player : NetworkBehaviour {
 		dir = dir.normalized;
 		transform.up = dir;
         CmdChangeHealth(currMaxHealth, true);
-
-		/*GetComponent<Collider2D>().enabled = true;
-		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
-        dead = false;*/
 
 		CmdDeath (false);
     }
@@ -616,40 +630,26 @@ public class Player : NetworkBehaviour {
 
     }
 
-
-
 	public void ApplyDamage(float damage, int enemyID) {
-		if (!isServer || dead || currentHealth <= 0) {
-            return;
-        }
-		//print ("DAMAGE! " + damage);
-		currentHealth -= damage;
-        // respawn the player if they are dead
-        if (currentHealth <= 0.0f) {
-            AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
-			RpcRespawn ();
+		CmdApplyDamage (damage, enemyID);
+	}
 
-			GameObject bm = GameObject.Find ("BountyManager");
-			if (bm != null) {
-				bm.GetComponent<BountyManager> ().ReportHit (playerID, enemyID);
-			}
-        }
-    }
+
     public void OnCollisionEnter2D(Collision2D collision) {
-        //if rammed
+		if (!isLocalPlayer) {
+			return;
+		}
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
-        // Debug.Log(transform.position + " " + hit.point);
-        // Debug.DrawLine(transform.position, hit.point, Color.red, 3);
+		//if rammed
+		Player otherPlayer = collision.collider.gameObject.GetComponent<Player> ();
+        //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
+		RaycastHit2D hit = Physics2D.Raycast(collision.gameObject.transform.position, collision.gameObject.transform.up);
 
-        // print(collision.gameObject.CompareTag("Player") + " " + (hit.collider != null) + " " + (hit.collider.tag == "Player") + " " + (!invuln));
-        // print(hit.collider.tag);
-        if (collision.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-            collision.gameObject.GetComponent<Player>().ApplyDamage(currRamDamage*(currVelocity/currMoveSpeed), playerID);
+		if (otherPlayer != null && collision.collider.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+			ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.playerID);
             AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
             //3 second invulnerability before you can take ram damage again
-            collision.gameObject.GetComponent<Player>().coroutine = collision.gameObject.GetComponent<Player>().RamInvuln();
-            collision.gameObject.GetComponent<Player>().StartCoroutine(collision.gameObject.GetComponent<Player>().coroutine);
+			StartCoroutine (RamInvuln ());
         }
     }
     private IEnumerator RamInvuln() {

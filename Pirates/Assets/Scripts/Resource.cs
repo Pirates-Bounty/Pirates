@@ -24,7 +24,7 @@ public class Resource : NetworkBehaviour {
 			AudioSource.PlayClipAtPoint (coinS, transform.position, 100.0f);
             GameObject.FindGameObjectWithTag("bountyManager").SendMessage("CmdSpawnResource");
 			//AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
+			Destroy(gameObject);
 		}
-		Destroy(gameObject);
 	}
 }

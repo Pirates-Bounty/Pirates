@@ -25,7 +25,9 @@ public class Projectile : NetworkBehaviour {
     void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Player")) {
             //collision.gameObject.SendMessage("ApplyDamage", damage);
-			collision.gameObject.GetComponent<Player>().ApplyDamage(damage, assignedID);
+			if (isServer) {
+				collision.gameObject.GetComponent<Player> ().ApplyDamage (damage, assignedID);
+			}
 			AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
         }
         Destroy(gameObject);
