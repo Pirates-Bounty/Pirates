@@ -27,7 +27,7 @@ public class Menu : MonoBehaviour {
     private AudioClip selectAudio;
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         canvas = GameObject.Find("Canvas").transform;
         boat = GameObject.Find("Boat");
         waves1 = GameObject.Find("Waves 1");
@@ -42,7 +42,12 @@ public class Menu : MonoBehaviour {
         //backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.5f), delegate { Navigator.Instance.LoadLevel("Lobby"); });
+            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.5f),
+            delegate {
+                Navigator.Instance.LoadLevel("Lobby");
+                SoundManager.Instance.PlaySFXTransition(Resources.Load<AudioClip>("Sound/SFX/UI/DoorOpen"),0.2f);
+                SoundManager.Instance.PlayBGM((int)TrackID.BGM_LOBBY);
+            } );
 
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, 64, canvas, sprite, highlightedSprite,
@@ -61,11 +66,13 @@ public class Menu : MonoBehaviour {
         playButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         instructionsButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         quitButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
+
+        SoundManager.Instance.PlayBGM((int)TrackID.BGM_MENU);
         //adding onclick audio
-        selectAudio = Resources.Load<AudioClip>("Sound/SFX/ButtonSelect");
-        playButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
-        instructionsButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
-        quitButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
+        //selectAudio = Resources.Load<AudioClip>("Sound/SFX/ButtonSelect");
+        //playButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
+        //instructionsButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
+        //quitButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => playAudio(selectAudio));
         //=== SOUND SECTION - END ===
     }
 	
@@ -97,7 +104,6 @@ public class Menu : MonoBehaviour {
             waves1.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
             waves2.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
         }
-
 
 	}
     
