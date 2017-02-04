@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 031aa4b2abb290c40b528aad0fef9551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickS: {fileID: 0}
 --- !u!4 &233450274
 Transform:
   m_ObjectHideFlags: 0
@@ -261,6 +260,7 @@ MonoBehaviour:
   maxResources: 40
   resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
+  victoryUndeclared: 0
 --- !u!114 &800447155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -624,6 +624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapG: {fileID: 134104756}
   tile: {fileID: 1000013852654590, guid: 7a22165f819d2934489543fb8cc844da, type: 2}
+  offset: 50
   multWidth: 20
   multHeight: 20
 --- !u!4 &1961871603

@@ -51,7 +51,7 @@ public class MapUIScript : MonoBehaviour {
     public void LobbyButton()
     {
         mapPanel.SetActive(false);
-        mapGen.reGenerate();
+        mapGen.CmdReGenerate();
     }
 
     
