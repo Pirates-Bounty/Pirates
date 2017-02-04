@@ -4,14 +4,20 @@ using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 using UnityEngine.UI;
 
-public class MapGenerator : MonoBehaviour {
+public class MapGenerator : NetworkBehaviour {
     public int width;
     public int height;
     public float frequency;
+
+    [SyncVar]
     public float landFreq;
-    public float waterFreq;
-    public float sandFreq;
-    public float centerWeight;
+
+    [SyncVar]
+    public int seed;
+
+    [HideInInspector]
+    public float centerWeight = 7;
+
     public static bool gameStart = false;
     //public float amplitude;
     public Sprite[] sprites;
@@ -20,19 +26,28 @@ public class MapGenerator : MonoBehaviour {
     public GameObject resourcePrefab;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
-    public int seed;
+
+
+    private int origSeed;
     public string[] tileNames;
+
+    [HideInInspector]
     public int octaves = 3;
+
+    [HideInInspector]
     public int[,] map;
+
     public int quadWidth;
     public int quadHeight;
+
     private int maxResources;
     private Transform canvas;
     private Camera minMap;
     private Sprite minMapBorder;
     private bool addResources = false;
     public MapGenerator Instance;
-    public GameObject Sync;
+    public Slider landSlider;
+    public Toggle randSeed;
 
 
 
@@ -55,7 +70,7 @@ public class MapGenerator : MonoBehaviour {
         //    Destroy(gameObject);
         //}
 
-            
+            origSeed = seed;
             Generate();
             GenerateGameObjects();
             //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
@@ -65,6 +80,35 @@ public class MapGenerator : MonoBehaviour {
             //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
 
             int numPlayers = LobbyManager.numPlayers;
+    }
+
+    [Command]
+    public void CmdChangeSeed(int newSeed)
+    {
+        seed = newSeed;
+    }
+
+    [Command]
+    public void CmdChangeLandFreq(int newLandFreq)
+    {
+        landFreq = newLandFreq;
+    }
+
+    public void SliderChange()
+    {
+        landFreq = landSlider.value;
+    }
+
+    public void SeedChange()
+    {
+        if (randSeed.isOn)
+        {
+            seed = System.DateTime.Now.Millisecond;
+        }
+        else
+        {
+            seed = origSeed;
+        }
     }
 
     // Use this for initialization
@@ -161,12 +205,18 @@ public class MapGenerator : MonoBehaviour {
         return total/maxAmp;
     }
 
-
-    public void reGenerate()
+    [ClientRpc]
+    public void RpcReGenerate()
     {
         DeleteChildren();
         Generate();
         GenerateGameObjects();
+    }
+
+    [Command]
+    public void CmdReGenerate()
+    {
+        RpcReGenerate();
     }
 
 

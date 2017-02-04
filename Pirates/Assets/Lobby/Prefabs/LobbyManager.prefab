@@ -5694,6 +5694,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000012693694270}
   - 114: {fileID: 114000012240236644}
+  - 114: {fileID: 114000012399794358}
   m_Layer: 0
   m_Name: MapGen
   m_TagString: mapGen
@@ -6194,8 +6195,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114000010919495060}
-        m_MethodName: toggleRandomSeed
+      - m_Target: {fileID: 114000012240236644}
+        m_MethodName: SeedChange
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6429,8 +6430,7 @@ MonoBehaviour:
   height: 300
   frequency: 15
   landFreq: 0.45
-  waterFreq: 0
-  sandFreq: 0
+  seed: 200
   centerWeight: 7
   sprites:
   - {fileID: 21300000, guid: 3123cec5d298f47a583b27249e4d90cf, type: 3}
@@ -6449,7 +6449,6 @@ MonoBehaviour:
   buoySprite: {fileID: 21300000, guid: f8b0b8140480b64488a43eaa04b20dc0, type: 3}
   resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
-  seed: 200
   tileNames:
   - water
   - grass
@@ -6459,7 +6458,8 @@ MonoBehaviour:
   quadWidth: 5
   quadHeight: 5
   Instance: {fileID: 0}
-  Sync: {fileID: 0}
+  landSlider: {fileID: 114000013646967572}
+  randSeed: {fileID: 114000010658767130}
 --- !u!114 &114000012348489090
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6493,6 +6493,38 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Random Seed
+--- !u!114 &114000012399794358
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010510580402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 192
+    i1: 151
+    i2: 130
+    i3: 81
+    i4: 255
+    i5: 123
+    i6: 16
+    i7: 212
+    i8: 251
+    i9: 149
+    i10: 74
+    i11: 75
+    i12: 86
+    i13: 172
+    i14: 217
+    i15: 240
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114000012723031694
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6626,8 +6658,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114000010919495060}
-        m_MethodName: landChange
+      - m_Target: {fileID: 114000012240236644}
+        m_MethodName: SliderChange
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
