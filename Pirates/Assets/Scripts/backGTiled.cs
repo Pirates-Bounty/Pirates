@@ -6,6 +6,7 @@ public class backGTiled : MonoBehaviour {
     private int Width;
     public GameObject mapG;
     public GameObject tile;
+    public int offset;
     public int multWidth = 1;
     public int multHeight = 1;
     private int tWidth;
@@ -19,9 +20,9 @@ public class backGTiled : MonoBehaviour {
         tWidth = (Width / multWidth);
         tHeight = (Height / multHeight);
 
-        for (int i = -Width/2; i < Width/2; i+=tWidth/2)
+        for (int i = -Width/2 - offset; i < Width/2 + offset; i+=tWidth/2)
         {
-            for (int j = -Height / 2; j < Height / 2; j += tHeight / 2)
+            for (int j = -Height / 2 - offset; j < Height / 2 + offset; j += tHeight / 2)
             {
                 Vector2 tilePos = new Vector2(i , j);
 

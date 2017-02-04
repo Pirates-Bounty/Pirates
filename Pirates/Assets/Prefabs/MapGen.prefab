@@ -54,6 +54,9 @@ MonoBehaviour:
   width: 300
   height: 300
   frequency: 15
+  landFreq: 0
+  waterFreq: 0
+  sandFreq: 0
   centerWeight: 7
   sprites:
   - {fileID: 21300000, guid: 3123cec5d298f47a583b27249e4d90cf, type: 3}
@@ -69,6 +72,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f12c5ecb7f87b95429228b256c9a7e7d, type: 3}
   - {fileID: 21300000, guid: ffd315337e476934fa8f87fad0472a0d, type: 3}
   - {fileID: 21300000, guid: f8c0bd4ceec930149b5a6b8f4da1e860, type: 3}
+  buoySprite: {fileID: 21300000, guid: f8b0b8140480b64488a43eaa04b20dc0, type: 3}
   resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
   seed: 200

@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
+using UnityEngine.UI;
 
 public class MapGenerator : MonoBehaviour {
     public int width;
@@ -15,6 +16,7 @@ public class MapGenerator : MonoBehaviour {
     //public float amplitude;
     public Sprite[] sprites;
     public Sprite[] plantSprites;
+    public Sprite buoySprite;
     public GameObject resourcePrefab;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
@@ -204,6 +206,9 @@ public class MapGenerator : MonoBehaviour {
                         case (int)TileType.WATER:
                             {
                                 Tile.AddComponent<BoxCollider2D>();
+                                SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                                sR.sprite = buoySprite;
+                                sR.sortingOrder = 1;
                             }
                             //Change Sprite
 
