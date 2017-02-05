@@ -17,8 +17,9 @@ public class Projectile : NetworkBehaviour {
 	void Update () {
 		lifetime -= Time.deltaTime;
 		if (lifetime <= 0) {
-			AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
-			Destroy(gameObject);
+			//AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(splash, 1.0f);
+            Destroy(gameObject);
 		}
 	}
 
@@ -28,7 +29,8 @@ public class Projectile : NetworkBehaviour {
 			if (isServer) {
 				collision.gameObject.GetComponent<Player> ().ApplyDamage (damage, assignedID);
 			}
-			AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
+			//AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(hit, 1.0f);
         }
         Destroy(gameObject);
     }

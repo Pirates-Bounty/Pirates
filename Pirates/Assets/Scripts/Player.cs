@@ -230,7 +230,8 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SpeedBoost();
-				AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(whooshS, 1.0f);
                 gofast = true;
                 boostTimer = BASE_BOOST_DELAY;
             }
@@ -258,7 +259,8 @@ public class Player : NetworkBehaviour {
             if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive)
             {
                 // left cannon
-                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
@@ -266,7 +268,8 @@ public class Player : NetworkBehaviour {
             if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive)
             {
                 // right cannon
-                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
@@ -274,7 +277,8 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradeMenuActive)
             {
                 // triple volley - fire all at once
-                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay; //+2.0f;
@@ -282,7 +286,8 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradeMenuActive)
             {
                 // triple shotgun spray
-                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay; //+2.0f;
@@ -290,7 +295,8 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradeMenuActive)
             {
                 // front shot
-                AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay+0.7f; //+2.0f;
@@ -479,8 +485,9 @@ public class Player : NetworkBehaviour {
 		currentHealth -= damage;
 		// respawn the player if they are dead
 		if (currentHealth <= 0.0f) {
-			AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
-			RpcRespawn ();
+            //AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(deathS, 1.0f);
+            RpcRespawn ();
 
 			GameObject bm = GameObject.Find ("BountyManager");
 			if (bm != null) {
@@ -550,8 +557,9 @@ public class Player : NetworkBehaviour {
 		if (Input.GetKey(left)) { // click left
 			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
 				creakTimer = 3.0f;
-				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
-			}
+                //AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+                SoundManager.Instance.PlaySFX(turnS, 0.7f);
+            }
 
             float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity*0.1f);
 
@@ -563,8 +571,9 @@ public class Player : NetworkBehaviour {
         if (Input.GetKey(right)) {
 			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
 				creakTimer = 3.0f;
-				AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
-			}
+				//AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
+                SoundManager.Instance.PlaySFX(turnS, 0.7f);
+            }
 
             float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
 
@@ -649,9 +658,10 @@ public class Player : NetworkBehaviour {
 
 		if (otherPlayer != null && collision.collider.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
 			ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.playerID);
-            AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            //AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(ramS, 1.0f);
             //3 second invulnerability before you can take ram damage again
-			StartCoroutine (RamInvuln ());
+            StartCoroutine (RamInvuln ());
         }
     }
     private IEnumerator RamInvuln() {
@@ -724,7 +734,7 @@ public class Player : NetworkBehaviour {
             //Highlight Sound
             UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
             entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-            entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio)); //call function=> playAudio(...)
+            entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio,0.3f)); //call function=> playAudio(...)
             upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         }
 		//UpdateVariables ();
@@ -798,7 +808,8 @@ public class Player : NetworkBehaviour {
 		seagullTimer -= Time.deltaTime;
 		if (seagullTimer <= 0) {
 			seagullTimer = 15 + Random.value * 15;
-			AudioSource.PlayClipAtPoint (seagullS, transform.position, 100.0f);
+            //AudioSource.PlayClipAtPoint (seagullS, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(seagullS, 1.0f);
 		}
 	}
 

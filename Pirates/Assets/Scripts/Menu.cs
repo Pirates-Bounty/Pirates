@@ -61,7 +61,7 @@ public class Menu : MonoBehaviour {
         //preparing highlight entries
         UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
         entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-        entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio)); //call function=> playAudio(...)
+        entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio, 0.3f)); //call function=> playAudio(...)
         //adding highlight entries
         playButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
         instructionsButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
@@ -107,9 +107,4 @@ public class Menu : MonoBehaviour {
 
 	}
     
-    //function to play audio
-    public void playAudio(AudioClip audio)
-    {
-        AudioSource.PlayClipAtPoint(audio, transform.position, 1.0f);
-    }
 }

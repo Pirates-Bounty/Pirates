@@ -21,7 +21,8 @@ public class Resource : NetworkBehaviour {
 	void OnCollisionEnter2D(Collision2D collision) {
 		if (collision.gameObject.CompareTag("Player")) {
 			collision.gameObject.SendMessage("AddGold", gold);
-			AudioSource.PlayClipAtPoint (coinS, transform.position, 100.0f);
+			//AudioSource.PlayClipAtPoint (coinS, transform.position, 100.0f);
+            SoundManager.Instance.PlaySFX(coinS, 1.0f);
             GameObject.FindGameObjectWithTag("bountyManager").SendMessage("CmdSpawnResource");
 			//AudioSource.PlayClipAtPoint(hit, transform.position, 100.0f);
 			Destroy(gameObject);

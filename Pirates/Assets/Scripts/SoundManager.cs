@@ -50,7 +50,7 @@ public class SoundManager : MonoBehaviour {
         }
 
         volumeBGM = 0.3f;
-        volumeSFX = 0.05f;
+        volumeSFX = 0.3f;
         trackOnPlay = -1;
         trackFadeIn = -1;
         trackFadeOut = -1;
@@ -62,7 +62,7 @@ public class SoundManager : MonoBehaviour {
         transform.position = GameObject.Find("Main Camera").transform.position;
     }
 
-
+    
 
     //=== PRIVATE FUNCTIONS ===
     //- Update  : fade mechanic
@@ -190,6 +190,7 @@ public class SoundManager : MonoBehaviour {
     {
         //still need tweaking later so that it's controllable by volumeSFX
         if (volume == -1) volume = volumeSFX;
+        else volume *= volumeSFX;
         AudioSource.PlayClipAtPoint(audio, Camera.main.transform.position, volume);
     }
 
@@ -197,8 +198,14 @@ public class SoundManager : MonoBehaviour {
     {
         AudioSource test = GameObject.Find("SoundManager").AddComponent<AudioSource>();
         test.clip = audio;
-        test.volume = volume;
+        test.volume = volume * volumeSFX;
         test.Play();
         Destroy(test, audio.length);
+    }
+
+    public void UpdateBGMVolume()
+    {
+        if (trackOnPlay >= 0)
+            bgm[trackOnPlay].volume = vol[trackOnPlay] * volumeBGM;
     }
 }
