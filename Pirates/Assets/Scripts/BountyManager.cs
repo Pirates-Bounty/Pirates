@@ -96,7 +96,7 @@ public class BountyManager : NetworkBehaviour {
 					int upgradeBounty = 10 * (int)Mathf.Floor (playerList [i].lowUpgrades / 2)
 					                   + 25 * playerList [i].midUpgrades
 					                   + 100 * playerList [i].highUpgrades;
-					int killStreakBounty = 100 * killStreak [playerList [i].playerID];
+					int killStreakBounty = 15 * killStreak [playerList [i].playerID];
 					float bonusMod = 1f;
 					if (playerList [i].playerID == GetHighestBounty ()) {
 						bonusMod = 1.2f;
@@ -169,11 +169,18 @@ public class BountyManager : NetworkBehaviour {
 	}
 
 	public void ReportHit (int loser, int winner) {
-		if (killStreak [loser] >= 5) {
-			killStreak [winner] += 2;
-		} else {
+		if (playerBounties [winner] * 0.5f >= playerBounties [loser]) {
 			killStreak [winner] += 1;
+		} else if (playerBounties [winner] * 0.8f >= playerBounties [loser]) {
+			killStreak [winner] += 3;
+		} else if (playerBounties [winner] * 1.2f >= playerBounties [loser]) {
+			killStreak [winner] += 5;
+		} else if (playerBounties [winner] * 2f >= playerBounties [loser]) {
+			killStreak [winner] += 7;
+		} else {
+			killStreak [winner] += 10;
 		}
+		killStreak [winner] += killStreak [loser] / 2;
 		killStreak [loser] = 0;
 		//playerBounties [loser] = 100;
 
@@ -206,7 +213,7 @@ public class BountyManager : NetworkBehaviour {
 
 	private IEnumerator DeclareVictory(int playerID) {
 		// delcare the winning player to be the pirate king
-		print("Victory has been declared... in theory");
+		//print("Victory has been declared!");
 		GameObject lastText = (UI.CreateText ("Victory Text", "Player " + (playerID+1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
 			Vector3.zero, new Vector2 (0.1f, 0.1f), new Vector2 (0.9f, 0.9f), TextAnchor.MiddleCenter, true));
 		//lastText.GetComponent<Text> ().resizeTextForBestFit = true;
