@@ -195,6 +195,33 @@ public class Player : NetworkBehaviour {
         InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
 
+    void DrawLineToLeader() {
+        if (!isLocalPlayer || dead) {
+            return;
+        }
+
+        GameObject bm = GameObject.Find ("BountyManager");
+        Player[] playerList = FindObjectsOfType<Player> ();
+        int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
+        Player leader = null;
+
+        if (playerID == leaderID) {
+            return;
+        }
+
+        for (int i = 0; i < playerList.Length; i++) {
+            if (playerList[i].playerID == leaderID) {
+                leader = playerList[i];
+                break;
+            }
+        }
+
+        Vector3 LeaderLine = transform.position - leader.transform.position;
+        Debug.Log(LeaderLine);
+        Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
+
+    }
+
     void Update()
     {
 
@@ -306,11 +333,14 @@ public class Player : NetworkBehaviour {
         UpdateVariables();
         //CmdDisplayHealth ();
 
+        DrawLineToLeader();
+
         //SOUND - SoundManager reposition & BGMswitch debugger (space key)
         if (GameObject.Find("SoundManager") != null)
         {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
+
 
     }
 
