@@ -293,4 +293,21 @@ public class MapGenerator : NetworkBehaviour {
             }
         }
     }
+
+    public Vector2 getRandWaterTile()
+    {
+        int xRand = Random.Range(0, width);
+        int yRand = Random.Range(0, height);
+        int tile = map[xRand,yRand];
+        Vector2 tilePos = new Vector2(xRand - width/2, yRand - height/2);
+        while ((TileType)tile != TileType.WATER)
+        {
+            xRand = Random.Range(0, width);
+            yRand = Random.Range(0, height);
+            tile = map[xRand,yRand];
+            tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+        }
+
+        return tilePos;
+    }
 }
