@@ -76,6 +76,8 @@ public class Player : NetworkBehaviour {
     private Sprite upgradeButtonDisabledSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
+    private FogOfWar fogOfWar;
+    private MapGenerator mapGenerator;
     // GameObject references
     private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
@@ -170,8 +172,13 @@ public class Player : NetworkBehaviour {
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
+        
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        fogOfWar = FindObjectOfType<FogOfWar>();
+        fogOfWar.player = this;
+        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);
 
-		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
+        lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
         
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
@@ -233,7 +240,7 @@ public class Player : NetworkBehaviour {
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
-
+        fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
         boostTimer -= Time.deltaTime;
         if (boostTimer < 0)
         {
