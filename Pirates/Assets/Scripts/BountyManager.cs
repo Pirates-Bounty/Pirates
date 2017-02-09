@@ -59,7 +59,7 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
         ClientScene.RegisterPrefab(resourcePrefab);
-        GameObject instantiatedResource = Instantiate(resourcePrefab, new Vector2(Random.Range(-MapGen.GetComponent<MapGenerator>().width / 2, MapGen.GetComponent<MapGenerator>().width / 2), Random.Range(-MapGen.GetComponent<MapGenerator>().height / 2, MapGen.GetComponent<MapGenerator>().height / 2)), Quaternion.identity) as GameObject;
+        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().getRandWaterTile(), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
 
@@ -240,7 +240,7 @@ public class BountyManager : NetworkBehaviour {
 			Vector3.zero, new Vector2(0.02f, 0.95f-0.1f*playerCount), new Vector3(0.18f, 0.95f));
 	}
 
-	private int GetHighestBounty() {
+	public int GetHighestBounty() {
 		int highestID = 0;
 		for (int i = 1; i < playerBounties.Count; i++) {
 			if (playerBounties [i] > playerBounties [highestID]) {

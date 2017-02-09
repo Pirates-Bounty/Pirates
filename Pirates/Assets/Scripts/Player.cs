@@ -4,15 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
-public enum Upgrade {
-    MANEUVERABILITY, //rotation speed
-    SPEED, // move speed
-    HULL_STRENGTH, // health
-    //CANNON_SPEED, // cannon firing time
-	RAM_STRENGTH, // ram damage
-    CANNON_STRENGTH, // cannon damage
-    COUNT //num items in the enum
-}
+
 public enum DamageType {
     CANNON,
     RAM
@@ -30,6 +22,7 @@ public class Player : NetworkBehaviour {
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
 	public const float BASE_RAM_DAMAGE = 5.0f;
+    public static int[] UPGRADE_SCALE = { 1, 5, 20 };
 
 
     [SyncVar]
@@ -79,15 +72,16 @@ public class Player : NetworkBehaviour {
     private Canvas canvas;
     private GameObject healthBar;
     private Font font;
-    private Sprite sprite;
-    private Sprite highlightedSprite;
+    private Sprite upgradeButtonSprite;
+    private Sprite upgradeButtonDisabledSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
+    private FogOfWar fogOfWar;
+    private MapGenerator mapGenerator;
     // GameObject references
     private GameObject inGameMenu;
-    private GameObject upgradeMenu;
-    private GameObject[] upgradeTexts = new GameObject[(int)Upgrade.COUNT];
-	private GameObject[] costTexts = new GameObject[(int)Upgrade.COUNT];
+    private UpgradePanel upgradePanel;
+
     private GameObject resourcesText;
     private Sprite menuBackground;
     private Rigidbody2D rb;
@@ -109,7 +103,6 @@ public class Player : NetworkBehaviour {
 	public float appliedRamDamage = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
-    private bool upgradeMenuActive = false;
     private bool anchorDown = false;
 	// ayy it's dem seagulls
 	public AudioClip seagullS;
@@ -133,16 +126,6 @@ public class Player : NetworkBehaviour {
     public int pSpawned = 0;
 
 
-	public enum UpgradeID
-	{
-		MNV,
-		SPD,
-		HULL,
-		RSTR,
-		CSTR
-	}
-
-
 
 
     //ramming cooldown
@@ -162,19 +145,18 @@ public class Player : NetworkBehaviour {
         }
 
 
-		foreach (var value in System.Enum.GetValues(typeof(UpgradeID)))
-		{
-			upgradeRanks.Add (0);
-		}
+		for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
+            upgradeRanks.Add(0);
+        }
         dead = false;
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
-        menuBackground = Resources.Load<Sprite>("Art/Textures/Menu Background");
+        menuBackground = Resources.Load<Sprite>("Art/Sprite/UI Upgrade/UI UpgradeBackDrop");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
-        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
+        upgradeButtonSprite = Resources.Load<Sprite>("Art/Sprites/UI Upgrade/UI Upgrade Button(Purchase)");
+        upgradeButtonDisabledSprite = Resources.Load<Sprite>("Art/Sprites/UI Upgrade/UI Upgrade Button(Limit)");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
 
@@ -186,13 +168,48 @@ public class Player : NetworkBehaviour {
         }
         RenderInterface();
         CreateInGameMenu();
-        CreateUpgradeMenu();
+        upgradePanel = FindObjectOfType<UpgradePanel>();
+        upgradePanel.player = this;
+        upgradePanel.UpdateUI();
+        upgradePanel.Hide();
+        
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        fogOfWar = FindObjectOfType<FogOfWar>();
+        fogOfWar.player = this;
+        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);
 
-		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
+        lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
         
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
         InvokeRepeating("EnemyDetection", 1f, 0.5f);
+    }
+
+    void DrawLineToLeader() {
+        if (!isLocalPlayer || dead) {
+            return;
+        }
+
+        GameObject bm = GameObject.Find ("BountyManager");
+        Player[] playerList = FindObjectsOfType<Player> ();
+        int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
+        Player leader = null;
+
+        if (playerID == leaderID) {
+            return;
+        }
+
+        for (int i = 0; i < playerList.Length; i++) {
+            if (playerList[i].playerID == leaderID) {
+                leader = playerList[i];
+                break;
+            }
+        }
+
+        Vector3 LeaderLine = transform.position - leader.transform.position;
+        Debug.Log(LeaderLine);
+        Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
+
     }
 
     void Update()
@@ -223,18 +240,19 @@ public class Player : NetworkBehaviour {
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
-
-		if (boostTimer > 0) {
-			boostTimer -= Time.deltaTime;
-		} else {
-			if (Input.GetKeyDown (KeyCode.LeftShift)) {
-				SpeedBoost ();
-				//AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
-				SoundManager.Instance.PlaySFX (whooshS, 1.0f);
-				gofast = true;
-				boostTimer = currBoostDelay;
-			}
-		}
+        fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
+        boostTimer -= Time.deltaTime;
+        if (boostTimer < 0)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                SpeedBoost();
+                //AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
+                SoundManager.Instance.PlaySFX(whooshS, 1.0f);
+                gofast = true;
+                boostTimer = BASE_BOOST_DELAY;
+            }
+        }
 
         if (gofast == true && boost > 0)
         {
@@ -255,7 +273,7 @@ public class Player : NetworkBehaviour {
         if (firingTimer < 0)
         {
             // fire cannons
-            if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradeMenuActive)
+            if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradePanel.gameObject.activeSelf)
             {
                 // left cannon
                 //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
@@ -264,7 +282,7 @@ public class Player : NetworkBehaviour {
                 // reset timer
                 firingTimer = currFiringDelay;
             }
-            if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradeMenuActive)
+            if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradePanel.gameObject.activeSelf)
             {
                 // right cannon
                 //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
@@ -273,7 +291,7 @@ public class Player : NetworkBehaviour {
                 // reset timer
                 firingTimer = currFiringDelay;
             }
-            if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradeMenuActive)
+            if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf)
             {
                 // triple volley - fire all at once
                 //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
@@ -282,7 +300,7 @@ public class Player : NetworkBehaviour {
                 // reset timer
                 firingTimer = currFiringDelay; //+2.0f;
             }
-            if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradeMenuActive)
+            if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf)
             {
                 // triple shotgun spray
                 //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
@@ -291,7 +309,7 @@ public class Player : NetworkBehaviour {
                 // reset timer
                 firingTimer = currFiringDelay; //+2.0f;
             }
-            if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradeMenuActive)
+            if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf)
             {
                 // front shot
                 //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
@@ -305,11 +323,14 @@ public class Player : NetworkBehaviour {
         UpdateVariables();
         //CmdDisplayHealth ();
 
+        DrawLineToLeader();
+
         //SOUND - SoundManager reposition & BGMswitch debugger (space key)
         if (GameObject.Find("SoundManager") != null)
         {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
+
 
     }
 
@@ -400,21 +421,7 @@ public class Player : NetworkBehaviour {
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
 		//int upgradeMod = 0;
 		if (positive) {
-			int upgradePrice = UPGRADE_COST;
-			switch (upgradeRanks [(int)upgrade]) {
-			case 0:
-				break;
-			case 1:
-				upgradePrice *= 5;
-				break;
-			case 2:
-				upgradePrice *= 20;
-				break;
-			default:
-				upgradePrice *= 50;
-				print ("That's a pricy upgrade...");
-				break;
-			}
+			int upgradePrice = UPGRADE_COST * UPGRADE_SCALE[upgradeRanks[(int) upgrade]];
 
 			if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= upgradePrice)) {
 				//upgradeMod++;
@@ -512,11 +519,11 @@ public class Player : NetworkBehaviour {
 		gameObject.transform.FindChild ("Sprite").gameObject.SetActive (true);
 	}
     void UpdateSprites() {
-		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)UpgradeID.HULL]];
-        sail.GetComponent<SpriteRenderer>().sprite = sails[upgradeRanks[(int) UpgradeID.SPD]];
-        rudder.GetComponent<SpriteRenderer>().sprite = rudders[upgradeRanks[(int)UpgradeID.MNV]];
-        cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)UpgradeID.CSTR]];
-		ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)UpgradeID.RSTR]];
+		boatBase.GetComponent<SpriteRenderer>().sprite = bases[upgradeRanks[(int)Upgrade.HULL]];
+        sail.GetComponent<SpriteRenderer>().sprite = sails[upgradeRanks[(int) Upgrade.SPEED]];
+        rudder.GetComponent<SpriteRenderer>().sprite = rudders[upgradeRanks[(int)Upgrade.AGILITY]];
+        cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)Upgrade.CANNON]];
+		ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)Upgrade.RAM]];
     }
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
@@ -527,13 +534,9 @@ public class Player : NetworkBehaviour {
             inGameMenu.SetActive(inGameMenuActive);
         }
         if (Input.GetKeyDown(upgrade)) {
-            if (!upgradeMenu) {
-                CreateUpgradeMenu();
-            }
-            upgradeMenuActive = !upgradeMenuActive;
-            upgradeMenu.SetActive(upgradeMenuActive);
+            upgradePanel.gameObject.SetActive(!upgradePanel.gameObject.activeSelf);
 
-            if (upgradeMenuActive)
+            if (upgradePanel.gameObject.activeSelf)
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuOpen,0.15f);
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose,0.15f);
@@ -585,8 +588,7 @@ public class Player : NetworkBehaviour {
 			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			//currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
-			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
+			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//CmdApplyDamage(10f, playerID);
@@ -676,6 +678,7 @@ public class Player : NetworkBehaviour {
 			return;
 		}
 		resources += gold;
+        upgradePanel.UpdateUI();
 	}
 
     private void RenderInterface() {
@@ -694,10 +697,10 @@ public class Player : NetworkBehaviour {
         inGameMenu = UI.CreatePanel("In-Game Menu", menuBackground, Color.white, canvas.transform,
             Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
         GameObject mainMenuButton = UI.CreateButton("Main Menu Button", "Main Menu", font, Color.black, 24, inGameMenu.transform,
-            sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.7f), new Vector2(0.75f, 0.9f),
+            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.7f), new Vector2(0.75f, 0.9f),
             delegate {
                 UI.CreateYesNoDialog("Confirmation", "Are you sure?",
-                 font, Color.black, 24, menuBackground, sprite, highlightedSprite,
+                 font, Color.black, 24, menuBackground, upgradeButtonSprite, upgradeButtonDisabledSprite,
                  Color.white, inGameMenu.transform, Vector3.zero, new Vector2(0.25f, 0.1f),
                  new Vector2(0.75f, 0.9f),
                  delegate {
@@ -707,63 +710,44 @@ public class Player : NetworkBehaviour {
                  });
             });
         GameObject optionButton = UI.CreateButton("Options Button", "Options", font, Color.black, 24, inGameMenu.transform,
-            sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.4f), new Vector2(0.75f, 0.6f), delegate {; });
+            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.4f), new Vector2(0.75f, 0.6f), delegate {; });
         GameObject returnButton = UI.CreateButton("Return to Game Button", "Return to Game", font, Color.black, 24, inGameMenu.transform,
-            sprite, highlightedSprite, Vector3.zero, new Vector2(0.25f, 0.1f), new Vector2(0.75f, 0.3f),
+            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.1f), new Vector2(0.75f, 0.3f),
             delegate { inGameMenuActive = !inGameMenuActive; inGameMenu.SetActive(inGameMenuActive); });
         inGameMenu.SetActive(inGameMenuActive);
     }
 
-    private void CreateUpgradeMenu() {
-		upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, new Color(1.0f, 1.0f, 1.0f, 0.85f), canvas.transform,
-            Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
-        for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
-            // creating this extra variable because delegates don't work on for loop variables for some reason
-            int dupe = i;
-            // Upgrade Minus Button
-            /*GameObject upgradeMinusButton = UI.CreateButton("Minus Button " + i, "-", font, Color.black, 24, upgradeMenu.transform,
-                sprite, highlightedSprite, Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.2f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, false); UpdateVariables(); });/**/
-            // Upgrade Plus Button
-            GameObject upgradePlusButton = UI.CreateButton("Plus Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
-                sprite, highlightedSprite, Vector3.zero, new Vector2(0.6f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
-            // Upgrade Text
-            upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
-                Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
-			costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
-				Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
-            //Highlight Sound
-            UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
-            entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-            entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio,0.3f)); //call function=> playAudio(...)
-            upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
-        }
-		//UpdateVariables ();
-        upgradeMenu.SetActive(upgradeMenuActive);
-    }
+  //  private void CreateUpgradeMenu() {
+		//upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, new Color(1.0f, 1.0f, 1.0f, 0.85f), canvas.transform,
+  //          Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
+  //      for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
+  //          // creating this extra variable because delegates don't work on for loop variables for some reason
+  //          int dupe = i;
+  //          // Upgrade Plus Button
+  //          GameObject upgradePlusButton = UI.CreateButton("Upgrade Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
+  //              upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.9f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
+  //          // Upgrade Text
+  //          upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
+  //              Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+		//	costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
+		//		Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
+  //          //Highlight Sound
+  //          UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
+  //          entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
+  //          entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio,0.3f)); //call function=> playAudio(...)
+  //          upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
+  //      }
+		////UpdateVariables ();
+  //      upgradeMenu.SetActive(upgradeMenuActive);
+  //  }
 
-    private void UpgradePlayer(Upgrade upgrade, bool positive) {
+    public void UpgradePlayer(Upgrade upgrade, bool positive) {
 		if (!isLocalPlayer) {
 			return;
 		}
 		CmdUpgrade (upgrade, positive);
+        UpdateVariables();
 		//UpdateSprites ();
-    }
-
-    public static string UpgradeToString(Upgrade upgrade) {
-        switch (upgrade) {
-            case Upgrade.MANEUVERABILITY:
-                return "Maneuverabilty";
-            case Upgrade.SPEED:
-                return "Speed";
-            case Upgrade.HULL_STRENGTH:
-                return "Hull Strength";
-			case Upgrade.RAM_STRENGTH:
-                return "Ram Strength";
-            case Upgrade.CANNON_STRENGTH:
-                return "Cannon Strength";
-            default:
-                return "";
-        }
     }
 
     public override void OnStartLocalPlayer() {
@@ -774,34 +758,19 @@ public class Player : NetworkBehaviour {
     private void UpdateVariables() {
         if (gofast == false) // only update movement speed if not in boost mode
         {
-            currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.SPD] / 2.0f));
-			currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)UpgradeID.MNV] / 3.0f));
+            currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)Upgrade.SPEED] / 2.0f));
+			currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)Upgrade.AGILITY] / 3.0f));
         }
 		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
 		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
-		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)UpgradeID.RSTR] / 1.5f));
-		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)UpgradeID.CSTR] / 1.0f));
-		currBoostDelay = BASE_BOOST_DELAY * (1 - (upgradeRanks[(int)UpgradeID.MNV] / 5.0f));
+		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)Upgrade.RAM] / 1.5f));
+		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)Upgrade.CANNON] / 1.0f));
 
 		float oldMaxHealth = currMaxHealth;
-		currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks [(int)UpgradeID.HULL] / 2.0f));
+		currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks [(int)Upgrade.HULL] / 2.0f));
 		if (oldMaxHealth != currMaxHealth) {
 			CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
 		}
-
-        for(int i = 0; i < (int)Upgrade.COUNT; ++i) {
-			upgradeTexts[i].GetComponent<Text>().text = UpgradeToString((Upgrade)i) + ": " + (upgradeRanks[i]);
-			//costTexts [i].GetComponent<Text> ().text = upgradePrices[i] + "g";
-			if (upgradeRanks [i] == 0) {
-				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST + "g";
-			} else if (upgradeRanks [i] == 1) {
-				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST * 5 + "g";
-			} else if (upgradeRanks [i] == 2) {
-				costTexts [i].GetComponent<Text> ().text = UPGRADE_COST * 20 + "g";
-			} else {
-				costTexts [i].GetComponent<Text> ().text = "SOLD OUT";
-			}
-        }
 
     }
 

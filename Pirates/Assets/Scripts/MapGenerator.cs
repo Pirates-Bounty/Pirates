@@ -47,6 +47,8 @@ public class MapGenerator : NetworkBehaviour {
     private bool addResources = false;
     public MapGenerator Instance;
     public Slider landSlider;
+    public Slider widthSlider;
+    public Slider heightSlider;
     public Toggle randSeed;
 
 
@@ -92,6 +94,28 @@ public class MapGenerator : NetworkBehaviour {
     public void CmdChangeLandFreq(int newLandFreq)
     {
         landFreq = newLandFreq;
+    }
+
+    [Command]
+    public void CmdChangeWidth(int newWidth)
+    {
+        width = newWidth;
+    }
+
+    public void WidthChange()
+    {
+        width = (int)(widthSlider.value * 1000);
+    }
+
+    [Command]
+    public void CmdChangeHeight(int newHeight)
+    {
+        height = newHeight;
+    }
+
+    public void HeightChange()
+    {
+        height = (int)(heightSlider.value * 1000);
     }
 
     public void SliderChange()
@@ -292,5 +316,22 @@ public class MapGenerator : NetworkBehaviour {
                 
             }
         }
+    }
+
+    public Vector2 getRandWaterTile()
+    {
+        int xRand = Random.Range(0, width);
+        int yRand = Random.Range(0, height);
+        int tile = map[xRand,yRand];
+        Vector2 tilePos = new Vector2(xRand - width/2, yRand - height/2);
+        while ((TileType)tile != TileType.WATER)
+        {
+            xRand = Random.Range(0, width);
+            yRand = Random.Range(0, height);
+            tile = map[xRand,yRand];
+            tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+        }
+
+        return tilePos;
     }
 }
