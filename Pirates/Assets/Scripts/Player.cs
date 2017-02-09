@@ -168,6 +168,7 @@ public class Player : NetworkBehaviour {
         CreateInGameMenu();
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
+        upgradePanel.UpdateUI();
         upgradePanel.Hide();
 
 		lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
@@ -670,6 +671,7 @@ public class Player : NetworkBehaviour {
 			return;
 		}
 		resources += gold;
+        upgradePanel.UpdateUI();
 	}
 
     private void RenderInterface() {

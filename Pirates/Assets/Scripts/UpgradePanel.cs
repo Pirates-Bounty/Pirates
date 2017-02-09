@@ -14,15 +14,10 @@ public enum Upgrade {
 public class UpgradePanel : MonoBehaviour {
     public Player player;
     public Text[] costTexts = new Text[(int)Upgrade.COUNT];
-    // Use this for initialization
-    void Start () {
-        UpdateUI();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public GameObject[] bars = new GameObject[(int)Upgrade.COUNT * Player.MAX_UPGRADES];
+    public Button[] buttons = new Button[(int)Upgrade.COUNT];
+    public Sprite lockedUpgrade;
+    public Sprite[] upgradeSprites = new Sprite[(int)Player.MAX_UPGRADES];
 
     public void Hide() {
         gameObject.SetActive(false);
@@ -46,13 +41,37 @@ public class UpgradePanel : MonoBehaviour {
     }
 
     public void UpgradePlayer(string upgrade) {
-        //player.UpgradePlayer(upgrade, true);
+        if(upgrade == "Ram") {
+            player.UpgradePlayer(Upgrade.RAM, true);
+        } else if (upgrade == "Cannon") {
+            player.UpgradePlayer(Upgrade.CANNON, true);
+        } else if (upgrade == "Hull") {
+            player.UpgradePlayer(Upgrade.HULL, true);
+        } else if (upgrade == "Agility") {
+            player.UpgradePlayer(Upgrade.AGILITY, true);
+        } else if (upgrade == "Speed") {
+            player.UpgradePlayer(Upgrade.SPEED, true);
+        }
         UpdateUI();
     }
 
-    void UpdateUI() {
+    public bool IsUpgradabale(Upgrade upgrade) {
+        return player.resources >= Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[(int)upgrade]];
+    }
+
+    public void UpdateUI() {
         for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
             costTexts[i].text = Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]] + "g";
+            buttons[i].interactable = IsUpgradabale((Upgrade)i);
+        }
+        for (int i = 0; i < bars.Length; i += Player.MAX_UPGRADES) {
+            for(int j = 0; j < Player.MAX_UPGRADES; ++j) {
+                if(player.upgradeRanks[i / Player.MAX_UPGRADES] > j) {
+                    bars[i + j].GetComponent<Image>().sprite = upgradeSprites[j];
+                } else {
+                    bars[i + j].GetComponent<Image>().sprite = lockedUpgrade;
+                }
+            }
         }
     }
 }
