@@ -56,12 +56,17 @@ public class UpgradePanel : MonoBehaviour {
     }
 
     public bool IsUpgradabale(Upgrade upgrade) {
-        return player.resources >= Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[(int)upgrade]];
+        return player.upgradeRanks[(int)upgrade] < Player.MAX_UPGRADES && player.resources >= Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[(int)upgrade]];
     }
 
     public void UpdateUI() {
         for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
-            costTexts[i].text = Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]] + "g";
+            if(player.upgradeRanks[i] < Player.MAX_UPGRADES) {
+                costTexts[i].text = Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]] + "g";
+            } else {
+                costTexts[i].text = "SOLD OUT";
+            }
+            
             buttons[i].interactable = IsUpgradabale((Upgrade)i);
         }
         for (int i = 0; i < bars.Length; i += Player.MAX_UPGRADES) {
