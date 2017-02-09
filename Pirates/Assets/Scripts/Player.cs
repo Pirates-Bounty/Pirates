@@ -241,18 +241,17 @@ public class Player : NetworkBehaviour {
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
         fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
-        boostTimer -= Time.deltaTime;
-        if (boostTimer < 0)
-        {
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                SpeedBoost();
-                //AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
-                SoundManager.Instance.PlaySFX(whooshS, 1.0f);
-                gofast = true;
-                boostTimer = BASE_BOOST_DELAY;
-            }
-        }
+		if (boostTimer > 0) {
+			boostTimer -= Time.deltaTime;
+		} else {
+			if (Input.GetKeyDown (KeyCode.LeftShift)) {
+				SpeedBoost ();
+				//AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
+				SoundManager.Instance.PlaySFX (whooshS, 1.0f);
+				gofast = true;
+				boostTimer = currBoostDelay;
+			}
+		}
 
         if (gofast == true && boost > 0)
         {
@@ -588,7 +587,8 @@ public class Player : NetworkBehaviour {
 			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
 			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
+			//currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
+			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
 			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
 			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
 			//CmdApplyDamage(10f, playerID);
@@ -765,6 +765,7 @@ public class Player : NetworkBehaviour {
 		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
 		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)Upgrade.RAM] / 1.5f));
 		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)Upgrade.CANNON] / 1.0f));
+		currBoostDelay = BASE_BOOST_DELAY * (1 - (upgradeRanks[(int)Upgrade.AGILITY] / 5.0f));
 
 		float oldMaxHealth = currMaxHealth;
 		currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks [(int)Upgrade.HULL] / 2.0f));
