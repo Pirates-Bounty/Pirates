@@ -4,7 +4,7 @@ public class backGTiled : MonoBehaviour {
 
     private int Height;
     private int Width;
-    public GameObject mapG;
+    private GameObject mapG;
     public GameObject tile;
     public int offset;
     public int multWidth = 1;
@@ -14,6 +14,7 @@ public class backGTiled : MonoBehaviour {
       
     // Use this for initialization
     void Start () {
+        mapG = GameObject.Find("MapGen");
         Height = mapG.GetComponent<MapGenerator>().height;
         Width = mapG.GetComponent<MapGenerator>().width;
 
