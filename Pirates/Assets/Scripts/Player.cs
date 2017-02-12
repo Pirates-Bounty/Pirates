@@ -608,11 +608,22 @@ public class Player : NetworkBehaviour {
         yield return new WaitForSeconds(2f);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
+        float minDistSum = 10000;
         foreach (GameObject g in sl)
         {
-            if ((g.transform.position - transform.position).sqrMagnitude > (farthestSpawn.transform.position - transform.position).sqrMagnitude)
+            float distSum = 0;
+            foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
             {
-                farthestSpawn = g; 
+                if (p != this.gameObject)
+                {
+                    distSum += (g.transform.position - p.transform.position).sqrMagnitude;
+                }
+
+            }
+            if (distSum < minDistSum)
+            {
+                minDistSum = distSum;
+                farthestSpawn = g;
             }
         }
         transform.position = farthestSpawn.transform.position;
