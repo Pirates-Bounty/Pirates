@@ -14,7 +14,7 @@ public class MapUIScript : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        origSeed = mapGen.seed;
+        origSeed = 200;
 	}
 	
 	// Update is called once per frame

@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 using UnityEngine.UI;
 
+
 public class MapGenerator : NetworkBehaviour {
     public int width;
     public int height;
@@ -13,7 +14,7 @@ public class MapGenerator : NetworkBehaviour {
     public float landFreq;
 
     [SyncVar]
-    public int seed;
+    public int seed = 200;
 
     [HideInInspector]
     public float centerWeight = 7;
@@ -28,7 +29,7 @@ public class MapGenerator : NetworkBehaviour {
     //public Color[] colors;
 
 
-    private int origSeed;
+    private int chosenSeed = 200;
     public string[] tileNames;
 
     [HideInInspector]
@@ -40,7 +41,9 @@ public class MapGenerator : NetworkBehaviour {
     public int quadWidth;
     public int quadHeight;
 
-    private int maxResources;
+    [SyncVar]
+    public float maxResources = .4f;
+
     private Transform canvas;
     private Camera minMap;
     private Sprite minMapBorder;
@@ -48,8 +51,9 @@ public class MapGenerator : NetworkBehaviour {
     public MapGenerator Instance;
     public Slider landSlider;
     public Slider widthSlider;
-    public Slider heightSlider;
+    public Slider resourceSlider;
     public Toggle randSeed;
+    public InputField SeedNumber;
 
 
 
@@ -72,7 +76,6 @@ public class MapGenerator : NetworkBehaviour {
         //    Destroy(gameObject);
         //}
 
-            origSeed = seed;
             Generate();
             GenerateGameObjects();
             //minMap = GameObject.Find("MinCam").GetComponent<Camera>();
@@ -114,21 +117,33 @@ public class MapGenerator : NetworkBehaviour {
         height = newHeight;
     }
 
+    [Command]
+    public void CmdChangeMaxResource(int newResource)
+    {
+        maxResources = newResource;
+    }
+
     public void SliderChange()
     {
         landFreq = landSlider.value;
     }
 
+    public void MaxResourceChange()
+    {
+        maxResources = (int)(resourceSlider.value * 100);
+    }
+
+    public void InputSeed()
+
+    {
+        seed = System.Convert.ToInt32(SeedNumber.text);
+        chosenSeed = seed;
+    }
+
     public void SeedChange()
     {
-        if (randSeed.isOn)
-        {
             seed = System.DateTime.Now.Millisecond;
-        }
-        else
-        {
-            seed = origSeed;
-        }
+            SeedNumber.text = seed.ToString();
     }
 
     // Use this for initialization

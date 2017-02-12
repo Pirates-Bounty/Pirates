@@ -20,7 +20,7 @@ public class BountyManager : NetworkBehaviour {
 	private Canvas canvas;
 	private Font font;
     public GameObject spawnPoint;
-    public int maxResources = 40;
+    private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
 
@@ -30,6 +30,7 @@ public class BountyManager : NetworkBehaviour {
 	void Start () {
 		victoryUndeclared = true;
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
+        maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
         //maxResources = Mathf.RoundToInt((width + height) / 50);
         
 		font = Resources.Load<Font>("Art/Fonts/riesling");
