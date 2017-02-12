@@ -241,13 +241,19 @@ public class BountyManager : NetworkBehaviour {
 	}
 
 	public int GetHighestBounty() {
-		int highestID = 0;
-		for (int i = 1; i < playerBounties.Count; i++) {
-			if (playerBounties [i] > playerBounties [highestID]) {
-				highestID = i;
+        Debug.Log("DEBUG 1");
+        int highestID = 0;
+        Debug.Log("DEBUG 2");
+        for (int i = 1; i < playerBounties.Count; i++) {
+            Debug.Log("DEBUG 3");
+            if (playerBounties [i] > playerBounties [highestID]) {
+                Debug.Log("DEBUG 4");
+                highestID = i;
 			}
-		}
-		return highestID;
+            Debug.Log("DEBUG 5");
+        }
+        Debug.Log("DEBUG 6");
+        return highestID;
 		//return scoreOrder [0];
 	}
 

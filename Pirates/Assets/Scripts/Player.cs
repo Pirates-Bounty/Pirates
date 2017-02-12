@@ -190,10 +190,22 @@ public class Player : NetworkBehaviour {
             return;
         }
 
+        Debug.Log("DEBUG A");
         GameObject bm = GameObject.Find ("BountyManager");
+        Debug.Log("DEBUG B");
         Player[] playerList = FindObjectsOfType<Player> ();
-        int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
-        Player leader = null;
+        Debug.Log("DEBUG C");
+        if (bm == null) Debug.Log("NULL!!!!");
+        Debug.Log("INCOMINGGG!!!!");
+        BountyManager test = bm.GetComponent<BountyManager>();
+            Debug.Log("DEBUG C2");
+            int test2 = test.GetHighestBounty();
+            Debug.Log("DEBUG C3");
+            int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
+            Debug.Log("DEBUG D");
+            Player leader = null;
+            Debug.Log("DEBUG E");
+        
 
         if (playerID == leaderID) {
             return;
