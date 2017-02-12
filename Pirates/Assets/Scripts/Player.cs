@@ -218,7 +218,7 @@ public class Player : NetworkBehaviour {
             }
         }
 
-        Vector3 LeaderLine = transform.position - leader.transform.position;
+        //Vector3 LeaderLine = transform.position - leader.transform.position;
         //Debug.Log(LeaderLine);
         Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
 
