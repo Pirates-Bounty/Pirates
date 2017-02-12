@@ -207,7 +207,7 @@ public class Player : NetworkBehaviour {
         }
 
         Vector3 LeaderLine = transform.position - leader.transform.position;
-        Debug.Log(LeaderLine);
+        //Debug.Log(LeaderLine);
         Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
 
     }
@@ -608,7 +608,7 @@ public class Player : NetworkBehaviour {
         yield return new WaitForSeconds(2f);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
-        float minDistSum = 10000;
+        float maxDistSum = 0;
         foreach (GameObject g in sl)
         {
             float distSum = 0;
@@ -620,9 +620,9 @@ public class Player : NetworkBehaviour {
                 }
 
             }
-            if (distSum < minDistSum)
+            if (distSum > maxDistSum)
             {
-                minDistSum = distSum;
+                maxDistSum = distSum;
                 farthestSpawn = g;
             }
         }
