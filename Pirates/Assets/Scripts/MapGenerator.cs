@@ -105,17 +105,13 @@ public class MapGenerator : NetworkBehaviour {
     public void WidthChange()
     {
         width = (int)(widthSlider.value * 1000);
+        height = (int)(widthSlider.value * 1000);
     }
 
     [Command]
     public void CmdChangeHeight(int newHeight)
     {
         height = newHeight;
-    }
-
-    public void HeightChange()
-    {
-        height = (int)(heightSlider.value * 1000);
     }
 
     public void SliderChange()
