@@ -51,7 +51,6 @@ public class BountyManager : NetworkBehaviour {
 		canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 		if (canvas != null) {
 			CreateBountyPanel ();
-			//print ("makin' a bounty board");
 		}
 	}
 
@@ -102,6 +101,7 @@ public class BountyManager : NetworkBehaviour {
 		}
 		for (int i = 0; i < scoreOrder.Count; i++) {
 			scoreOrder[orders[i]] = i;
+			//print ("Player " + orders [i] + " is ranked " + i + " with " + playerBounties [orders [i]] + "g");
 		}
 	}
 
@@ -154,7 +154,6 @@ public class BountyManager : NetworkBehaviour {
 								Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(scoreOrder[j]+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-scoreOrder[j])), TextAnchor.UpperLeft, true);
 							bountyTexts [j] = newText;
 							GameObject.Destroy (oldText);*/
-							print ("eh?");
 							RectTransform rectMod = bountyTexts [j].GetComponent<RectTransform> ();
 							rectMod.anchorMin = new Vector2 (0.1f, 1f / playerCount * (scoreOrder [j] + 0));
 							rectMod.anchorMax = new Vector2 (0.9f, 1f / playerCount * (scoreOrder [j] + 1));
@@ -251,18 +250,12 @@ public class BountyManager : NetworkBehaviour {
 	}
 
 	public int GetHighestBounty() {
-        Debug.Log("DEBUG 1");
         int highestID = 0;
-        Debug.Log("DEBUG 2");
         for (int i = 1; i < playerBounties.Count; i++) {
-            Debug.Log("DEBUG 3");
             if (playerBounties [i] > playerBounties [highestID]) {
-                Debug.Log("DEBUG 4");
                 highestID = i;
 			}
-            Debug.Log("DEBUG 5");
         }
-        Debug.Log("DEBUG 6");
         return highestID;
 		//return scoreOrder [0];
 	}

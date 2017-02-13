@@ -196,6 +196,9 @@ public class Player : NetworkBehaviour {
         }
 
         GameObject bm = GameObject.Find ("BountyManager");
+		if (bm == null) {
+			return;
+		}
         Player[] playerList = FindObjectsOfType<Player> ();
 
         if (playerList.Length == 0) return;
@@ -213,10 +216,13 @@ public class Player : NetworkBehaviour {
                 break;
             }
         }
+		if (leader == null) {
+			return;
+		}
         Vector3 LeaderLine = transform.position - leader.transform.position;
         LeaderLine.z = 0f;
         LeaderLine = LeaderLine.normalized;
-        Debug.Log(Mathf.Atan2(LeaderLine.y, LeaderLine.x));
+        //Debug.Log(Mathf.Atan2(LeaderLine.y, LeaderLine.x));
 
 
         //Debug.Log(LeaderLine);
@@ -556,17 +562,20 @@ public class Player : NetworkBehaviour {
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose,0.15f);
         }
     }
-    void OnChangePlayer(float health) {
+    void OnChangePlayer(float newHealth) {
         if (!isLocalPlayer) {
             return;
         }
-		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f - 0.3f * (currMaxHealth - health) / currMaxHealth, 0.95f);
+		currentHealth = newHealth;
+		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.65f - 0.3f * (currMaxHealth - currentHealth) / currMaxHealth, 0.2f);
     }
-    void OnChangeResources(int resources) {
+    void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
             return;
         }
-        resourcesText.GetComponent<Text>().text = "" + resources;
+		resources = newResources;
+		resourcesText.GetComponent<Text>().text = "" + resources;
+		upgradePanel.UpdateUI();
     }
 
     private void GetMovement() {
@@ -704,7 +713,7 @@ public class Player : NetworkBehaviour {
 			return;
 		}
 		resources += gold;
-        upgradePanel.UpdateUI();
+        //upgradePanel.UpdateUI();
 	}
 
     private void RenderInterface() {
