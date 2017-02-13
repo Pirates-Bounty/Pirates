@@ -66,7 +66,7 @@ public class Player : NetworkBehaviour {
     public GameObject projectile;
 	public GameObject resourceObj;
 	public GameObject deathExplode;
-
+    public GameObject leaderArrow;
 
     private Camera playerCamera;
     private Canvas canvas;
@@ -159,6 +159,7 @@ public class Player : NetworkBehaviour {
         upgradeButtonDisabledSprite = Resources.Load<Sprite>("Art/Sprites/UI Upgrade/UI Upgrade Button(Limit)");
         healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
         resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
+        leaderArrow = GameObject.Find("LeaderArrow");
 
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
@@ -186,12 +187,19 @@ public class Player : NetworkBehaviour {
     }
 
     void DrawLineToLeader() {
+        Quaternion rot=new Quaternion();
+        rot.eulerAngles = new Vector3(0f,0f, 60);
+        leaderArrow.transform.rotation = rot;
+
         if (!isLocalPlayer || dead) {
             return;
         }
 
         GameObject bm = GameObject.Find ("BountyManager");
         Player[] playerList = FindObjectsOfType<Player> ();
+
+        if (playerList.Length == 0) return;
+
         int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
         Player leader = null;
 
@@ -205,11 +213,14 @@ public class Player : NetworkBehaviour {
                 break;
             }
         }
-
         Vector3 LeaderLine = transform.position - leader.transform.position;
-        Debug.Log(LeaderLine);
-        Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
+        LeaderLine.z = 0f;
+        LeaderLine = LeaderLine.normalized;
+        Debug.Log(Mathf.Atan2(LeaderLine.y, LeaderLine.x));
 
+
+        //Debug.Log(LeaderLine);
+        Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
     }
 
     void Update()
@@ -612,11 +623,22 @@ public class Player : NetworkBehaviour {
         yield return new WaitForSeconds(2f);
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
+        float maxDistSum = 0;
         foreach (GameObject g in sl)
         {
-            if ((g.transform.position - transform.position).sqrMagnitude > (farthestSpawn.transform.position - transform.position).sqrMagnitude)
+            float distSum = 0;
+            foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
             {
-                farthestSpawn = g; 
+                if (p != this.gameObject)
+                {
+                    distSum += (g.transform.position - p.transform.position).sqrMagnitude;
+                }
+
+            }
+            if (distSum > maxDistSum)
+            {
+                maxDistSum = distSum;
+                farthestSpawn = g;
             }
         }
         transform.position = farthestSpawn.transform.position;

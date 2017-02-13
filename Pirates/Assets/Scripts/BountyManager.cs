@@ -22,7 +22,7 @@ public class BountyManager : NetworkBehaviour {
 	private Canvas canvas;
 	private Font font;
     public GameObject spawnPoint;
-    public int maxResources = 40;
+    private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
 
@@ -32,6 +32,7 @@ public class BountyManager : NetworkBehaviour {
 	void Start () {
 		victoryUndeclared = true;
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
+        maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
         //maxResources = Mathf.RoundToInt((width + height) / 50);
         
 		font = Resources.Load<Font>("Art/Fonts/riesling");
@@ -250,13 +251,19 @@ public class BountyManager : NetworkBehaviour {
 	}
 
 	public int GetHighestBounty() {
-		int highestID = 0;
-		for (int i = 1; i < playerBounties.Count; i++) {
-			if (playerBounties [i] > playerBounties [highestID]) {
-				highestID = i;
+        Debug.Log("DEBUG 1");
+        int highestID = 0;
+        Debug.Log("DEBUG 2");
+        for (int i = 1; i < playerBounties.Count; i++) {
+            Debug.Log("DEBUG 3");
+            if (playerBounties [i] > playerBounties [highestID]) {
+                Debug.Log("DEBUG 4");
+                highestID = i;
 			}
-		}
-		return highestID;
+            Debug.Log("DEBUG 5");
+        }
+        Debug.Log("DEBUG 6");
+        return highestID;
 		//return scoreOrder [0];
 	}
 
