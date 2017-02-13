@@ -62,7 +62,7 @@ public class UpgradePanel : MonoBehaviour {
     public void UpdateUI() {
         for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
             if(player.upgradeRanks[i] < Player.MAX_UPGRADES) {
-                costTexts[i].text = Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]] + "g";
+				costTexts[i].text = (Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]]) + "";
             } else {
                 costTexts[i].text = "SOLD OUT";
             }

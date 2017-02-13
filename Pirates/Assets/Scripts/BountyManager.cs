@@ -8,6 +8,8 @@ using Prototype.NetworkLobby;
 
 public class BountyManager : NetworkBehaviour {
 
+	public bool displayLocal;
+
 	public const int BASE_BOUNTY = 100;
 
 	public SyncListInt playerBounties = new SyncListInt();
@@ -36,7 +38,9 @@ public class BountyManager : NetworkBehaviour {
 
         Random.InitState(System.DateTime.Now.Millisecond);
 		for (int i = 0; i < maxResources; i++) {
-			CmdSpawnResource ();
+			if (isServer) {
+				CmdSpawnResource ();
+			}
 		}
 
         if (!isLocalPlayer) {
@@ -77,8 +81,8 @@ public class BountyManager : NetworkBehaviour {
 		}
 	}*/
 
-	[Command]
-	void CmdOrderBounties () {
+
+	void OrderBounties () {
 		bool finishedSort = false;
 		int[] orders = new int[scoreOrder.Count];
 		for (int i = 0; i < scoreOrder.Count; i++) {
@@ -104,6 +108,8 @@ public class BountyManager : NetworkBehaviour {
     
 	// Update is called once per frame
     void Update () {
+		displayLocal = isLocalPlayer;
+
 		if (canvas == null) {
 			canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 			if (canvas != null) {
@@ -115,7 +121,9 @@ public class BountyManager : NetworkBehaviour {
 		if (playerBounties.Count > 0) {
 			Player[] playerList = FindObjectsOfType<Player> ();
 
-			CmdOrderBounties ();
+			if (isServer) {
+				OrderBounties ();
+			}
 			for (int i = 0; i < playerList.Length; i++) {
 				if (isServer) {
 					int upgradeBounty = 10 * (int)Mathf.Floor (playerList [i].lowUpgrades / 2)
@@ -145,7 +153,8 @@ public class BountyManager : NetworkBehaviour {
 								Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(scoreOrder[j]+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-scoreOrder[j])), TextAnchor.UpperLeft, true);
 							bountyTexts [j] = newText;
 							GameObject.Destroy (oldText);*/
-							RectTransform rectMod = bountyTexts [playerList [i].playerID].GetComponent<RectTransform> ();
+							print ("eh?");
+							RectTransform rectMod = bountyTexts [j].GetComponent<RectTransform> ();
 							rectMod.anchorMin = new Vector2 (0.1f, 1f / playerCount * (scoreOrder [j] + 0));
 							rectMod.anchorMax = new Vector2 (0.9f, 1f / playerCount * (scoreOrder [j] + 1));
 						}

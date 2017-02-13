@@ -525,14 +525,18 @@ public class Player : NetworkBehaviour {
 		ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)Upgrade.RAM]];
     }
     private void UpdateInterface() {
-        if (Input.GetKeyDown(menu)) {
+		if (Input.GetKeyDown(menu)) {
             if (!inGameMenu) {
                 CreateInGameMenu();
             }
-            inGameMenuActive = !inGameMenuActive;
-            inGameMenu.SetActive(inGameMenuActive);
+			if (upgradePanel.gameObject.activeSelf) {
+				upgradePanel.gameObject.SetActive (false);
+			} else {
+				inGameMenuActive = !inGameMenuActive;
+				inGameMenu.SetActive (inGameMenuActive);
+			}
         }
-        if (Input.GetKeyDown(upgrade)) {
+		if (Input.GetKeyDown(upgrade) && !inGameMenuActive) {
             upgradePanel.gameObject.SetActive(!upgradePanel.gameObject.activeSelf);
 
             if (upgradePanel.gameObject.activeSelf)
@@ -683,11 +687,11 @@ public class Player : NetworkBehaviour {
 
     private void RenderInterface() {
         //UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.75f), new Vector2(0.2f, 0.95f));
-        healthBar = UI.CreatePanel("Health", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.85f), new Vector2(0.5f, 0.95f));
+        healthBar = UI.CreatePanel("Health", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.35f, 0.1f), new Vector2(0.65f, 0.2f));
         GameObject healthBarOverlay = UI.CreatePanel("Health Bar", null, Color.green, healthBar.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
-		UI.CreatePanel("Health Bar Overlay", healthBarSprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.2f, 0.85f), new Vector2(0.5f, 0.95f));
+		UI.CreatePanel("Health Bar Overlay", healthBarSprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.35f, 0.1f), new Vector2(0.65f, 0.2f));
 
-        GameObject barOverlay = UI.CreatePanel("Resources", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.2f, 0.75f), new Vector2(0.5f, 0.85f));
+		GameObject barOverlay = UI.CreatePanel("Resources", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.79f, 0.01f), new Vector2(0.99f, 0.11f));
         GameObject bar = UI.CreatePanel("Resource Bar", null, new Color(0.8f, 0.8f, 0.1f), barOverlay.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
         UI.CreatePanel("Resource Bar Overlay", resourceBarSprite, Color.white, barOverlay.transform, Vector3.zero, Vector2.zero, Vector2.one);
         resourcesText = UI.CreateText("Resources Text", "" + resources, font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
