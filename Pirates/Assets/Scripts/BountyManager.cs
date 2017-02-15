@@ -25,11 +25,13 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
+	private Player[] playerList;
 
 	public bool victoryUndeclared;
 
 	// Use this for initialization
 	void Start () {
+		playerList = FindObjectsOfType<Player> ();
 		victoryUndeclared = true;
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
         maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
@@ -119,8 +121,11 @@ public class BountyManager : NetworkBehaviour {
 			}
 		}
 
+		if (playerList.Length < LobbyManager.numPlayers) {
+			playerList = FindObjectsOfType<Player> ();
+		}
+
 		if (playerBounties.Count > 0) {
-			Player[] playerList = FindObjectsOfType<Player> ();
 
 			if (isServer) {
 				OrderBounties ();
@@ -187,7 +192,6 @@ public class BountyManager : NetworkBehaviour {
 		//localID = CmdCreateID ();
 		//return localID;
 
-		Player[] playerList = FindObjectsOfType<Player> ();
 		int newID = playerBounties.Count;
 		playerBounties.Add (100);
 		killStreak.Add (0);
@@ -229,7 +233,6 @@ public class BountyManager : NetworkBehaviour {
 		killStreak [loser] = 0;
 		//playerBounties [loser] = 100;
 
-		Player[] playerList = FindObjectsOfType<Player> ();
 		for (int i = 0; i < playerList.Length; i++) {
 			if (playerList [i].playerID == winner) {
 				float bonusMod = 1.0f;
@@ -243,7 +246,6 @@ public class BountyManager : NetworkBehaviour {
 
 
 	private void CreateBountyPanel() {
-		Player[] playerList = FindObjectsOfType<Player> ();
 		int playerCount = playerList.Length;
 		bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(1.0f, 1.0f, 1.0f, 0.65f), canvas.transform,
 			Vector3.zero, new Vector2(0.02f, 0.95f-0.1f*playerCount), new Vector3(0.18f, 0.95f));
@@ -267,8 +269,6 @@ public class BountyManager : NetworkBehaviour {
 		GameObject lastText = (UI.CreateText ("Victory Text", "Player " + (playerID+1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
 			Vector3.zero, new Vector2 (0.1f, 0.1f), new Vector2 (0.9f, 0.9f), TextAnchor.MiddleCenter, true));
 		//lastText.GetComponent<Text> ().resizeTextForBestFit = true;
-
-		Player[] playerList = FindObjectsOfType<Player> ();
 
 		if (isServer) {
 			for (int i = 0; i < playerList.Length; i++) {	
