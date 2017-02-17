@@ -75,26 +75,13 @@ public class Player : NetworkBehaviour {
     private GameObject redCannon;
     private RectTransform redCannonRect;
     private Font font;
-<<<<<<< HEAD
-    private FogOfWar fogOfWar;
-=======
-    private Sprite upgradeButtonSprite;
-    private Sprite upgradeButtonDisabledSprite;
-    private Sprite healthBarSprite;
-    private Sprite resourceBarSprite;
     //private FogOfWar fogOfWar;
->>>>>>> origin/master
     private MapGenerator mapGenerator;
     // GameObject references
     //private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
-
     private GameObject resourcesText;
-<<<<<<< HEAD
-=======
 	private GameObject respawnTimerText;
-    private Sprite menuBackground;
->>>>>>> origin/master
     private Rigidbody2D rb;
     // upgrade menu ranks
 	public SyncListInt upgradeRanks = new SyncListInt();
@@ -180,8 +167,6 @@ public class Player : NetworkBehaviour {
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
-
-<<<<<<< HEAD
         healthBar = GameObject.Find("Canvas/UI/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
         purpleCannon = GameObject.Find("Canvas/UI/Purple Cannon");
@@ -189,15 +174,12 @@ public class Player : NetworkBehaviour {
         redCannon = GameObject.Find("Canvas/UI/Red Cannon");
         redCannonRect = redCannon.GetComponent<RectTransform>();
 
-
-=======
 		respawnTimerText = UI.CreateText ("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
 			Vector3.zero, new Vector2 (0.3f, 0.3f), new Vector2 (0.7f, 0.7f), TextAnchor.MiddleCenter, true);
 		respawnTimerText.SetActive (false);
 		Text timerText = respawnTimerText.GetComponent<Text> ();
 		timerText.resizeTextMaxSize = timerText.fontSize;
         
->>>>>>> origin/master
         mapGenerator = FindObjectOfType<MapGenerator>();
         /*fogOfWar = FindObjectOfType<FogOfWar>();
         fogOfWar.player = this;
@@ -222,9 +204,11 @@ public class Player : NetworkBehaviour {
 		}
         Player[] playerList = FindObjectsOfType<Player> ();
 
-        if (playerList.Length <= 1) 
+        if (playerList.Length <= 1) {
             leaderArrow.SetActive(false);
             return;
+        } 
+
 
         int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
         Player leader = null;
@@ -608,10 +592,6 @@ public class Player : NetworkBehaviour {
  			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
 			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
-<<<<<<< HEAD
-=======
-			//ApplyDamage (10f, playerID);
->>>>>>> origin/master
 		} else {
 			if (currVelocity > 0) {
 				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
