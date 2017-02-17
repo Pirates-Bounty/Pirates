@@ -187,11 +187,8 @@ public class Player : NetworkBehaviour {
     }
 
     void DrawLineToLeader() {
-        Quaternion rot=new Quaternion();
-        rot.eulerAngles = new Vector3(0f,0f, 60);
-        leaderArrow.transform.rotation = rot;
-
         if (!isLocalPlayer || dead) {
+            leaderArrow.SetActive(false);
             return;
         }
 
@@ -201,12 +198,15 @@ public class Player : NetworkBehaviour {
 		}
         Player[] playerList = FindObjectsOfType<Player> ();
 
-        if (playerList.Length == 0) return;
+        if (playerList.Length <= 1) 
+            leaderArrow.SetActive(false);
+            return;
 
         int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
         Player leader = null;
 
         if (playerID == leaderID) {
+            leaderArrow.SetActive(false);
             return;
         }
 
@@ -217,12 +217,22 @@ public class Player : NetworkBehaviour {
             }
         }
 		if (leader == null) {
+            leaderArrow.SetActive(false);
 			return;
 		}
+        leaderArrow.SetActive(true);
         Vector3 LeaderLine = transform.position - leader.transform.position;
         LeaderLine.z = 0f;
         LeaderLine = LeaderLine.normalized;
-        //Debug.Log(Mathf.Atan2(LeaderLine.y, LeaderLine.x));
+
+        leaderArrow.transform.up = -LeaderLine;
+
+        // float rotAngle = (180/3.14159f) * Mathf.Atan2(LeaderLine.y, LeaderLine.x);
+        // Debug.Log(rotAngle);
+
+        // Quaternion rot=new Quaternion();
+        // rot.eulerAngles = new Vector3(0f,0f, rotAngle);
+        // leaderArrow.transform.rotation = rot;
 
 
         //Debug.Log(LeaderLine);
