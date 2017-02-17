@@ -75,13 +75,26 @@ public class Player : NetworkBehaviour {
     private GameObject redCannon;
     private RectTransform redCannonRect;
     private Font font;
+<<<<<<< HEAD
     private FogOfWar fogOfWar;
+=======
+    private Sprite upgradeButtonSprite;
+    private Sprite upgradeButtonDisabledSprite;
+    private Sprite healthBarSprite;
+    private Sprite resourceBarSprite;
+    //private FogOfWar fogOfWar;
+>>>>>>> origin/master
     private MapGenerator mapGenerator;
     // GameObject references
     //private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
 
     private GameObject resourcesText;
+<<<<<<< HEAD
+=======
+	private GameObject respawnTimerText;
+    private Sprite menuBackground;
+>>>>>>> origin/master
     private Rigidbody2D rb;
     // upgrade menu ranks
 	public SyncListInt upgradeRanks = new SyncListInt();
@@ -168,6 +181,7 @@ public class Player : NetworkBehaviour {
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
 
+<<<<<<< HEAD
         healthBar = GameObject.Find("Canvas/UI/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
         purpleCannon = GameObject.Find("Canvas/UI/Purple Cannon");
@@ -176,10 +190,18 @@ public class Player : NetworkBehaviour {
         redCannonRect = redCannon.GetComponent<RectTransform>();
 
 
+=======
+		respawnTimerText = UI.CreateText ("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
+			Vector3.zero, new Vector2 (0.3f, 0.3f), new Vector2 (0.7f, 0.7f), TextAnchor.MiddleCenter, true);
+		respawnTimerText.SetActive (false);
+		Text timerText = respawnTimerText.GetComponent<Text> ();
+		timerText.resizeTextMaxSize = timerText.fontSize;
+        
+>>>>>>> origin/master
         mapGenerator = FindObjectOfType<MapGenerator>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
+        /*fogOfWar = FindObjectOfType<FogOfWar>();
         fogOfWar.player = this;
-        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);
+        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);*/
 
         lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
@@ -189,11 +211,8 @@ public class Player : NetworkBehaviour {
     }
 
     void DrawLineToLeader() {
-        Quaternion rot=new Quaternion();
-        rot.eulerAngles = new Vector3(0f,0f, 60);
-        leaderArrow.transform.rotation = rot;
-
         if (!isLocalPlayer || dead) {
+            leaderArrow.SetActive(false);
             return;
         }
 
@@ -203,12 +222,15 @@ public class Player : NetworkBehaviour {
 		}
         Player[] playerList = FindObjectsOfType<Player> ();
 
-        if (playerList.Length == 0) return;
+        if (playerList.Length <= 1) 
+            leaderArrow.SetActive(false);
+            return;
 
         int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
         Player leader = null;
 
         if (playerID == leaderID) {
+            leaderArrow.SetActive(false);
             return;
         }
 
@@ -219,12 +241,22 @@ public class Player : NetworkBehaviour {
             }
         }
 		if (leader == null) {
+            leaderArrow.SetActive(false);
 			return;
 		}
+        leaderArrow.SetActive(true);
         Vector3 LeaderLine = transform.position - leader.transform.position;
         LeaderLine.z = 0f;
         LeaderLine = LeaderLine.normalized;
-        //Debug.Log(Mathf.Atan2(LeaderLine.y, LeaderLine.x));
+
+        leaderArrow.transform.up = -LeaderLine;
+
+        // float rotAngle = (180/3.14159f) * Mathf.Atan2(LeaderLine.y, LeaderLine.x);
+        // Debug.Log(rotAngle);
+
+        // Quaternion rot=new Quaternion();
+        // rot.eulerAngles = new Vector3(0f,0f, rotAngle);
+        // leaderArrow.transform.rotation = rot;
 
 
         //Debug.Log(LeaderLine);
@@ -259,7 +291,7 @@ public class Player : NetworkBehaviour {
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
-        fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
+        //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
 		if (boostTimer > 0) {
 			boostTimer -= Time.deltaTime;
 		} else {
@@ -576,6 +608,10 @@ public class Player : NetworkBehaviour {
  			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
 			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
+<<<<<<< HEAD
+=======
+			//ApplyDamage (10f, playerID);
+>>>>>>> origin/master
 		} else {
 			if (currVelocity > 0) {
 				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
@@ -589,7 +625,16 @@ public class Player : NetworkBehaviour {
 
     IEnumerator Death()
     {
-        yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
+
+		Text timerText = respawnTimerText.GetComponent<Text> ();
+		respawnTimerText.SetActive (true);
+		for (int i = 5; i > 0; i--) {
+			timerText.text = i + "";
+			yield return new WaitForSeconds(1f);
+		}
+		respawnTimerText.SetActive (false);
+
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
         float maxDistSum = 0;
