@@ -82,6 +82,7 @@ public class Player : NetworkBehaviour {
     private UpgradePanel upgradePanel;
     private GameObject resourcesText;
 	private GameObject respawnTimerText;
+    private Image sprintCooldownImage;
     private Rigidbody2D rb;
     // upgrade menu ranks
 	public SyncListInt upgradeRanks = new SyncListInt();
@@ -173,6 +174,7 @@ public class Player : NetworkBehaviour {
         purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
         redCannon = GameObject.Find("Canvas/UI/Red Cannon");
         redCannonRect = redCannon.GetComponent<RectTransform>();
+        sprintCooldownImage = GameObject.Find("Canvas/UI/Sprint Cooldown").GetComponent<Image>();
 
 		respawnTimerText = UI.CreateText ("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
 			Vector3.zero, new Vector2 (0.3f, 0.3f), new Vector2 (0.7f, 0.7f), TextAnchor.MiddleCenter, true);
@@ -208,7 +210,6 @@ public class Player : NetworkBehaviour {
             leaderArrow.SetActive(false);
             return;
         } 
-
 
         int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
         Player leader = null;
@@ -553,6 +554,7 @@ public class Player : NetworkBehaviour {
         }
         purpleCannonRect.anchorMin = new Vector2(0.26f + 0.24f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
         redCannonRect.anchorMax = new Vector2(0.74f - 0.24f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        sprintCooldownImage.fillAmount = boostTimer/currBoostDelay;
     }
     void OnChangePlayer(float newHealth) {
         if (!isLocalPlayer) {
