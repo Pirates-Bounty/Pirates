@@ -76,13 +76,14 @@ public class Player : NetworkBehaviour {
     private Sprite upgradeButtonDisabledSprite;
     private Sprite healthBarSprite;
     private Sprite resourceBarSprite;
-    private FogOfWar fogOfWar;
+    //private FogOfWar fogOfWar;
     private MapGenerator mapGenerator;
     // GameObject references
     private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
 
     private GameObject resourcesText;
+	private GameObject respawnTimerText;
     private Sprite menuBackground;
     private Rigidbody2D rb;
     // upgrade menu ranks
@@ -173,11 +174,17 @@ public class Player : NetworkBehaviour {
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
+
+		respawnTimerText = UI.CreateText ("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
+			Vector3.zero, new Vector2 (0.3f, 0.3f), new Vector2 (0.7f, 0.7f), TextAnchor.MiddleCenter, true);
+		respawnTimerText.SetActive (false);
+		Text timerText = respawnTimerText.GetComponent<Text> ();
+		timerText.resizeTextMaxSize = timerText.fontSize;
         
         mapGenerator = FindObjectOfType<MapGenerator>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
+        /*fogOfWar = FindObjectOfType<FogOfWar>();
         fogOfWar.player = this;
-        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);
+        fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);*/
 
         lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
@@ -267,7 +274,7 @@ public class Player : NetworkBehaviour {
         
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
-        fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
+        //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
 		if (boostTimer > 0) {
 			boostTimer -= Time.deltaTime;
 		} else {
@@ -613,19 +620,12 @@ public class Player : NetworkBehaviour {
             float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
 
             transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
-
-            //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey (up)) {
  			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
-			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
-			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			//currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
-			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
-			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
-			//CmdApplyDamage(10f, playerID);
+			//ApplyDamage (10f, playerID);
 		} else {
 			if (currVelocity > 0) {
 				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
@@ -639,7 +639,16 @@ public class Player : NetworkBehaviour {
 
     IEnumerator Death()
     {
-        yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
+
+		Text timerText = respawnTimerText.GetComponent<Text> ();
+		respawnTimerText.SetActive (true);
+		for (int i = 5; i > 0; i--) {
+			timerText.text = i + "";
+			yield return new WaitForSeconds(1f);
+		}
+		respawnTimerText.SetActive (false);
+
         GameObject[] sl = GameObject.FindGameObjectsWithTag("spawner");
         GameObject farthestSpawn = sl[0];
         float maxDistSum = 0;
