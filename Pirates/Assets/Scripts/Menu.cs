@@ -17,6 +17,8 @@ public class Menu : MonoBehaviour {
     private GameObject rightArm;
     private GameObject waves1;
     private GameObject waves2;
+    private GameObject waves3;
+    private GameObject waves4;
     private float maxRotation = 2f;
     private float currentRotation = 0.0f;
     private bool positive = true;
@@ -32,6 +34,8 @@ public class Menu : MonoBehaviour {
         boat = GameObject.Find("Boat");
         waves1 = GameObject.Find("Waves 1");
         waves2 = GameObject.Find("Waves 2");
+        waves3 = GameObject.Find("Waves 3");
+        waves4 = GameObject.Find("Waves 4");
         leftArm = GameObject.Find("leftarm");
         rightArm = GameObject.Find("rightarm");
         font = Resources.Load<Font>("Art/Fonts/Angel Tears");
@@ -42,7 +46,7 @@ public class Menu : MonoBehaviour {
         //backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
         playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.35f), new Vector2(0.9f, 0.5f),
+            Vector3.zero, new Vector2(0.2f, 0.35f), new Vector2(0.8f, 0.5f),
             delegate {
                 Navigator.Instance.LoadLevel("Lobby");
                 SoundManager.Instance.PlaySFXTransition(Resources.Load<AudioClip>("Sound/SFX/UI/DoorOpen"),0.2f);
@@ -51,11 +55,11 @@ public class Menu : MonoBehaviour {
 
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.2f), new Vector2(0.9f, 0.35f), delegate { Navigator.Instance.LoadLevel("Lobby Tutorial"); });
+            Vector3.zero, new Vector2(0.2f, 0.2f), new Vector2(0.8f, 0.35f), delegate { Navigator.Instance.LoadLevel("Lobby Tutorial"); });
 
         // Quit Button
         quitButton = UI.CreateButton("Quit", "Quit", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.6f, 0.05f), new Vector2(0.9f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
+            Vector3.zero, new Vector2(0.2f, 0.05f), new Vector2(0.8f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
 
         //=== SOUND SECTION - BEGIN ===
         //preparing highlight entries
@@ -100,9 +104,13 @@ public class Menu : MonoBehaviour {
         if (positive) {
             waves1.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
             waves2.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
+            waves3.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
+            waves4.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
         } else {
             waves1.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
             waves2.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
+            waves3.transform.Translate(new Vector3(-0.5f * Time.deltaTime, -0.1f * Time.deltaTime, 0f));
+            waves4.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
         }
 
 	}

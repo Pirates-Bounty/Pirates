@@ -26,6 +26,8 @@ public class BountyManager : NetworkBehaviour {
     public GameObject resourcePrefab;
     private GameObject MapGen;
 	private Player[] playerList;
+    private GameObject bountyBoard;
+    private RectTransform bountyBoardRect;
 
 	public bool victoryUndeclared;
 
@@ -38,6 +40,8 @@ public class BountyManager : NetworkBehaviour {
         //maxResources = Mathf.RoundToInt((width + height) / 50);
         
 		font = Resources.Load<Font>("Art/Fonts/riesling");
+        bountyBoard = GameObject.Find("Canvas/UI/Bounty Board");
+        bountyBoardRect = bountyBoard.GetComponent<RectTransform>();
 
         Random.InitState(System.DateTime.Now.Millisecond);
 		for (int i = 0; i < maxResources; i++) {
@@ -247,8 +251,9 @@ public class BountyManager : NetworkBehaviour {
 
 	private void CreateBountyPanel() {
 		int playerCount = playerList.Length;
-		bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(1.0f, 1.0f, 1.0f, 0.65f), canvas.transform,
-			Vector3.zero, new Vector2(0.02f, 0.95f-0.1f*playerCount), new Vector3(0.18f, 0.95f));
+		bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(0.0f, 0.0f, 0.0f, 0f), canvas.transform,
+			Vector3.zero, new Vector2(0.75f, 0.1f), new Vector3(1f, 0.2f + 0.1f * playerCount));
+        bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.2f + 0.1f * playerCount);
 	}
 
 	public int GetHighestBounty() {

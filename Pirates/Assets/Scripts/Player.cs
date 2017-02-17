@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour {
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
 	public const float BASE_RAM_DAMAGE = 5.0f;
+    public const float MAX_SHOTS = 4.0f;
     public static int[] UPGRADE_SCALE = { 1, 5, 20 };
 
 
@@ -53,9 +54,6 @@ public class Player : NetworkBehaviour {
     public KeyCode down;
     public KeyCode left;
     public KeyCode right;
-    // now uses mouse buttons to fire so no longer needed
-    // public KeyCode fireLeft;
-    // public KeyCode fireRight;
     public KeyCode menu;
     public KeyCode upgrade;
     public Transform leftSpawn;
@@ -71,19 +69,19 @@ public class Player : NetworkBehaviour {
     private Camera playerCamera;
     private Canvas canvas;
     private GameObject healthBar;
+    private RectTransform healthBarRect;
+    private GameObject purpleCannon;
+    private RectTransform purpleCannonRect;
+    private GameObject redCannon;
+    private RectTransform redCannonRect;
     private Font font;
-    private Sprite upgradeButtonSprite;
-    private Sprite upgradeButtonDisabledSprite;
-    private Sprite healthBarSprite;
-    private Sprite resourceBarSprite;
     private FogOfWar fogOfWar;
     private MapGenerator mapGenerator;
     // GameObject references
-    private GameObject inGameMenu;
+    //private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
 
     private GameObject resourcesText;
-    private Sprite menuBackground;
     private Rigidbody2D rb;
     // upgrade menu ranks
 	public SyncListInt upgradeRanks = new SyncListInt();
@@ -99,6 +97,8 @@ public class Player : NetworkBehaviour {
     public float boostTimer = BASE_BOOST_DELAY;
 	public float currMaxHealth = BASE_MAX_HEALTH;
 	public float currVelocity = 0.0f;
+    public float numPurpleShots = MAX_SHOTS;
+    public float numRedShots = MAX_SHOTS;
 	[SyncVar]
 	public float appliedRamDamage = 0.0f;
     // menu checks
@@ -153,12 +153,7 @@ public class Player : NetworkBehaviour {
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
-        menuBackground = Resources.Load<Sprite>("Art/Sprite/UI Upgrade/UI UpgradeBackDrop");
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        upgradeButtonSprite = Resources.Load<Sprite>("Art/Sprites/UI Upgrade/UI Upgrade Button(Purchase)");
-        upgradeButtonDisabledSprite = Resources.Load<Sprite>("Art/Sprites/UI Upgrade/UI Upgrade Button(Limit)");
-        healthBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Health Bar");
-        resourceBarSprite = Resources.Load<Sprite>("Art/Sprites/UI Updated 11-19-16/UI Main Menu Booty Count");
         leaderArrow = GameObject.Find("LeaderArrow");
 
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
@@ -167,13 +162,20 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        RenderInterface();
-        CreateInGameMenu();
+        //CreateInGameMenu();
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
-        
+
+        healthBar = GameObject.Find("Canvas/UI/Health Bar");
+        healthBarRect = healthBar.GetComponent<RectTransform>();
+        purpleCannon = GameObject.Find("Canvas/UI/Purple Cannon");
+        purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
+        redCannon = GameObject.Find("Canvas/UI/Red Cannon");
+        redCannonRect = redCannon.GetComponent<RectTransform>();
+
+
         mapGenerator = FindObjectOfType<MapGenerator>();
         fogOfWar = FindObjectOfType<FogOfWar>();
         fogOfWar.player = this;
@@ -263,7 +265,6 @@ public class Player : NetworkBehaviour {
 		} else {
 			if (Input.GetKeyDown (KeyCode.LeftShift)) {
 				SpeedBoost ();
-				//AudioSource.PlayClipAtPoint (whooshS, transform.position, 100.0f);
 				SoundManager.Instance.PlaySFX (whooshS, 1.0f);
 				gofast = true;
 				boostTimer = currBoostDelay;
@@ -289,28 +290,27 @@ public class Player : NetworkBehaviour {
         if (firingTimer < 0)
         {
             // fire cannons
-            if (/*Input.GetKeyDown(fireLeft)*/Input.GetMouseButtonDown(0) && !upgradePanel.gameObject.activeSelf)
+            if (Input.GetMouseButtonDown(0) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1)
             {
                 // left cannon
-                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
+                numPurpleShots--;
             }
-            if (/*Input.GetKeyDown(fireRight)*/Input.GetMouseButtonDown(1) && !upgradePanel.gameObject.activeSelf)
+            if (Input.GetMouseButtonDown(1) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1)
             {
                 // right cannon
-                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimer = currFiringDelay;
+                numRedShots--;
             }
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf)
             {
                 // triple volley - fire all at once
-                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
@@ -319,7 +319,6 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf)
             {
                 // triple shotgun spray
-                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
@@ -328,7 +327,6 @@ public class Player : NetworkBehaviour {
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf)
             {
                 // front shot
-                //AudioSource.PlayClipAtPoint(shotS, transform.position, 100.0f);
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
@@ -368,7 +366,6 @@ public class Player : NetworkBehaviour {
 		for (int i = 0; i < damageStrength/10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED;
-			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
@@ -378,7 +375,6 @@ public class Player : NetworkBehaviour {
 		for (int i = 0; i < damageStrength / 10; i++) {
 			GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, rightSpawners[i].position, Quaternion.identity);
 			instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = rightSpawners[i].up * BASE_PROJECTILE_SPEED;
-			//instantiatedProjectile.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
 			NetworkServer.Spawn (instantiatedProjectile);
 		}
@@ -389,7 +385,6 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < 3; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED/2;
-            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile);
         }
@@ -400,20 +395,17 @@ public class Player : NetworkBehaviour {
 
             GameObject instantiatedProjectile1 = (GameObject)Instantiate (projectile, leftSpawners[0].position, Quaternion.identity);
             instantiatedProjectile1.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, 45) * leftSpawners[0].up * BASE_PROJECTILE_SPEED;
-            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile1.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile1);
 
             //angled 45 degrees backward
             GameObject instantiatedProjectile2 = (GameObject)Instantiate (projectile, leftSpawners[1].position, Quaternion.identity);
             instantiatedProjectile2.GetComponent<Rigidbody2D> ().velocity = leftSpawners[1].up * BASE_PROJECTILE_SPEED;
-            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile2.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile2);
 
             GameObject instantiatedProjectile3 = (GameObject)Instantiate (projectile, leftSpawners[2].position, Quaternion.identity);
             instantiatedProjectile3.GetComponent<Rigidbody2D> ().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
-            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile3.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile3);
     }
@@ -423,7 +415,6 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength/10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate (projectile, frontSpawners[0].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D> ().velocity = frontSpawners[0].up * BASE_PROJECTILE_SPEED;
-            //instantiatedProjectile1.GetComponent<Projectile> ().damage = damageStrength;
 			instantiatedProjectile.GetComponent<Projectile> ().assignedID = playerID;
             NetworkServer.Spawn (instantiatedProjectile);
         }
@@ -435,12 +426,10 @@ public class Player : NetworkBehaviour {
     }
 	[Command]
 	void CmdUpgrade(Upgrade upgrade, bool positive) {
-		//int upgradeMod = 0;
 		if (positive) {
 			int upgradePrice = UPGRADE_COST * UPGRADE_SCALE[upgradeRanks[(int) upgrade]];
 
 			if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= upgradePrice)) {
-				//upgradeMod++;
 				upgradeRanks[(int)upgrade]++;
 				resources -= upgradePrice;
 				switch (upgradeRanks [(int)upgrade]) {
@@ -458,15 +447,7 @@ public class Player : NetworkBehaviour {
 					break;
 				}
 			}
-		} /*else {
-			if (upgradeRanks[(int)upgrade] > 0) {
-				//upgradeMod--;
-				upgradeRanks[(int)upgrade]--;
-				resources += UPGRADE_COST;
-			}
-		}*/
-        //UpdateSprites();
-		//upgradeRanks [(int)upgrade] += upgradeMod;
+		}
 	}
 	[Command]
 	void CmdChangeHealth(float setHealth, bool flatSet) {
@@ -507,7 +488,6 @@ public class Player : NetworkBehaviour {
 		currentHealth -= damage;
 		// respawn the player if they are dead
 		if (currentHealth <= 0.0f) {
-            //AudioSource.PlayClipAtPoint(deathS, transform.position, 100.0f);
             SoundManager.Instance.PlaySFX(deathS, 1.0f);
             RpcRespawn ();
 
@@ -543,14 +523,8 @@ public class Player : NetworkBehaviour {
     }
     private void UpdateInterface() {
 		if (Input.GetKeyDown(menu)) {
-            if (!inGameMenu) {
-                CreateInGameMenu();
-            }
 			if (upgradePanel.gameObject.activeSelf) {
 				upgradePanel.gameObject.SetActive (false);
-			} else {
-				inGameMenuActive = !inGameMenuActive;
-				inGameMenu.SetActive (inGameMenuActive);
 			}
         }
 		if (Input.GetKeyDown(upgrade) && !inGameMenuActive) {
@@ -561,13 +535,15 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose,0.15f);
         }
+        purpleCannonRect.anchorMin = new Vector2(0.26f + 0.24f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(0.74f - 0.24f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
     }
     void OnChangePlayer(float newHealth) {
         if (!isLocalPlayer) {
             return;
         }
 		currentHealth = newHealth;
-		healthBar.GetComponent<RectTransform>().anchorMax = new Vector2(0.65f - 0.3f * (currMaxHealth - currentHealth) / currMaxHealth, 0.2f);
+        healthBarRect.anchorMax = new Vector2(0.64f - 0.28f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
@@ -582,40 +558,24 @@ public class Player : NetworkBehaviour {
 		if (Input.GetKey(left)) { // click left
 			if (creakTimer <= 0 && Input.GetKeyDown (left)) {
 				creakTimer = 3.0f;
-                //AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-
             float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity*0.1f);
-
             transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
-
-            //             transform.Rotate(new Vector3(0.0f, 0.0f, currRotationSpeed * Time.deltaTime));
         }
 
         if (Input.GetKey(right)) {
 			if (creakTimer <= 0 && Input.GetKeyDown (right)) {
 				creakTimer = 3.0f;
-				//AudioSource.PlayClipAtPoint (turnS, transform.position, 0.7f);
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-
             float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
-
             transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
-
-            //             transform.Rotate(new Vector3(0.0f, 0.0f, -currRotationSpeed * Time.deltaTime));
         }
         if (Input.GetKey (up)) {
  			currVelocity = Mathf.Min (currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
-			//transform.Translate (0.0f, currMoveSpeed * Time.deltaTime, 0.0f);
-			//rb.AddForce(transform.up * currMoveSpeed*1000 * Time.deltaTime);
 		} else if (Input.GetKey (down)) {
-			//currVelocity = Mathf.Max(-currMoveSpeed/2f, currVelocity - currMoveSpeed*.75f * Time.deltaTime);
 			currVelocity = Mathf.Max(-currMoveSpeed * (1+(currRotationSpeed/BASE_ROTATION_SPEED/4))/2f, currVelocity - currMoveSpeed*.85f * Time.deltaTime);
-			//transform.Translate (0.0f, -currMoveSpeed / 4 * Time.deltaTime, 0.0f);
-			//rb.AddForce(-transform.up * currMoveSpeed*1000 / 4 * Time.deltaTime);
-			//CmdApplyDamage(10f, playerID);
 		} else {
 			if (currVelocity > 0) {
 				currVelocity = Mathf.Max (0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
@@ -695,7 +655,6 @@ public class Player : NetworkBehaviour {
 
 		if (otherPlayer != null && collision.collider.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
 			ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.playerID);
-            //AudioSource.PlayClipAtPoint(ramS, transform.position, 100.0f);
             SoundManager.Instance.PlaySFX(ramS, 1.0f);
             //3 second invulnerability before you can take ram damage again
             StartCoroutine (RamInvuln ());
@@ -716,66 +675,6 @@ public class Player : NetworkBehaviour {
         //upgradePanel.UpdateUI();
 	}
 
-    private void RenderInterface() {
-        //UI.CreatePanel("Profile", sprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.05f, 0.75f), new Vector2(0.2f, 0.95f));
-        healthBar = UI.CreatePanel("Health", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.35f, 0.1f), new Vector2(0.65f, 0.2f));
-        GameObject healthBarOverlay = UI.CreatePanel("Health Bar", null, Color.green, healthBar.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
-		UI.CreatePanel("Health Bar Overlay", healthBarSprite, Color.white, canvas.transform, Vector3.zero, new Vector2(0.35f, 0.1f), new Vector2(0.65f, 0.2f));
-
-		GameObject barOverlay = UI.CreatePanel("Resources", null, new Color(0.0f, 0.0f, 0.0f, 0.0f), canvas.transform, Vector3.zero, new Vector2(0.79f, 0.01f), new Vector2(0.99f, 0.11f));
-        GameObject bar = UI.CreatePanel("Resource Bar", null, new Color(0.8f, 0.8f, 0.1f), barOverlay.transform, Vector3.zero, new Vector2(0.02f, 0.2f), new Vector2(0.98f, 0.75f));
-        UI.CreatePanel("Resource Bar Overlay", resourceBarSprite, Color.white, barOverlay.transform, Vector3.zero, Vector2.zero, Vector2.one);
-        resourcesText = UI.CreateText("Resources Text", "" + resources, font, Color.black, 20, bar.transform, Vector3.zero, Vector2.zero, Vector2.one, TextAnchor.MiddleCenter, true);
-    }
-
-    private void CreateInGameMenu() {
-        inGameMenu = UI.CreatePanel("In-Game Menu", menuBackground, Color.white, canvas.transform,
-            Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
-        GameObject mainMenuButton = UI.CreateButton("Main Menu Button", "Main Menu", font, Color.black, 24, inGameMenu.transform,
-            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.7f), new Vector2(0.75f, 0.9f),
-            delegate {
-                UI.CreateYesNoDialog("Confirmation", "Are you sure?",
-                 font, Color.black, 24, menuBackground, upgradeButtonSprite, upgradeButtonDisabledSprite,
-                 Color.white, inGameMenu.transform, Vector3.zero, new Vector2(0.25f, 0.1f),
-                 new Vector2(0.75f, 0.9f),
-                 delegate {
-                     CancelInvoke("EnemyDetection");
-                     Navigator.Instance.LoadLevel("Menu");
-
-                 });
-            });
-        GameObject optionButton = UI.CreateButton("Options Button", "Options", font, Color.black, 24, inGameMenu.transform,
-            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.4f), new Vector2(0.75f, 0.6f), delegate {; });
-        GameObject returnButton = UI.CreateButton("Return to Game Button", "Return to Game", font, Color.black, 24, inGameMenu.transform,
-            upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.25f, 0.1f), new Vector2(0.75f, 0.3f),
-            delegate { inGameMenuActive = !inGameMenuActive; inGameMenu.SetActive(inGameMenuActive); });
-        inGameMenu.SetActive(inGameMenuActive);
-    }
-
-  //  private void CreateUpgradeMenu() {
-		//upgradeMenu = UI.CreatePanel("Upgrade Menu", menuBackground, new Color(1.0f, 1.0f, 1.0f, 0.85f), canvas.transform,
-  //          Vector3.zero, new Vector2(0.25f, 0.25f), new Vector3(0.75f, 0.75f));
-  //      for(int i = 0; i < (int) Upgrade.COUNT; ++i) {
-  //          // creating this extra variable because delegates don't work on for loop variables for some reason
-  //          int dupe = i;
-  //          // Upgrade Plus Button
-  //          GameObject upgradePlusButton = UI.CreateButton("Upgrade Button " + i, "+", font, Color.black, 24, upgradeMenu.transform,
-  //              upgradeButtonSprite, upgradeButtonDisabledSprite, Vector3.zero, new Vector2(0.7f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.9f, 1.0f / (int)Upgrade.COUNT * (i + 1)), delegate { UpgradePlayer((Upgrade) dupe, true); UpdateVariables(); });
-  //          // Upgrade Text
-  //          upgradeTexts[i] = UI.CreateText("Upgrade Text " + i, UpgradeToString((Upgrade)i), font, Color.black, 24, upgradeMenu.transform,
-  //              Vector3.zero, new Vector2(0.1f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.5f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
-		//	costTexts[i] = UI.CreateText("Cost Text " + i, UPGRADE_COST + "g", font, Color.black, 24, upgradeMenu.transform,
-		//		Vector3.zero, new Vector2(0.75f, 1.0f / (int)Upgrade.COUNT * i), new Vector2(0.95f, 1.0f / (int)Upgrade.COUNT * (i + 1)), TextAnchor.MiddleCenter, true);
-  //          //Highlight Sound
-  //          UnityEngine.EventSystems.EventTrigger.Entry entry_highlight = new UnityEngine.EventSystems.EventTrigger.Entry(); //entry object creation
-  //          entry_highlight.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter; //setting the trigger type; how is it triggered
-  //          entry_highlight.callback.AddListener((data) => SoundManager.Instance.PlaySFX(GameObject.Find("SoundManager").GetComponent<SoundManager>().highlightAudio,0.3f)); //call function=> playAudio(...)
-  //          upgradePlusButton.AddComponent<UnityEngine.EventSystems.EventTrigger>().triggers.Add(entry_highlight);
-  //      }
-		////UpdateVariables ();
-  //      upgradeMenu.SetActive(upgradeMenuActive);
-  //  }
-
     public void UpgradePlayer(Upgrade upgrade, bool positive) {
 		if (!isLocalPlayer) {
 			return;
@@ -786,8 +685,7 @@ public class Player : NetworkBehaviour {
     }
 
     public override void OnStartLocalPlayer() {
-        //GetComponent<SpriteRenderer>().color = Color.red;
-        //UpdateSprites();
+        
     }
 
     private void UpdateVariables() {
@@ -796,8 +694,6 @@ public class Player : NetworkBehaviour {
             currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)Upgrade.SPEED] / 2.0f));
 			currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)Upgrade.AGILITY] / 3.0f));
         }
-		//currFiringDelay = BASE_FIRING_DELAY * (1 - (upgradeRanks[UpgradeID.CSPD] / 10.0f));
-		//currProjectileSpeed = BASE_PROJECTILE_SPEED * (1 + (upgradeRanks[(int)UpgradeID.CSPD] / 4.0f));
 		currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)Upgrade.RAM] / 1.5f));
 		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)Upgrade.CANNON] / 1.0f));
 		currBoostDelay = BASE_BOOST_DELAY * (1 - (upgradeRanks[(int)Upgrade.AGILITY] / 5.0f));
@@ -807,14 +703,16 @@ public class Player : NetworkBehaviour {
 		if (oldMaxHealth != currMaxHealth) {
 			CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
 		}
-
+        numRedShots += Time.deltaTime;
+        numRedShots = Mathf.Clamp(numRedShots, 0, MAX_SHOTS);
+        numPurpleShots += Time.deltaTime;
+        numPurpleShots = Mathf.Clamp(numPurpleShots, 0, MAX_SHOTS);
     }
 
 	private void UpdateSeagulls() {
 		seagullTimer -= Time.deltaTime;
 		if (seagullTimer <= 0) {
 			seagullTimer = 15 + Random.value * 15;
-            //AudioSource.PlayClipAtPoint (seagullS, transform.position, 100.0f);
             SoundManager.Instance.PlaySFX(seagullS, 1.0f);
 		}
 	}
