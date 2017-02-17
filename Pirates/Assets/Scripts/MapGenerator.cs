@@ -55,6 +55,7 @@ public class MapGenerator : NetworkBehaviour {
     public Toggle randSeed;
     public InputField SeedNumber;
     public Material waterMat;
+    public RawImage mapPic;
     
 
 
@@ -150,6 +151,7 @@ public class MapGenerator : NetworkBehaviour {
             SeedNumber.text = seed.ToString();
     }
 
+
     // Use this for initialization
 
     // Update is called once per frame
@@ -226,8 +228,29 @@ public class MapGenerator : NetworkBehaviour {
         plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width/5, height/5);
         plane.transform.localScale = new Vector3(width / 10, 1, height / 10);
         plane.transform.parent = transform;
-        
 
+        Texture2D tex = new Texture2D(width, height);
+        mapPic.GetComponent<RawImage>().texture = tex;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (map[x, y] == (int)TileType.WATER)
+                {
+                    tex.SetPixel(x, y, Color.blue);
+                }
+                else if (map[x, y] == (int)TileType.GRASS)
+                {
+                    tex.SetPixel(x, y, Color.green);
+                }
+                else if (map[x, y] == (int)TileType.SAND)
+                {
+                    tex.SetPixel(x, y, Color.yellow);
+                }
+            }
+        }
+        tex.Apply();
 
     }
 
