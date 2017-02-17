@@ -23,8 +23,8 @@ public class MapGenerator : NetworkBehaviour {
     //public float amplitude;
     public Sprite[] sprites;
     public Sprite[] plantSprites;
-    public Sprite buoySprite;
     public GameObject resourcePrefab;
+    private GameObject plane;
     // no longer needed because we have actual art instead of placeholders
     //public Color[] colors;
 
@@ -54,6 +54,8 @@ public class MapGenerator : NetworkBehaviour {
     public Slider resourceSlider;
     public Toggle randSeed;
     public InputField SeedNumber;
+    public Material waterMat;
+    
 
 
 
@@ -85,6 +87,8 @@ public class MapGenerator : NetworkBehaviour {
             //UI.CreatePanel("minMap Border", minMapBorder, Color.white, canvas, Vector3.zero, new Vector2(0.8f, 0.0f), new Vector2(1.0f, 0.4f));
 
             int numPlayers = LobbyManager.numPlayers;
+
+
     }
 
     [Command]
@@ -215,6 +219,15 @@ public class MapGenerator : NetworkBehaviour {
             }
         }
 
+        plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
+        plane.transform.Rotate(new Vector3(90, 0, 180));
+        plane.GetComponent<MeshRenderer>().material = waterMat;
+        plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width/5, height/5);
+        plane.transform.localScale = new Vector3(width / 10, 1, height / 10);
+        plane.transform.parent = transform;
+        
+
 
     }
 
@@ -292,7 +305,6 @@ public class MapGenerator : NetworkBehaviour {
                             {
                                 Tile.AddComponent<BoxCollider2D>();
                                 SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
-                                sR.sprite = buoySprite;
                                 sR.sortingOrder = 1;
                             }
                             //Change Sprite

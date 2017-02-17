@@ -568,7 +568,8 @@ public class Player : NetworkBehaviour {
             return;
         }
 		resources = newResources;
-		resourcesText.GetComponent<Text>().text = "" + resources;
+        //This is never assigned so not sure how its used;
+		//resourcesText.GetComponent<Text>().text = "" + resources;
 		upgradePanel.UpdateUI();
     }
 
