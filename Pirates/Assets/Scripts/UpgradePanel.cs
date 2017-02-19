@@ -19,6 +19,9 @@ public class UpgradePanel : MonoBehaviour {
     public Sprite lockedUpgrade;
     public Sprite[] upgradeSprites = new Sprite[(int)Player.MAX_UPGRADES];
 
+	// SFX
+	public AudioClip upgradeS;
+
     public void Hide() {
         gameObject.SetActive(false);
     }
@@ -43,14 +46,19 @@ public class UpgradePanel : MonoBehaviour {
     public void UpgradePlayer(string upgrade) {
         if(upgrade == "Ram") {
             player.UpgradePlayer(Upgrade.RAM, true);
+			SoundManager.Instance.PlaySFX (upgradeS, 0.5f);
         } else if (upgrade == "Cannon") {
-            player.UpgradePlayer(Upgrade.CANNON, true);
+			player.UpgradePlayer(Upgrade.CANNON, true);
+			SoundManager.Instance.PlaySFX (upgradeS, 0.5f);
         } else if (upgrade == "Hull") {
-            player.UpgradePlayer(Upgrade.HULL, true);
+			player.UpgradePlayer(Upgrade.HULL, true);
+			SoundManager.Instance.PlaySFX (upgradeS, 0.5f);
         } else if (upgrade == "Agility") {
-            player.UpgradePlayer(Upgrade.AGILITY, true);
+			player.UpgradePlayer(Upgrade.AGILITY, true);
+			SoundManager.Instance.PlaySFX (upgradeS, 0.5f);
         } else if (upgrade == "Speed") {
-            player.UpgradePlayer(Upgrade.SPEED, true);
+			player.UpgradePlayer(Upgrade.SPEED, true);
+			SoundManager.Instance.PlaySFX (upgradeS, 0.5f);
         }
         UpdateUI();
     }

@@ -6913,8 +6913,8 @@ MonoBehaviour:
   - sand
   - tree
   octaves: 4
-  quadWidth: 5
-  quadHeight: 5
+  quadWidth: 6
+  quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
   landSlider: {fileID: 114000013646967572}

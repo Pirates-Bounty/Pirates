@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 
 public class MapGenerator : NetworkBehaviour {
-    public int width;
-    public int height;
+    public int width = 6;
+    public int height = 6;
     public float frequency;
 
     [SyncVar]

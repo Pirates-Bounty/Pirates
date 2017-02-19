@@ -64,7 +64,9 @@ public class Player : NetworkBehaviour {
     public GameObject projectile;
     public GameObject resourceObj;
     public GameObject deathExplode;
+
     public GameObject leaderArrow;
+    private Player[] playerList;
 
     private Camera playerCamera;
     private Canvas canvas;
@@ -137,6 +139,7 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
+        playerList = FindObjectsOfType<Player>();
         //StartCoroutine(BoatRepairs());
         if (isServer) {
             //print ("Adding to bounty manager, here we go.");
@@ -156,7 +159,6 @@ public class Player : NetworkBehaviour {
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/riesling");
-        leaderArrow = GameObject.Find("LeaderArrow");
 
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
@@ -165,6 +167,9 @@ public class Player : NetworkBehaviour {
             return;
         }
         //CreateInGameMenu();
+
+        leaderArrow = transform.FindChild("LeaderArrow").gameObject;
+
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
@@ -206,7 +211,9 @@ public class Player : NetworkBehaviour {
         if (bm == null) {
             return;
         }
-        Player[] playerList = FindObjectsOfType<Player>();
+
+        if (playerList.Length < LobbyManager.numPlayers) 
+            playerList = FindObjectsOfType<Player>();
 
         if (playerList.Length <= 1) {
             leaderArrow.SetActive(false);
@@ -314,12 +321,11 @@ public class Player : NetworkBehaviour {
         }
     }
     void GetCannonFire() {
-		if (firingTimerLeft > 0) {
+        if (firingTimerLeft > 0) {
 			firingTimerLeft -= Time.deltaTime;
-		}
-		else {
+		} else {
 			// fire cannons
-			if (Input.GetMouseButtonDown (0) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1f) {
+			if ((Input.GetMouseButtonDown (0) || Input.GetKeyDown (KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
 				// left cannon
 				SoundManager.Instance.PlaySFX (shotS, 1.0f);
 				CmdFireLeft ((int)currProjectileStrength);
@@ -331,9 +337,8 @@ public class Player : NetworkBehaviour {
 
 		if (firingTimerRight > 0) {
 			firingTimerRight -= Time.deltaTime;
-		}
-		else {
-			if (Input.GetMouseButtonDown (1) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1f) {
+		} else {
+			if ((Input.GetMouseButtonDown (1) || Input.GetKeyDown (KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
 				// right cannon
 				SoundManager.Instance.PlaySFX (shotS, 1.0f);
 				CmdFireRight ((int)currProjectileStrength);
@@ -342,31 +347,30 @@ public class Player : NetworkBehaviour {
 				numRedShots--;
 			}
 		}
-
-		if (firingTimerLeft < 0 && firingTimerRight < 0) {
+		if (firingTimerLeft > 0 && firingTimerRight > 0) {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf) {
                 // triple volley - fire all at once
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
-				firingTimerLeft = currFiringDelay;
-				firingTimerRight = currFiringDelay;
+                firingTimerLeft = currFiringDelay; //+2.0f;
+				firingTimerRight = currFiringDelay; //+2.0f;
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf) {
                 // triple shotgun spray
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
-				firingTimerLeft = currFiringDelay;
-				firingTimerRight = currFiringDelay;
+				firingTimerLeft = currFiringDelay; //+2.0f;
+				firingTimerRight = currFiringDelay; //+2.0f;
             }
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf) {
                 // front shot
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
-				firingTimerLeft = currFiringDelay;
-				firingTimerRight = currFiringDelay;
+				firingTimerLeft = currFiringDelay; //+2.0f;
+				firingTimerRight = currFiringDelay; //+2.0f;
             }
         }
     }
@@ -704,7 +708,6 @@ public class Player : NetworkBehaviour {
     }
 
     public override void OnStartLocalPlayer() {
-
     }
 
     private void UpdateVariables() {
@@ -722,13 +725,13 @@ public class Player : NetworkBehaviour {
         if (oldMaxHealth != currMaxHealth) {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
-		if (firingTimerRight <= 0) {
-			numRedShots += Time.deltaTime;
-			numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
-		}
 		if (firingTimerLeft <= 0) {
 			numPurpleShots += Time.deltaTime;
 			numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
+		}
+		if (firingTimerRight <= 0) {
+			numRedShots += Time.deltaTime;
+			numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
 		}
     }
 
