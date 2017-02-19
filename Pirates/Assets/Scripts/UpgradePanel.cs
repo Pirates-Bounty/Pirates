@@ -64,7 +64,7 @@ public class UpgradePanel : MonoBehaviour {
             if(player.upgradeRanks[i] < Player.MAX_UPGRADES) {
 				costTexts[i].text = (Player.UPGRADE_COST * Player.UPGRADE_SCALE[player.upgradeRanks[i]]) + "";
             } else {
-                costTexts[i].text = "SOLD OUT";
+                costTexts[i].text = "Sold Out";
             }
             
             buttons[i].interactable = IsUpgradabale((Upgrade)i);

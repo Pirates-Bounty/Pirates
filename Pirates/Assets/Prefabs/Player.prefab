@@ -395,7 +395,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012361358088}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -47.454006, y: 131.3, z: 0}
+  m_LocalPosition: {x: 100, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -789,6 +789,7 @@ MonoBehaviour:
     type: 2}
   deathExplode: {fileID: 1000013251136846, guid: 9e8ef88156c21184480fd64b5ef2fe03,
     type: 2}
+  leaderArrow: {fileID: 0}
   currMoveSpeed: 10
   currRotationSpeed: 25
   currFiringDelay: 0.3
@@ -799,6 +800,8 @@ MonoBehaviour:
   boostTimer: 5
   currMaxHealth: 100
   currVelocity: 0
+  numPurpleShots: 4
+  numRedShots: 4
   appliedRamDamage: 0
   seagullS: {fileID: 8300000, guid: 09e636280fff23342a5f5e3305217153, type: 3}
   shotS: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
@@ -808,7 +811,6 @@ MonoBehaviour:
   whooshS: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
   sfx_upgradeMenuOpen: {fileID: 0}
   sfx_upgradeMenuClose: {fileID: 0}
-  leaderSprite: {fileID: 21300000, guid: 7eb43444292290f41a87dda2172ae827, type: 3}
   dead: 0
   gofast: 0
   boost: 1.2
