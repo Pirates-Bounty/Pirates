@@ -17,7 +17,8 @@ public class BountyManager : NetworkBehaviour {
     public SyncListInt scoreOrder = new SyncListInt();
 
     //public int localID;
-    private GameObject bountyPanel;
+	public Sprite bountyBoardSprite;
+	private GameObject bountyPanel;
     private List<GameObject> bountyTexts = new List<GameObject>();
     private Canvas canvas;
     private Font font;
@@ -162,19 +163,19 @@ public class BountyManager : NetworkBehaviour {
 							bountyTexts [j] = newText;
 							GameObject.Destroy (oldText);*/
                             RectTransform rectMod = bountyTexts[j].GetComponent<RectTransform>();
-                            rectMod.anchorMin = new Vector2(0.1f, 1f / playerCount * (scoreOrder[j] + 0));
-                            rectMod.anchorMax = new Vector2(0.9f, 1f / playerCount * (scoreOrder[j] + 1));
+							rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[j] + 0));
+							rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[j] + 1));
                         }
 
                         bountyTexts.Add(UI.CreateText("Bounty Text " + i, "Player " + (i + 1) + " | " + playerBounties[playerList[i].playerID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-                            Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (scoreOrder[i] + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - scoreOrder[i])), TextAnchor.UpperLeft, false));
+                            Vector3.zero, new Vector2(0.1f, 0.8f / playerCount * (playerCount - (scoreOrder[i] + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - scoreOrder[i])), TextAnchor.UpperLeft, false));
                     }
                 } else {
                     int playerCount = playerList.Length;
                     bountyTexts[playerList[i].playerID].GetComponent<Text>().text = "Player " + (i + 1) + "  |  " + playerBounties[playerList[i].playerID] + "g";
                     RectTransform rectMod = bountyTexts[playerList[i].playerID].GetComponent<RectTransform>();
-                    rectMod.anchorMin = new Vector2(0.1f, 1f / playerCount * (scoreOrder[i] + 0));
-                    rectMod.anchorMax = new Vector2(0.9f, 1f / playerCount * (scoreOrder[i] + 1));
+					rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[i] + 0));
+					rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[i] + 1));
                     if (playerList[i].isLocalPlayer) {
                         bountyTexts[playerList[i].playerID].GetComponent<Text>().color = Color.red;
                     }
@@ -205,13 +206,13 @@ public class BountyManager : NetworkBehaviour {
                 GameObject oldText = bountyTexts[j];
                 Text tx = oldText.GetComponent<Text>();
                 GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent,
-                    Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (j + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - j)), TextAnchor.UpperLeft, false);
+                    Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (j + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - j)), TextAnchor.UpperLeft, false);
                 bountyTexts[j] = newText;
                 GameObject.Destroy(oldText);
             }
 
             bountyTexts.Add(UI.CreateText("Bounty Text " + newID, "Player " + (newID + 1) + " | " + playerBounties[newID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-                Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, false));
+                Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, false));
             /*bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
 				Vector3.zero, new Vector2 (0.1f, 1.0f / 5f * newID), new Vector2 (0.9f, 1.0f / 5f * (newID+1)), TextAnchor.MiddleCenter, true));*/
         }
@@ -248,9 +249,10 @@ public class BountyManager : NetworkBehaviour {
 
     private void CreateBountyPanel() {
         int playerCount = playerList.Length;
-        bountyPanel = UI.CreatePanel("Bounty Panel", null, new Color(0.0f, 0.0f, 0.0f, 0f), canvas.transform,
+		bountyPanel = UI.CreatePanel("Bounty Panel", bountyBoardSprite, Color.white, canvas.transform,
             Vector3.zero, new Vector2(0.75f, 0.1f), new Vector3(1f, 0.2f + 0.1f * playerCount));
-        bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.3f + 0.1f * playerCount);
+		bountyPanel.transform.SetAsFirstSibling ();
+		bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.1f + 0.1f * playerCount);
     }
 
     public int GetHighestBounty() {
