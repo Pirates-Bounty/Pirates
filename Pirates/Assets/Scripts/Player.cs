@@ -201,8 +201,56 @@ public class Player : NetworkBehaviour {
         //InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
 
-    void DrawLineToLeader() {
+    void Update() {
+
+        if (playerID < 0 && isServer) {
+            //print ("Better late than never, adding to bounty manager.");
+            GameObject bm = GameObject.Find("BountyManager");
+            if (bm != null) {
+                playerID = bm.GetComponent<BountyManager>().AddID();
+            }
+        }
+
+        //if (Input.GetKeyDown(KeyCode.V))
+        //{
+        //    RpcRespawn();
+        //}
+
+        UpdateSprites();
+        // networking check
         if (!isLocalPlayer || dead) {
+            return;
+        }
+
+        // update the camera's position
+        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
+        //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
+        HandleBoost();
+        // get player's movement
+        GetMovement();
+        GetCannonFire();
+        UpdateInterface();
+        UpdateVariables();
+        //CmdDisplayHealth ();
+
+        DrawLineToLeader();
+
+        //SOUND - SoundManager reposition & BGMswitch debugger (space key)
+        if (GameObject.Find("SoundManager") != null) {
+            GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
+        }
+
+
+    }
+
+    void DrawLineToLeader() {
+        //For all players who are not in the lead, draws a local onscreen arrow pointing to the leader.
+        //Encourages constant fighting due to all non-leader players having a location they can go to
+        //To find a player
+
+        //TODO: hide at beginning, hide until certain bounty is earned, hide when leader near
+        //TODO: make this a compass on the corner of the screen instead of under the boat
+        if (!isLocalPlayer || dead || currentHealth <= 0) {
             leaderArrow.SetActive(false);
             return;
         }
@@ -244,61 +292,9 @@ public class Player : NetworkBehaviour {
         LeaderLine = LeaderLine.normalized;
 
         leaderArrow.transform.up = -LeaderLine;
-
-        // float rotAngle = (180/3.14159f) * Mathf.Atan2(LeaderLine.y, LeaderLine.x);
-        // Debug.Log(rotAngle);
-
-        // Quaternion rot=new Quaternion();
-        // rot.eulerAngles = new Vector3(0f,0f, rotAngle);
-        // leaderArrow.transform.rotation = rot;
-
-
-        //Debug.Log(LeaderLine);
-        Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
+        // Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
     }
 
-    void Update() {
-
-
-        if (playerID < 0 && isServer) {
-            //print ("Better late than never, adding to bounty manager.");
-            GameObject bm = GameObject.Find("BountyManager");
-            if (bm != null) {
-                playerID = bm.GetComponent<BountyManager>().AddID();
-            }
-        }
-
-        //if (Input.GetKeyDown(KeyCode.V))
-        //{
-        //    RpcRespawn();
-        //}
-
-        UpdateSprites();
-        // networking check
-        if (!isLocalPlayer || dead) {
-            return;
-        }
-
-        // update the camera's position
-        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
-        //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
-        HandleBoost();
-        // get player's movement
-        GetMovement();
-        GetCannonFire();
-        UpdateInterface();
-        UpdateVariables();
-        //CmdDisplayHealth ();
-
-        DrawLineToLeader();
-
-        //SOUND - SoundManager reposition & BGMswitch debugger (space key)
-        if (GameObject.Find("SoundManager") != null) {
-            GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
-        }
-
-
-    }
     void HandleBoost() {
         if (boostTimer > 0) {
             boostTimer -= Time.deltaTime;
