@@ -38,7 +38,7 @@ public class BountyManager : NetworkBehaviour {
         playerList = FindObjectsOfType<Player>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
-        maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources * 100);
+        maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
         //maxResources = Mathf.RoundToInt((width + height) / 50);
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");

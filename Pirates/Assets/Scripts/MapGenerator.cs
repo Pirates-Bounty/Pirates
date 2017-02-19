@@ -38,7 +38,7 @@ public class MapGenerator : NetworkBehaviour {
     public int quadHeight;
 
     [SyncVar]
-    public float maxResources = .2f;
+    public float maxResources;
 
     private Transform canvas;
     private Camera minMap;
@@ -62,6 +62,7 @@ public class MapGenerator : NetworkBehaviour {
         Generate();
         GenerateGameObjects();
         int numPlayers = LobbyManager.numPlayers;
+        maxResources = (.2f * 20000) / width ;
 
 
     }
@@ -101,7 +102,7 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     public void MaxResourceChange() {
-        maxResources = (int)(resourceSlider.value * 100);
+        maxResources = (int)((resourceSlider.value * 20000) / width);
     }
 
     public void InputSeed() {
