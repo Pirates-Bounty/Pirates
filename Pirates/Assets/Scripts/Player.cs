@@ -94,7 +94,8 @@ public class Player : NetworkBehaviour {
     //public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
     public float currRamDamage = BASE_RAM_DAMAGE;
     public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
-    public float firingTimer = BASE_FIRING_DELAY;
+    public float firingTimerLeft = BASE_FIRING_DELAY;
+	public float firingTimerRight = BASE_FIRING_DELAY;
     public float boostTimer = BASE_BOOST_DELAY;
     public float currMaxHealth = BASE_MAX_HEALTH;
     public float currVelocity = 0.0f;
@@ -313,45 +314,59 @@ public class Player : NetworkBehaviour {
         }
     }
     void GetCannonFire() {
-        firingTimer -= Time.deltaTime;
-        if (firingTimer < 0) {
-            // fire cannons
-            if (Input.GetMouseButtonDown(0) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
-                // left cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
-                CmdFireLeft((int)currProjectileStrength);
-                // reset timer
-                firingTimer = currFiringDelay;
-                numPurpleShots--;
-            }
-            if (Input.GetMouseButtonDown(1) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
-                // right cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
-                CmdFireRight((int)currProjectileStrength);
-                // reset timer
-                firingTimer = currFiringDelay;
-                numRedShots--;
-            }
+		if (firingTimerLeft > 0) {
+			firingTimerLeft -= Time.deltaTime;
+		}
+		else {
+			// fire cannons
+			if (Input.GetMouseButtonDown (0) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1f) {
+				// left cannon
+				SoundManager.Instance.PlaySFX (shotS, 1.0f);
+				CmdFireLeft ((int)currProjectileStrength);
+				// reset timer
+				firingTimerLeft = currFiringDelay;
+				numPurpleShots--;
+			}
+		}
+
+		if (firingTimerRight > 0) {
+			firingTimerRight -= Time.deltaTime;
+		}
+		else {
+			if (Input.GetMouseButtonDown (1) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1f) {
+				// right cannon
+				SoundManager.Instance.PlaySFX (shotS, 1.0f);
+				CmdFireRight ((int)currProjectileStrength);
+				// reset timer
+				firingTimerRight = currFiringDelay;
+				numRedShots--;
+			}
+		}
+
+		if (firingTimerLeft < 0 && firingTimerRight < 0) {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf) {
                 // triple volley - fire all at once
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
-                firingTimer = currFiringDelay; //+2.0f;
+				firingTimerLeft = currFiringDelay;
+				firingTimerRight = currFiringDelay;
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf) {
                 // triple shotgun spray
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
-                firingTimer = currFiringDelay; //+2.0f;
+				firingTimerLeft = currFiringDelay;
+				firingTimerRight = currFiringDelay;
             }
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf) {
                 // front shot
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
-                firingTimer = currFiringDelay + 0.7f; //+2.0f;
+				firingTimerLeft = currFiringDelay;
+				firingTimerRight = currFiringDelay;
             }
         }
     }
@@ -538,8 +553,8 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose, 0.15f);
         }
-        purpleCannonRect.anchorMin = new Vector2(0.26f + 0.24f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
-        redCannonRect.anchorMax = new Vector2(0.74f - 0.24f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        purpleCannonRect.anchorMin = new Vector2(0.26f + 0.2f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(0.74f - 0.2f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
         sprintCooldownImage.fillAmount = boostTimer / currBoostDelay;
     }
     void OnChangePlayer(float newHealth) {
@@ -707,9 +722,11 @@ public class Player : NetworkBehaviour {
         if (oldMaxHealth != currMaxHealth) {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
-		if (firingTimer <= 0) {
+		if (firingTimerRight <= 0) {
 			numRedShots += Time.deltaTime;
 			numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
+		}
+		if (firingTimerLeft <= 0) {
 			numPurpleShots += Time.deltaTime;
 			numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
 		}
