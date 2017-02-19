@@ -713,10 +713,12 @@ public class Player : NetworkBehaviour {
         if (oldMaxHealth != currMaxHealth) {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
-        numRedShots += Time.deltaTime;
-        numRedShots = Mathf.Clamp(numRedShots, 0, MAX_SHOTS);
-        numPurpleShots += Time.deltaTime;
-        numPurpleShots = Mathf.Clamp(numPurpleShots, 0, MAX_SHOTS);
+		if (firingTimer <= 0) {
+			numRedShots += Time.deltaTime;
+			numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
+			numPurpleShots += Time.deltaTime;
+			numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
+		}
     }
 
     private void UpdateSeagulls() {

@@ -7,9 +7,10 @@ public class Resource : NetworkBehaviour {
 	public int gold = 10;
 	public AudioClip coinS;
 
-	void OnCollisionEnter2D(Collision2D collision) {
-		if (collision.gameObject.CompareTag("Player")) {
-			collision.gameObject.SendMessage("AddGold", gold);
+	//void OnCollisionEnter2D(Collision2D collision) {
+	void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.CompareTag("Player")) {
+			col.gameObject.SendMessage("AddGold", gold);
             SoundManager.Instance.PlaySFX(coinS, 1.0f);
             GameObject.FindGameObjectWithTag("bountyManager").SendMessage("CmdSpawnResource");
 			Destroy(gameObject);
