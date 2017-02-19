@@ -239,6 +239,17 @@ public class MapGenerator : NetworkBehaviour {
         plane.transform.localScale = new Vector3(width / 10, 1, height / 10);
         plane.transform.parent = transform;
 
+		float numPoints = 1000f;
+		for (float i = 0; i < numPoints; i++) {
+			GameObject border = new GameObject ("Borderline" + i);
+			border.transform.position = new Vector2 (width*0.55f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.55f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
+			border.AddComponent<CircleCollider2D>();
+			border.transform.parent = transform;
+			SpriteRenderer sR = border.AddComponent<SpriteRenderer> ();
+			sR.sprite = sprites[2];
+			sR.sortingOrder = 0;
+		}
+
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
@@ -266,9 +277,9 @@ public class MapGenerator : NetworkBehaviour {
 
                     switch (map[i, j]) {
                         case (int)TileType.WATER: {
-                                Tile.AddComponent<BoxCollider2D>();
+                                /*Tile.AddComponent<BoxCollider2D>();
                                 SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
-                                sR.sortingOrder = 1;
+                                sR.sortingOrder = 1;*/
                             }
                             //Change Sprite
 

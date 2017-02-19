@@ -43,7 +43,7 @@ public class gameSetUpScript : MonoBehaviour {
             int qWidth = (x > 0 ? mg.quadWidth : -mg.quadWidth);
             int qHeight = (y > 0 ? -mg.quadHeight : mg.quadHeight);
             //Checks to see if a good spot to spawn the spawnPoints
-            while (!spawnable) {
+            while (spawnable) {
                 bool resetLoop = false;
 
                 for (int j = x - qWidth / 2; j < x + qWidth / 2; j++) {
