@@ -197,8 +197,8 @@ public class Player : NetworkBehaviour {
         lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
 
 
-        //SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
-        //InvokeRepeating("EnemyDetection", 1f, 0.5f);
+        SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
+        InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
 
     void Update() {
