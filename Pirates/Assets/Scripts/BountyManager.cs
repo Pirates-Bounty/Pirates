@@ -19,7 +19,7 @@ public class BountyManager : NetworkBehaviour {
     //public int localID;
 	public Sprite bountyBoardSprite;
 	private GameObject bountyPanel;
-    private List<GameObject> bountyTexts = new List<GameObject>();
+	public List<GameObject> bountyTexts = new List<GameObject>();
     private Canvas canvas;
     private Font font;
     private int fontSize = 10;
@@ -27,8 +27,8 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
-    private Player[] playerList;
-    private GameObject bountyBoard;
+	public Player[] playerList;
+    //private GameObject bountyBoard;
     private RectTransform bountyBoardRect;
 
     public bool victoryUndeclared;
@@ -42,8 +42,8 @@ public class BountyManager : NetworkBehaviour {
         //maxResources = Mathf.RoundToInt((width + height) / 50);
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");
-        bountyBoard = GameObject.Find("Canvas/UI/Bounty Board");
-        bountyBoardRect = bountyBoard.GetComponent<RectTransform>();
+        //bountyBoard = GameObject.Find("Canvas/UI/Bounty Board");
+        //bountyBoardRect = bountyBoard.GetComponent<RectTransform>();
 
         Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < maxResources; i++) {
@@ -136,7 +136,7 @@ public class BountyManager : NetworkBehaviour {
             }
             for (int i = 0; i < playerList.Length; i++) {
                 if (isServer) {
-                    int upgradeBounty = 10 * (int)Mathf.Floor(playerList[i].lowUpgrades / 2)
+                    int upgradeBounty = 5 * playerList[i].lowUpgrades
                                        + 25 * playerList[i].midUpgrades
                                        + 100 * playerList[i].highUpgrades;
                     int killStreakBounty = 15 * killStreak[playerList[i].playerID];
@@ -252,6 +252,7 @@ public class BountyManager : NetworkBehaviour {
 		bountyPanel = UI.CreatePanel("Bounty Panel", bountyBoardSprite, Color.white, canvas.transform,
             Vector3.zero, new Vector2(0.75f, 0.1f), new Vector3(1f, 0.2f + 0.1f * playerCount));
 		bountyPanel.transform.SetAsFirstSibling ();
+		bountyBoardRect = bountyPanel.GetComponent<RectTransform> ();
 		bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.1f + 0.1f * playerCount);
     }
 
