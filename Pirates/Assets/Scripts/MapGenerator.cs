@@ -6,14 +6,18 @@ using UnityEngine.UI;
 
 
 public class MapGenerator : NetworkBehaviour {
+
+    [SyncVar]
     public int width = 6;
+
+    [SyncVar]
     public int height = 6;
     public float frequency;
 
     [SyncVar]
     public float landFreq;
 
-    [SyncVar]
+    [SyncVar ]
     public int seed = 200;
 
     [HideInInspector]
@@ -62,7 +66,7 @@ public class MapGenerator : NetworkBehaviour {
         }
         bg = GetComponent<BoundaryGenerator>();
         Generate();
-        GenerateGameObjects();
+        //GenerateGameObjects();
         int numPlayers = LobbyManager.numPlayers;
         maxResources = (.2f * 20000) / width ;
     }
@@ -73,18 +77,20 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     [Command]
-    public void CmdChangeLandFreq(int newLandFreq) {
+    public void CmdChangeLandFreq(float newLandFreq) {
         landFreq = newLandFreq;
     }
 
     [Command]
     public void CmdChangeWidth(int newWidth) {
         width = newWidth;
+        height = newWidth;
     }
 
     public void WidthChange() {
         width = (int)(widthSlider.value * 1000);
         height = (int)(widthSlider.value * 1000);
+        CmdChangeWidth(width);
     }
 
     [Command]
@@ -99,6 +105,7 @@ public class MapGenerator : NetworkBehaviour {
 
     public void SliderChange() {
         landFreq = landSlider.value;
+        CmdChangeLandFreq(landFreq);
     }
 
     public void MaxResourceChange() {
@@ -116,12 +123,13 @@ public class MapGenerator : NetworkBehaviour {
     public void SeedChange() {
         seed = System.DateTime.Now.Millisecond;
         seedInputField.text = seed.ToString();
+        CmdChangeSeed(seed);
     }
 
 
     public void LobbyButton() {
         mapPanel.SetActive(false);
-        CmdReGenerate();
+        //CmdReGenerate();
     }
 
 
@@ -229,9 +237,9 @@ public class MapGenerator : NetworkBehaviour {
     }
 
 
-    void GenerateGameObjects() {
+    public void GenerateGameObjects() {
         // Background tiles and boundary
-        bg.Generate(width * 0.55f);
+        bg.Generate(width * 0.75f);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
@@ -243,7 +251,7 @@ public class MapGenerator : NetworkBehaviour {
 		float numPoints = 1000f;
 		for (float i = 0; i < numPoints; i++) {
 			GameObject border = new GameObject ("Borderline" + i);
-			border.transform.position = new Vector2 (width*0.55f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.55f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
+			border.transform.position = new Vector2 (width*0.75f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.75f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
 			border.transform.parent = transform;
 			SpriteRenderer sR = border.AddComponent<SpriteRenderer> ();
 			sR.sprite = sprites[2];
