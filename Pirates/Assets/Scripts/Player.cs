@@ -288,7 +288,7 @@ public class Player : NetworkBehaviour {
         }
         leaderArrow.SetActive(true);
 
-        leaderArrow.transform.up = (transform.position - leader.transform.position).normalized;
+        leaderArrow.transform.up = (leader.transform.position - transform.position).normalized;
     }
 
     void HandleBoost() {
@@ -558,7 +558,7 @@ public class Player : NetworkBehaviour {
             return;
         }
         currentHealth = newHealth;
-        healthBarRect.anchorMax = new Vector2(0.64f - 0.28f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
+        healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {

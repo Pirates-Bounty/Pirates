@@ -39,7 +39,7 @@ public class BountyManager : NetworkBehaviour {
     public bool victoryUndeclared;
     private bool createdPlayerIcons;
     private Sprite iconSprite;
-    public GameObject[] playerIconGOs = new GameObject[MAX_PLAYERS];
+    public GameObject[] playerIconGOs = new GameObject[LobbyManager.numPlayers];
 
     // Use this for initialization
     void Start() {
@@ -158,7 +158,6 @@ public class BountyManager : NetworkBehaviour {
                 playerBounties[playerList[i].playerID] = (int)((BASE_BOUNTY + upgradeBounty + killStreakBounty) * bonusMod);
 
                 if (!createdPlayerIcons) {
-                    createdPlayerIcons = true;
                     GameObject playerIcon = new GameObject("Player Icon " + (i + 1));
                     playerIcon.transform.parent = bountyBoard.transform;
                     Image image = playerIcon.AddComponent<Image>();
@@ -217,6 +216,7 @@ public class BountyManager : NetworkBehaviour {
                 //            }
             }
         }
+        createdPlayerIcons = true;
 
         /*if (Input.GetKeyDown (KeyCode.Q)) {
 			StartCoroutine(DeclareVictory (0));
