@@ -152,7 +152,7 @@ public class BountyManager : NetworkBehaviour {
                     victoryUndeclared = false;
                 }
 
-                if (bountyTexts.Count <= i) {
+				if (bountyTexts.Count <= playerList[i].playerID) {
                     if (bountyPanel != null) {
                         int playerCount = playerList.Length;
                         for (int j = 0; j < bountyTexts.Count; j++) {
