@@ -51,6 +51,7 @@ public class MapGenerator : NetworkBehaviour {
     public InputField seedInputField;
     public Material waterMat;
     public RawImage mapPic;
+    private BoundaryGenerator bg;
 
     void Start() {
         if (!Instance) {
@@ -59,12 +60,11 @@ public class MapGenerator : NetworkBehaviour {
         } else if (Instance != this) {
             Destroy(gameObject);
         }
+        bg = GetComponent<BoundaryGenerator>();
         Generate();
         GenerateGameObjects();
         int numPlayers = LobbyManager.numPlayers;
         maxResources = (.2f * 20000) / width ;
-
-
     }
 
     [Command]
@@ -230,7 +230,8 @@ public class MapGenerator : NetworkBehaviour {
 
 
     void GenerateGameObjects() {
-        // Background tiles
+        // Background tiles and boundary
+        bg.Generate(width * 0.55f);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
@@ -243,7 +244,6 @@ public class MapGenerator : NetworkBehaviour {
 		for (float i = 0; i < numPoints; i++) {
 			GameObject border = new GameObject ("Borderline" + i);
 			border.transform.position = new Vector2 (width*0.55f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.55f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
-			border.AddComponent<CircleCollider2D>();
 			border.transform.parent = transform;
 			SpriteRenderer sR = border.AddComponent<SpriteRenderer> ();
 			sR.sprite = sprites[2];
