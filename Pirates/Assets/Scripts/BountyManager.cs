@@ -113,6 +113,7 @@ public class BountyManager : NetworkBehaviour {
 
         if (playerBounties.Count > 0) {
             for (int i = 0; i < playerList.Length; i++) {
+                
                 int upgradeBounty = 5 * playerList[i].lowUpgrades
                                    + 25 * playerList[i].midUpgrades
                                    + 100 * playerList[i].highUpgrades;
@@ -132,11 +133,19 @@ public class BountyManager : NetworkBehaviour {
                     rect.offsetMax = Vector3.zero;
                     playerIconGOs[i] = playerIcon;
                 } else {
+<<<<<<< HEAD
                     RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
                     rect.anchorMin = new Vector2((playerBounties[i] - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
                     rect.anchorMax = new Vector2((playerBounties[i] + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
                     rect.offsetMin = Vector3.zero;
                     rect.offsetMax = Vector3.zero;
+=======
+                        RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
+                        rect.anchorMin = new Vector2((playerBounties[i] - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
+                        rect.anchorMax = new Vector2((playerBounties[i] + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
+                        rect.offsetMin = Vector3.zero;
+                        rect.offsetMax = Vector3.zero;
+>>>>>>> origin/master
                 }
 
                 if (victoryUndeclared && playerBounties[playerList[i].playerID] >= MAX_BOUNTY) {
@@ -145,7 +154,26 @@ public class BountyManager : NetworkBehaviour {
                 }
             }
         }
+<<<<<<< HEAD
         createdPlayerIcons = true;
+=======
+        for (int i = 0; i < playerIconGOs.Length; i++)
+        {
+            if (playerIconGOs[i] == null)
+            {
+                createdPlayerIcons = false;
+                break;
+            }
+            else
+            {
+                createdPlayerIcons = true;
+            }
+        }
+
+        /*if (Input.GetKeyDown (KeyCode.Q)) {
+			StartCoroutine(DeclareVictory (0));
+		}*/
+>>>>>>> origin/master
     }
 
     public int AddID() {
