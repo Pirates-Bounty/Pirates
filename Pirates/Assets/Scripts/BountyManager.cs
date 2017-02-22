@@ -97,32 +97,6 @@ public class BountyManager : NetworkBehaviour {
 		}
 	}*/
 
-
-    void OrderBounties() {
-        bool finishedSort = false;
-        int[] orders = new int[scoreOrder.Count];
-        for (int i = 0; i < scoreOrder.Count; i++) {
-            orders[scoreOrder[i]] = i;
-        }
-        for (int i = scoreOrder.Count - 1; !finishedSort && (i > 0); i--) {
-            finishedSort = true;
-            for (int j = 0; j < i; j++) {
-                if (playerBounties[orders[j]] < playerBounties[orders[j + 1]]) {
-                    int temp = orders[j];
-                    orders[j] = orders[j + 1];
-                    orders[j + 1] = temp;
-                    finishedSort = false;
-                }
-            }
-        }
-        for (int i = 0; i < scoreOrder.Count; i++) {
-            scoreOrder[orders[i]] = i;
-            //print ("Player " + orders [i] + " is ranked " + i + " with " + playerBounties [orders [i]] + "g");
-        }
-    }
-
-
-
     // Update is called once per frame
     void Update() {
         displayLocal = isLocalPlayer;
@@ -132,23 +106,12 @@ public class BountyManager : NetworkBehaviour {
         } else if (Input.GetKeyUp(KeyCode.Tab)) {
             bountyBoard.SetActive(false);
         }
-        //if (canvas == null) {
-        //    canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-        //    if (canvas != null) {
-        //        CreateBountyPanel();
-        //        //print ("makin' a bounty board (late)");
-        //    }
-        //}
 
         if (playerList.Length < LobbyManager.numPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
 
         if (playerBounties.Count > 0) {
-
-            if (isServer) {
-                OrderBounties();
-            }
             for (int i = 0; i < playerList.Length; i++) {
                 int upgradeBounty = 5 * playerList[i].lowUpgrades
                                    + 25 * playerList[i].midUpgrades
@@ -164,90 +127,33 @@ public class BountyManager : NetworkBehaviour {
                     image.sprite = iconSprite;
                     RectTransform rect = playerIcon.GetComponent<RectTransform>();
                     rect.anchorMin = new Vector2((playerBounties[i] - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
-                    rect.anchorMax = new Vector2((playerBounties[i] + iconPadding)  / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
+                    rect.anchorMax = new Vector2((playerBounties[i] + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
                     rect.offsetMin = Vector3.zero;
                     rect.offsetMax = Vector3.zero;
                     playerIconGOs[i] = playerIcon;
                 } else {
-                    foreach(GameObject go in playerIconGOs) {
-                        RectTransform rect = go.GetComponent<RectTransform>();
-                        rect.anchorMin = new Vector2((playerBounties[i] - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
-                        rect.anchorMax = new Vector2((playerBounties[i] + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
-                        rect.offsetMin = Vector3.zero;
-                        rect.offsetMax = Vector3.zero;
-                    }
+                    RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
+                    rect.anchorMin = new Vector2((playerBounties[i] - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
+                    rect.anchorMax = new Vector2((playerBounties[i] + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
+                    rect.offsetMin = Vector3.zero;
+                    rect.offsetMax = Vector3.zero;
                 }
 
-                if (victoryUndeclared && playerBounties[playerList[i].playerID] >= 1000) {
+                if (victoryUndeclared && playerBounties[playerList[i].playerID] >= MAX_BOUNTY) {
                     StartCoroutine(DeclareVictory(playerList[i].playerID));
                     victoryUndeclared = false;
                 }
-
-                //if (bountyTexts.Count <= playerList[i].playerID) {
-                //                if (bountyPanel != null) {
-                //                    int playerCount = playerList.Length;
-                //                    for (int j = 0; j < bountyTexts.Count; j++) {
-                //                        /*GameObject oldText = bountyTexts [j];
-                //			Text tx = oldText.GetComponent<Text> ();
-                //			GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent, 
-                //				Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(scoreOrder[j]+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-scoreOrder[j])), TextAnchor.UpperLeft, true);
-                //			bountyTexts [j] = newText;
-                //			GameObject.Destroy (oldText);*/
-                //                        RectTransform rectMod = bountyTexts[j].GetComponent<RectTransform>();
-                //			rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[j] + 0));
-                //			rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[j] + 1));
-                //                    }
-
-                //                    bountyTexts.Add(UI.CreateText("Bounty Text " + i, "Player " + (i + 1) + " | " + playerBounties[playerList[i].playerID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-                //                        Vector3.zero, new Vector2(0.1f, 0.8f / playerCount * (playerCount - (scoreOrder[i] + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - scoreOrder[i])), TextAnchor.UpperLeft, false));
-                //                }
-                //            } else {
-                //                int playerCount = playerList.Length;
-                //                bountyTexts[playerList[i].playerID].GetComponent<Text>().text = "Player " + (i + 1) + "  |  " + playerBounties[playerList[i].playerID] + "g";
-                //                RectTransform rectMod = bountyTexts[playerList[i].playerID].GetComponent<RectTransform>();
-                //	rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[i] + 0));
-                //	rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[i] + 1));
-                //                if (playerList[i].isLocalPlayer) {
-                //                    bountyTexts[playerList[i].playerID].GetComponent<Text>().color = Color.red;
-                //                }
-                //            }
-                //            if (GetHighestBounty() == playerList[i].playerID) {
-                //                bountyTexts[playerList[i].playerID].GetComponent<Text>().text += " +" + 0.2f * playerBounties[playerList[i].playerID] + "g";
-                //            }
             }
         }
         createdPlayerIcons = true;
-
-        /*if (Input.GetKeyDown (KeyCode.Q)) {
-			StartCoroutine(DeclareVictory (0));
-		}*/
     }
 
     public int AddID() {
-        //localID = CmdCreateID ();
-        //return localID;
 
         int newID = playerBounties.Count;
         playerBounties.Add(100);
         killStreak.Add(0);
         scoreOrder.Add(newID);
-        //    if (bountyPanel != null) {
-        //        int playerCount = playerList.Length;
-
-        //        for (int j = 0; j < bountyTexts.Count; j++) {
-        //            GameObject oldText = bountyTexts[j];
-        //            Text tx = oldText.GetComponent<Text>();
-        //            GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent,
-        //                Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (j + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - j)), TextAnchor.UpperLeft, false);
-        //            bountyTexts[j] = newText;
-        //            GameObject.Destroy(oldText);
-        //        }
-
-        //        bountyTexts.Add(UI.CreateText("Bounty Text " + newID, "Player " + (newID + 1) + " | " + playerBounties[newID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-        //            Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, false));
-        //        /*bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
-        //Vector3.zero, new Vector2 (0.1f, 1.0f / 5f * newID), new Vector2 (0.9f, 1.0f / 5f * (newID+1)), TextAnchor.MiddleCenter, true));*/
-        //    }
         return newID;
     }
 
@@ -279,15 +185,6 @@ public class BountyManager : NetworkBehaviour {
     }
 
 
-    //  private void CreateBountyPanel() {
-    //      int playerCount = playerList.Length;
-    //bountyPanel = UI.CreatePanel("Bounty Panel", bountyBoardSprite, Color.white, canvas.transform,
-    //          Vector3.zero, new Vector2(0.75f, 0.1f), new Vector3(1f, 0.2f + 0.1f * playerCount));
-    //bountyPanel.transform.SetAsFirstSibling ();
-    //bountyBoardRect = bountyPanel.GetComponent<RectTransform> ();
-    //bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.1f + 0.1f * playerCount);
-    //  }
-
     public int GetHighestBounty() {
         int highestID = 0;
         for (int i = 1; i < playerBounties.Count; i++) {
@@ -301,7 +198,7 @@ public class BountyManager : NetworkBehaviour {
 
 
     private IEnumerator DeclareVictory(int playerID) {
-        // delcare the winning player to be the pirate king
+        // declare the winning player to be the pirate king
         //print("Victory has been declared!");
         GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID + 1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
