@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour {
 
 
     [SyncVar]
-    public int playerID = -2;
+    public int ID = -2;
     [SyncVar]
     public int lowUpgrades = 0;
     [SyncVar]
@@ -39,6 +39,12 @@ public class Player : NetworkBehaviour {
     public float currentHealth = BASE_MAX_HEALTH;
     [SyncVar(hook = "OnChangeResources")]
     public int resources;
+    [SyncVar]
+    public int kills = 0;
+    [SyncVar]
+    public int deaths = 0;
+    [SyncVar]
+    public int streak = 0;
     public Sprite[] bases;
     public Sprite[] sails;
     public Sprite[] rudders;
@@ -66,7 +72,6 @@ public class Player : NetworkBehaviour {
     public GameObject deathExplode;
 
     public GameObject leaderArrow;
-    private Player[] playerList;
 
     private Camera playerCamera;
     private Canvas canvas;
@@ -78,6 +83,9 @@ public class Player : NetworkBehaviour {
     private RectTransform redCannonRect;
     private Font font;
     private Text resourcesText;
+    private Text killsText;
+    private Text deathsText;
+    private Text bountyText;
     //private FogOfWar fogOfWar;
     //private MapGenerator mapGenerator;
     // GameObject references
@@ -97,7 +105,7 @@ public class Player : NetworkBehaviour {
     public float currRamDamage = BASE_RAM_DAMAGE;
     public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
     public float firingTimerLeft = BASE_FIRING_DELAY;
-	public float firingTimerRight = BASE_FIRING_DELAY;
+    public float firingTimerRight = BASE_FIRING_DELAY;
     public float boostTimer = BASE_BOOST_DELAY;
     public float currMaxHealth = BASE_MAX_HEALTH;
     public float currVelocity = 0.0f;
@@ -135,19 +143,12 @@ public class Player : NetworkBehaviour {
     //ramming cooldown
     private IEnumerator coroutine;
     private bool invuln = false;
+    private bool registered = false;
 
 
     // Use this for initialization
     void Start() {
-        playerList = FindObjectsOfType<Player>();
         //StartCoroutine(BoatRepairs());
-        if (isServer) {
-            //print ("Adding to bounty manager, here we go.");
-            GameObject bm = GameObject.Find("BountyManager");
-            if (bm != null) {
-                playerID = bm.GetComponent<BountyManager>().AddID();
-            }
-        }
 
 
         for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
@@ -158,7 +159,7 @@ public class Player : NetworkBehaviour {
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
-        font = Resources.Load<Font>("Art/Fonts/riesling");
+        font = Resources.Load<Font>("Art/Fonts/SHOWG");
 
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
@@ -166,7 +167,6 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        //CreateInGameMenu();
 
         leaderArrow = GameObject.Find("Canvas/UI/Compass");
 
@@ -182,6 +182,9 @@ public class Player : NetworkBehaviour {
         redCannonRect = redCannon.GetComponent<RectTransform>();
         sprintCooldownImage = GameObject.Find("Canvas/UI/Sprint Cooldown").GetComponent<Image>();
         resourcesText = GameObject.Find("Canvas/UI/Bounty Display Text").GetComponent<Text>();
+        killsText = GameObject.Find("Canvas/UI/KDR/Kills Text").GetComponent<Text>();
+        deathsText = GameObject.Find("Canvas/UI/KDR/Deaths Text").GetComponent<Text>();
+        bountyText = GameObject.Find("Canvas/UI/KDR/Bounty Text").GetComponent<Text>();
 
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);
@@ -195,7 +198,10 @@ public class Player : NetworkBehaviour {
         fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);*/
 
         lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
-
+        if (BountyManager.Instance && !registered) {
+            ID = BountyManager.Instance.RegisterPlayer(this);
+            registered = true;
+        }
 
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
         InvokeRepeating("EnemyDetection", 1f, 0.5f);
@@ -203,18 +209,14 @@ public class Player : NetworkBehaviour {
 
     void Update() {
 
-        if (playerID < 0 && isServer) {
-            //print ("Better late than never, adding to bounty manager.");
-            GameObject bm = GameObject.Find("BountyManager");
-            if (bm != null) {
-                playerID = bm.GetComponent<BountyManager>().AddID();
-            }
-        }
-
         //if (Input.GetKeyDown(KeyCode.V))
         //{
         //    RpcRespawn();
         //}
+        if (BountyManager.Instance && !registered) {
+            ID = BountyManager.Instance.RegisterPlayer(this);
+            registered = true;
+        }
 
         UpdateSprites();
         // networking check
@@ -254,41 +256,17 @@ public class Player : NetworkBehaviour {
             leaderArrow.SetActive(false);
             return;
         }
-
-        GameObject bm = GameObject.Find("BountyManager");
-        if (bm == null) {
-            return;
-        }
-
-        if (playerList.Length < LobbyManager.numPlayers) 
-            playerList = FindObjectsOfType<Player>();
-
-        if (playerList.Length <= 1) {
-            leaderArrow.SetActive(false);
-            return;
-        }
-
-        int leaderID = bm.GetComponent<BountyManager>().GetHighestBounty();
-        Player leader = null;
-
-        if (playerID == leaderID) {
-            leaderArrow.SetActive(false);
-            return;
-        }
-
-        for (int i = 0; i < playerList.Length; i++) {
-            if (playerList[i].playerID == leaderID) {
-                leader = playerList[i];
-                break;
+        if (BountyManager.Instance) {
+            Player leader = BountyManager.Instance.GetLeader();
+            if (leader == null || leader == this) {
+                leaderArrow.SetActive(false);
+                return;
             }
-        }
-        if (leader == null) {
-            leaderArrow.SetActive(false);
-            return;
-        }
-        leaderArrow.SetActive(true);
 
-        leaderArrow.transform.up = (leader.transform.position - transform.position).normalized;
+            leaderArrow.SetActive(true);
+
+            leaderArrow.transform.up = (leader.transform.position - transform.position).normalized;
+        }
     }
 
     void HandleBoost() {
@@ -314,55 +292,55 @@ public class Player : NetworkBehaviour {
     }
     void GetCannonFire() {
         if (firingTimerLeft > 0) {
-			firingTimerLeft -= Time.deltaTime;
-		} else {
-			// fire cannons
-			if ((Input.GetMouseButtonDown (0) || Input.GetKeyDown (KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
-				// left cannon
-				SoundManager.Instance.PlaySFX (shotS, 1.0f);
-				CmdFireLeft ((int)currProjectileStrength);
-				// reset timer
-				firingTimerLeft = currFiringDelay;
-				numPurpleShots--;
-			}
-		}
+            firingTimerLeft -= Time.deltaTime;
+        } else {
+            // fire cannons
+            if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
+                // left cannon
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                CmdFireLeft((int)currProjectileStrength);
+                // reset timer
+                firingTimerLeft = currFiringDelay;
+                numPurpleShots--;
+            }
+        }
 
-		if (firingTimerRight > 0) {
-			firingTimerRight -= Time.deltaTime;
-		} else {
-			if ((Input.GetMouseButtonDown (1) || Input.GetKeyDown (KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
-				// right cannon
-				SoundManager.Instance.PlaySFX (shotS, 1.0f);
-				CmdFireRight ((int)currProjectileStrength);
-				// reset timer
-				firingTimerRight = currFiringDelay;
-				numRedShots--;
-			}
-		}
-		if (firingTimerLeft > 0 && firingTimerRight > 0) {
+        if (firingTimerRight > 0) {
+            firingTimerRight -= Time.deltaTime;
+        } else {
+            if ((Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
+                // right cannon
+                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                CmdFireRight((int)currProjectileStrength);
+                // reset timer
+                firingTimerRight = currFiringDelay;
+                numRedShots--;
+            }
+        }
+        if (firingTimerLeft > 0 && firingTimerRight > 0) {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf) {
                 // triple volley - fire all at once
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
-				firingTimerRight = currFiringDelay; //+2.0f;
+                firingTimerRight = currFiringDelay; //+2.0f;
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf) {
                 // triple shotgun spray
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
-				firingTimerLeft = currFiringDelay; //+2.0f;
-				firingTimerRight = currFiringDelay; //+2.0f;
+                firingTimerLeft = currFiringDelay; //+2.0f;
+                firingTimerRight = currFiringDelay; //+2.0f;
             }
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf) {
                 // front shot
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
-				firingTimerLeft = currFiringDelay; //+2.0f;
-				firingTimerRight = currFiringDelay; //+2.0f;
+                firingTimerLeft = currFiringDelay; //+2.0f;
+                firingTimerRight = currFiringDelay; //+2.0f;
             }
         }
     }
@@ -383,7 +361,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED;
-            instantiatedProjectile.GetComponent<Projectile>().assignedID = playerID;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -392,7 +370,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawners[i].up * BASE_PROJECTILE_SPEED;
-            instantiatedProjectile.GetComponent<Projectile>().assignedID = playerID;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -402,7 +380,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < 3; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED / 2;
-            instantiatedProjectile.GetComponent<Projectile>().assignedID = playerID;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -412,18 +390,18 @@ public class Player : NetworkBehaviour {
 
         GameObject instantiatedProjectile1 = (GameObject)Instantiate(projectile, leftSpawners[0].position, Quaternion.identity);
         instantiatedProjectile1.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, 45) * leftSpawners[0].up * BASE_PROJECTILE_SPEED;
-        instantiatedProjectile1.GetComponent<Projectile>().assignedID = playerID;
+        instantiatedProjectile1.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile1);
 
         //angled 45 degrees backward
         GameObject instantiatedProjectile2 = (GameObject)Instantiate(projectile, leftSpawners[1].position, Quaternion.identity);
         instantiatedProjectile2.GetComponent<Rigidbody2D>().velocity = leftSpawners[1].up * BASE_PROJECTILE_SPEED;
-        instantiatedProjectile2.GetComponent<Projectile>().assignedID = playerID;
+        instantiatedProjectile2.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile2);
 
         GameObject instantiatedProjectile3 = (GameObject)Instantiate(projectile, leftSpawners[2].position, Quaternion.identity);
         instantiatedProjectile3.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
-        instantiatedProjectile3.GetComponent<Projectile>().assignedID = playerID;
+        instantiatedProjectile3.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile3);
     }
     [Command]
@@ -432,7 +410,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, frontSpawners[0].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = frontSpawners[0].up * BASE_PROJECTILE_SPEED;
-            instantiatedProjectile.GetComponent<Projectile>().assignedID = playerID;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -504,10 +482,12 @@ public class Player : NetworkBehaviour {
         if (currentHealth <= 0.0f) {
             SoundManager.Instance.PlaySFX(deathS, 1.0f);
             RpcRespawn();
-
-            GameObject bm = GameObject.Find("BountyManager");
-            if (bm != null) {
-                bm.GetComponent<BountyManager>().ReportHit(playerID, enemyID);
+            BountyManager.Instance.CmdReportKill(ID, enemyID);
+            deaths++;
+            if (streak < 0) {
+                streak--;
+            } else {
+                streak = -1;
             }
         }
     }
@@ -552,6 +532,9 @@ public class Player : NetworkBehaviour {
         purpleCannonRect.anchorMin = new Vector2(0.13f + 0.22f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
         redCannonRect.anchorMax = new Vector2(0.66f - 0.22f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
         sprintCooldownImage.fillAmount = boostTimer / currBoostDelay;
+        killsText.text = "" + kills;
+        deathsText.text = "" + deaths;
+        bountyText.text = "" + BountyManager.CalculateWorth(this);
     }
     void OnChangePlayer(float newHealth) {
         if (!isLocalPlayer) {
@@ -669,7 +652,7 @@ public class Player : NetworkBehaviour {
         RaycastHit2D hit = Physics2D.Raycast(collision.gameObject.transform.position, collision.gameObject.transform.up);
 
         if (otherPlayer != null && collision.collider.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
-            ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.playerID);
+            ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.ID);
             SoundManager.Instance.PlaySFX(ramS, 1.0f);
             //3 second invulnerability before you can take ram damage again
             StartCoroutine(RamInvuln());
@@ -717,14 +700,14 @@ public class Player : NetworkBehaviour {
         if (oldMaxHealth != currMaxHealth) {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
-		if (firingTimerLeft <= 0) {
-			numPurpleShots += Time.deltaTime;
-			numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
-		}
-		if (firingTimerRight <= 0) {
-			numRedShots += Time.deltaTime;
-			numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
-		}
+        if (firingTimerLeft <= 0) {
+            numPurpleShots += Time.deltaTime;
+            numPurpleShots = Mathf.Clamp(numPurpleShots, 0, MAX_SHOTS);
+        }
+        if (firingTimerRight <= 0) {
+            numRedShots += Time.deltaTime;
+            numRedShots = Mathf.Clamp(numRedShots, 0, MAX_SHOTS);
+        }
     }
 
     private void UpdateSeagulls() {
