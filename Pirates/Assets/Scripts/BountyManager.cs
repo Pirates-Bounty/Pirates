@@ -66,7 +66,7 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
 
-        //canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         //if (canvas != null) {
         //    CreateBountyPanel();
         //}
@@ -151,6 +151,7 @@ public class BountyManager : NetworkBehaviour {
             if (playerIconGOs[i] == null)
             {
                 createdPlayerIcons = false;
+                playerIconGOs = new GameObject[LobbyManager.numPlayers];
                 break;
             }
             else
