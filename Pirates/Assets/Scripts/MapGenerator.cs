@@ -236,7 +236,7 @@ public class MapGenerator : NetworkBehaviour {
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
         plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 5, height / 5);
-        plane.transform.localScale = new Vector3(width / 10, 1, height / 10);
+        plane.transform.localScale = new Vector3(width / 6, 1, height / 6);
         plane.transform.parent = transform;
 
 		float numPoints = 1000f;
