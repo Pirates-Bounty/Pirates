@@ -9,6 +9,7 @@ public class MapGenerator : NetworkBehaviour {
     public int width = 6;
     public int height = 6;
     public float frequency;
+    public float borderRadius = 0.75f;
 
     [SyncVar]
     public float landFreq;
@@ -26,6 +27,7 @@ public class MapGenerator : NetworkBehaviour {
     public GameObject resourcePrefab;
     public GameObject mapPanel;
     private GameObject plane;
+    private GameObject quad;
     public string[] tileNames;
 
     [HideInInspector]
@@ -50,6 +52,7 @@ public class MapGenerator : NetworkBehaviour {
     public Slider resourceSlider;
     public InputField seedInputField;
     public Material waterMat;
+    public Material boundaryMat;
     public RawImage mapPic;
     private BoundaryGenerator bg;
 
@@ -231,25 +234,19 @@ public class MapGenerator : NetworkBehaviour {
 
     void GenerateGameObjects() {
         // Background tiles and boundary
-        bg.Generate(width * 0.55f);
+        bg.Generate(width * borderRadius);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
         plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 5, height / 5);
-        plane.transform.localScale = new Vector3(width / 6, 1, height / 6);
+        plane.transform.localScale = new Vector3(width / 5, 1, height / 5);
         plane.transform.parent = transform;
 
-		float numPoints = 1000f;
-		for (float i = 0; i < numPoints; i++) {
-			GameObject border = new GameObject ("Borderline" + i);
-			border.transform.position = new Vector2 (width*0.55f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.55f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
-			border.transform.parent = transform;
-			SpriteRenderer sR = border.AddComponent<SpriteRenderer> ();
-			sR.sprite = sprites[2];
-			sR.sortingOrder = 0;
-		}
-
+        quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        quad.transform.localScale = new Vector3(width * 2, width * 2, 1);
+        quad.GetComponent<MeshRenderer>().material = boundaryMat;
+        quad.transform.parent = transform;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
@@ -259,7 +256,7 @@ public class MapGenerator : NetworkBehaviour {
                 //Don't want to spawn water tiles if we don't need to
                 //We already have seperate water tile background so only spawn water tiles that create
                 //boundary for the map
-                if (map[i, j] != (int)TileType.WATER || (i == 0 || j == 0 || i == width - 1 || j == height - 1)) {
+                if (map[i, j] != (int)TileType.WATER) {
                     GameObject Tile = new GameObject(tileNames[id]);
 
                     //Don't add a sprite renderer to boundary water tiles
