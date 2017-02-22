@@ -168,7 +168,7 @@ public class Player : NetworkBehaviour {
         }
         //CreateInGameMenu();
 
-        leaderArrow = transform.FindChild("LeaderArrow").gameObject;
+        leaderArrow = GameObject.Find("Canvas/UI/Compass");
 
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
@@ -287,12 +287,8 @@ public class Player : NetworkBehaviour {
             return;
         }
         leaderArrow.SetActive(true);
-        Vector3 LeaderLine = transform.position - leader.transform.position;
-        LeaderLine.z = 0f;
-        LeaderLine = LeaderLine.normalized;
 
-        leaderArrow.transform.up = -LeaderLine;
-        // Debug.DrawLine(transform.position, leader.transform.position, Color.blue, 3.0f);
+        leaderArrow.transform.up = (transform.position - leader.transform.position).normalized;
     }
 
     void HandleBoost() {
@@ -553,8 +549,8 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose, 0.15f);
         }
-        purpleCannonRect.anchorMin = new Vector2(0.26f + 0.2f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
-        redCannonRect.anchorMax = new Vector2(0.74f - 0.2f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        purpleCannonRect.anchorMin = new Vector2(0.13f + 0.22f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(0.66f - 0.22f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
         sprintCooldownImage.fillAmount = boostTimer / currBoostDelay;
     }
     void OnChangePlayer(float newHealth) {
