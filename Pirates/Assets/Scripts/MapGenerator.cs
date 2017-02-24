@@ -21,8 +21,8 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar ]
     public int seed = 200;
 
-    [HideInInspector]
-    public float centerWeight = 7;
+    //[HideInInspector]
+    //public float centerWeight = 7;
 
     public static bool gameStart = false;
     //public float amplitude;
@@ -46,7 +46,7 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public float maxResources;
 
-    private Transform canvas;
+    public GameObject canvas;
     private Camera minMap;
     private Sprite minMapBorder;
     private bool addResources = false;
@@ -150,9 +150,13 @@ public class MapGenerator : NetworkBehaviour {
         }
     }
 
-    public void GenerateTexture() {
+    public void GeneratePreviewTexture() {
+        Texture2D tex = GenerateTexture();
+        mapPic.texture = tex;
+    }
+
+    public Texture2D GenerateTexture() {
         Texture2D tex = new Texture2D(width, height);
-        mapPic.GetComponent<RawImage>().texture = tex;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -166,6 +170,7 @@ public class MapGenerator : NetworkBehaviour {
             }
         }
         tex.Apply();
+        return tex;
     }
 
     public void Generate() {
@@ -189,7 +194,7 @@ public class MapGenerator : NetworkBehaviour {
                 // change the noise so that it is also weighted based on the euclidean distance from the center of the map
                 // this way, there will be a larger island in the middle of the map
                 // comment this line to go back to the old generation
-                noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
+                //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
                 if (noise < landFreq) {
                     if (noise > Random.Range(0, 40f)) {
                         map[i, j] = (int)TileType.TREE;
@@ -251,10 +256,15 @@ public class MapGenerator : NetworkBehaviour {
         plane.transform.localScale = new Vector3(width / 5, 1, height / 5);
         plane.transform.parent = transform;
 
+        // boundary mesh
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
         quad.transform.localScale = new Vector3(width * 2, width * 2, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
         quad.transform.parent = transform;
+
+        // minimap
+        RawImage miniMap = canvas.GetComponentInChildren<RawImage>();
+        miniMap.texture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
