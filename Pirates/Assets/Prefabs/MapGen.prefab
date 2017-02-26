@@ -20,6 +20,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000010342813736}
   - 114: {fileID: 114000010229539288}
+  - 114: {fileID: 114000011153274272}
+  - 114: {fileID: 114000013906915664}
+  - 68: {fileID: 68000013219574218}
   m_Layer: 0
   m_Name: MapGen
   m_TagString: mapGen
@@ -40,6 +43,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!68 &68000013219574218
+EdgeCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010902933306}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_Offset: {x: 0, y: 0}
+  m_Points:
+  - {x: -0.5, y: 0}
+  - {x: 0.5, y: 0}
 --- !u!114 &114000010229539288
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -54,6 +72,9 @@ MonoBehaviour:
   width: 300
   height: 300
   frequency: 15
+  borderRadius: 0.75
+  landFreq: 0.45
+  seed: 200
   centerWeight: 7
   sprites:
   - {fileID: 21300000, guid: 3123cec5d298f47a583b27249e4d90cf, type: 3}
@@ -71,14 +92,65 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f8c0bd4ceec930149b5a6b8f4da1e860, type: 3}
   resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
-  seed: 200
+  mapPanel: {fileID: 0}
   tileNames:
   - water
   - grass
   - sand
   - tree
   octaves: 4
-  quadWidth: 5
-  quadHeight: 5
+  quadWidth: 6
+  quadHeight: 6
+  maxResources: 0.4
   Instance: {fileID: 0}
-  Sync: {fileID: 0}
+  landSlider: {fileID: 0}
+  widthSlider: {fileID: 0}
+  resourceSlider: {fileID: 0}
+  seedInputField: {fileID: 0}
+  waterMat: {fileID: 2100000, guid: 91ffbfb29bfd2154a9d15ee583a910e2, type: 2}
+  boundaryMat: {fileID: 2100000, guid: 3dad96c43f707434c9bd7253bcb88abb, type: 2}
+  mapPic: {fileID: 0}
+--- !u!114 &114000011153274272
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010902933306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 32
+    i1: 186
+    i2: 66
+    i3: 124
+    i4: 12
+    i5: 119
+    i6: 132
+    i7: 244
+    i8: 136
+    i9: 131
+    i10: 147
+    i11: 231
+    i12: 153
+    i13: 6
+    i14: 198
+    i15: 34
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!114 &114000013906915664
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010902933306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86768283d463c13478447de88ed055cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  points: 30

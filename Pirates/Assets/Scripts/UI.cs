@@ -42,7 +42,6 @@ public static class UI {
         t.font = font;
         t.color = fontColor;
         t.fontSize = fontSize;
-        t.resizeTextForBestFit = true;
 
         return buttonGO;
     }

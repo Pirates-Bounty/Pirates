@@ -402,6 +402,7 @@ namespace Prototype.NetworkLobby
                 }
             }
 
+            mapGen.GetComponent<MapGenerator>().CmdReGenerate();
             Instantiate(gameSetUp, transform.position, Quaternion.identity);
 
             for (int i = 0; i < lobbySlots.Length; ++i)
