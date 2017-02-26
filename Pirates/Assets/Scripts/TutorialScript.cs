@@ -6,7 +6,7 @@ public class TutorialScript : MonoBehaviour {
     public GameObject backG;
     public GameObject activeObject;
     public int children;
-    public int counter = 0;
+    public int counter;
     
     // Use this for initialization
     void Start()
@@ -17,23 +17,15 @@ public class TutorialScript : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-		if (Input.GetKeyDown(KeyCode.Return) && counter != children)
-        {
-			StartCoroutine (switchActive (5));
-
-        }
+        //if (Input.GetKeyDown(KeyCode.Enter) && counter > 10)
+        //{
+        //    transform.GetChild(children).SetActive(true);
+        //    activeObject.SetActive(false);
+        //    nextObject.SetActive(true);
+        //}
+        //else if(Input.GetKeyDown(KeyCode.Enter))
+        //{
+        //    counter++;
+        //}
     }
-
-
-	IEnumerator switchActive(int time)
-	{
-		activeObject = transform.GetChild(counter).gameObject;
-		activeObject.SetActive (true);
-		yield return new WaitForSeconds (time);
-		activeObject.SetActive (false);
-		counter++;
-		if (counter < children) {
-			StartCoroutine(switchActive(time));
-		}
-	}
 }

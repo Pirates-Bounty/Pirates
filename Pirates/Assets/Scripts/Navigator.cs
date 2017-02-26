@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class Navigator : MonoBehaviour {
     // singleton
     public static Navigator Instance;
-	public bool Tutorial = false;
 
     void Start()
     {
