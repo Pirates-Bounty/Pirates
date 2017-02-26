@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.EventSystems;
 using Prototype.NetworkLobby;
 
 public enum DamageType {
@@ -297,8 +298,8 @@ public class Player : NetworkBehaviour {
             firingTimerLeft -= Time.deltaTime;
         } else {
             // fire cannons
-            if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
-                // left cannon
+			if (((Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
+				// left cannon
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
@@ -310,7 +311,7 @@ public class Player : NetworkBehaviour {
         if (firingTimerRight > 0) {
             firingTimerRight -= Time.deltaTime;
         } else {
-            if ((Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
+			if (((Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
                 // right cannon
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
