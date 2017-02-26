@@ -31,6 +31,7 @@ public class BountyManager : NetworkBehaviour {
     private GameObject[] playerIconGOs = new GameObject[LobbyManager.numPlayers];
     private int currentIndex = 0;
     public static BountyManager Instance;
+	public UpgradePanel upgradePanel;
 
     // Use this for initialization
     void Start() {
@@ -41,6 +42,7 @@ public class BountyManager : NetworkBehaviour {
             Destroy(gameObject);
         }
         playerList = FindObjectsOfType<Player>();
+		//upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
         maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
@@ -191,6 +193,11 @@ public class BountyManager : NetworkBehaviour {
         }
         return null;
     }
+
+
+	public void UpgradeMenuButton() {
+		upgradePanel.gameObject.SetActive(!upgradePanel.gameObject.activeSelf);
+	}
 
 
     private IEnumerator DeclareVictory(int playerID) {

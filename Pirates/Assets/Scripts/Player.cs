@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.EventSystems;
 using Prototype.NetworkLobby;
 
 public enum DamageType {
@@ -273,11 +274,13 @@ public class Player : NetworkBehaviour {
         if (boostTimer > 0) {
             boostTimer -= Time.deltaTime;
         } else {
-            if (Input.GetKeyDown(KeyCode.LeftShift)) {
+			sprintCooldownImage.color = Color.green;
+			if (Input.GetKeyDown(KeyCode.LeftShift)) {
                 SpeedBoost();
                 SoundManager.Instance.PlaySFX(whooshS, 1.0f);
                 gofast = true;
                 boostTimer = currBoostDelay;
+				sprintCooldownImage.color = Color.red;
             }
         }
 
@@ -295,26 +298,26 @@ public class Player : NetworkBehaviour {
             firingTimerLeft -= Time.deltaTime;
         } else {
             // fire cannons
-            if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
-                // left cannon
+			if (((Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
+				// left cannon
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay;
-                numPurpleShots--;
+				numPurpleShots = Mathf.Floor(numPurpleShots-1);
             }
         }
 
         if (firingTimerRight > 0) {
             firingTimerRight -= Time.deltaTime;
         } else {
-            if ((Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
+			if (((Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
                 // right cannon
                 SoundManager.Instance.PlaySFX(shotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimerRight = currFiringDelay;
-                numRedShots--;
+				numRedShots = Mathf.Floor(numRedShots-1);
             }
         }
         if (firingTimerLeft > 0 && firingTimerRight > 0) {
@@ -529,9 +532,9 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose, 0.15f);
         }
-        purpleCannonRect.anchorMin = new Vector2(0.13f + 0.22f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
-        redCannonRect.anchorMax = new Vector2(0.66f - 0.22f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
-        sprintCooldownImage.fillAmount = boostTimer / currBoostDelay;
+        purpleCannonRect.anchorMin = new Vector2(0.13f + 0.236f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(0.66f - 0.236f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        sprintCooldownImage.fillAmount = 1f - boostTimer / currBoostDelay;
         killsText.text = "" + kills;
         deathsText.text = "" + deaths;
         bountyText.text = "" + BountyManager.CalculateWorth(this);
