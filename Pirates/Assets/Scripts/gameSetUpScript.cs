@@ -10,7 +10,6 @@ public class gameSetUpScript : MonoBehaviour {
     private MapGenerator mapGen;
     // Use this for initialization
     void Start() {
-
         mapGen = GameObject.FindGameObjectWithTag("mapGen").GetComponent<MapGenerator>();
         spawnPoints(mapGen);
     }

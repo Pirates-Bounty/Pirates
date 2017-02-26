@@ -56,7 +56,7 @@ public class Menu : MonoBehaviour {
 
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, fontSize, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { Navigator.Instance.LoadLevel("Lobby Tutorial"); });
+            Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
 
         // Quit Button
         quitButton = UI.CreateButton("Quit", "Quit", font, color, fontSize, canvas, sprite, highlightedSprite,
