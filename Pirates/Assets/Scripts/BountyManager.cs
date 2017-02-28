@@ -32,6 +32,12 @@ public class BountyManager : NetworkBehaviour {
     private int currentIndex = 0;
     public static BountyManager Instance;
 	public UpgradePanel upgradePanel;
+    public GameObject Hill;
+    public int hillCheck;
+    public int hillSize;
+    public Vector2 moveHillRange;
+    private GameObject currHill;
+
 
     // Use this for initialization
     void Start() {
@@ -52,9 +58,10 @@ public class BountyManager : NetworkBehaviour {
         iconSprite = Resources.Load<Sprite>("Art/Lobby/In Game UI/PlayerIndicator");
         bountyBoard = GameObject.Find("Canvas/Bounty Board");
         bountyBoard.SetActive(false);
-
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
+
+        StartCoroutine(MoveHill((int)moveHillRange.x,(int)moveHillRange.y));
         Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < maxResources; i++) {
             if (isServer) {
@@ -72,6 +79,29 @@ public class BountyManager : NetworkBehaviour {
         ClientScene.RegisterPrefab(resourcePrefab);
         GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandWaterTile(), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
+    }
+
+    [Command]
+    void CmdSpawnHill()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        ClientScene.RegisterPrefab(Hill);
+        currHill = Instantiate(Hill, MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck), Quaternion.identity) as GameObject;
+        currHill.transform.localScale *= hillSize;
+        NetworkServer.Spawn(currHill);
+    }
+
+    [Command]
+    void CmdMoveHill()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        currHill.transform.position = MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck);
     }
 
     // Update is called once per frame
@@ -215,5 +245,18 @@ public class BountyManager : NetworkBehaviour {
 
         yield return new WaitForSeconds(5.0f);
         Navigator.Instance.LoadLevel("Menu");
+    }
+
+    private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
+    {
+        if (currHill == null)
+        {
+            CmdSpawnHill();
+            yield return new WaitForSeconds(Random.Range(rangeBegin,rangeEnd));
+        }
+        CmdMoveHill();
+        yield return new WaitForSeconds(Random.Range(rangeBegin, rangeEnd));
+        StartCoroutine(MoveHill(rangeBegin, rangeEnd));
+
     }
 }

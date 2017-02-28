@@ -550,6 +550,10 @@ MonoBehaviour:
   iconStartY: 0.82
   victoryUndeclared: 0
   upgradePanel: {fileID: 175756438}
+  Hill: {fileID: 1000010432489534, guid: aaeacb4c4d187a04dac564a554ee9fa9, type: 2}
+  hillCheck: 20
+  hillSize: 4
+  moveHillRange: {x: 15, y: 30}
 --- !u!114 &800447155
 MonoBehaviour:
   m_ObjectHideFlags: 0

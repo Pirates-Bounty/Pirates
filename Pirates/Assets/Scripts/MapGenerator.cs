@@ -328,6 +328,7 @@ public class MapGenerator : NetworkBehaviour {
 
             }
         }
+
     }
 
     public Vector2 GetRandWaterTile() {
@@ -343,5 +344,52 @@ public class MapGenerator : NetworkBehaviour {
         }
 
         return tilePos;
+    }
+
+    public Vector2 GetRandHillLocation(int size)
+    {
+        Vector2 returnLoc = Vector2.zero;
+        bool end = false;
+        while (!end)
+        {
+            returnLoc = GetRandWaterTile();
+            end = CheckNeighborsForWater(size,returnLoc);
+            
+        }
+        return returnLoc;
+    }
+
+    public bool CheckNeighborsForWater(int size, Vector2 loc)
+    {
+        for (int i = -size/2; i < size/2; i++)
+        {
+            for (int j = -size / 2; j < size / 2; j++)
+            {
+                Vector2 tileLoc = LocToMap(loc);
+                if (tileLoc.x + i < width && tileLoc.x + i >= 0 && tileLoc.y + j < height && tileLoc.y + j >= 0)
+                {
+
+                    int Tile = map[(int)tileLoc.x + i, (int)tileLoc.y + j];
+                    if (((TileType)Tile != TileType.WATER))
+                    {
+                        return false;
+                    }
+
+
+                }
+                else
+                {
+                    return false;
+                }
+
+                   
+            }
+        }
+        return true;
+    }
+
+    public Vector2 LocToMap(Vector2 loc)
+    {
+        return new Vector2(loc.x + width/2, loc.y + height/2);
     }
 }
