@@ -12,19 +12,28 @@ public enum DamageType {
 }
 public class Player : NetworkBehaviour {
     // const vars
-    public const float BASE_MAX_HEALTH = 100.0f;
+    //public const float BASE_MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 70.0f;
     public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
-    public const float BASE_BOOST_DELAY = 5.0f;
-    public const float BASE_BOOST = 1.2f;
-    public const float BASE_ROTATION_SPEED = 35.0f;
-    public const float BASE_MOVE_SPEED = 10.0f;
+    //public const float BASE_BOOST_DELAY = 5.0f;
+    //public const float BASE_BOOST = 1.2f;
+    //public const float BASE_ROTATION_SPEED = 35.0f;
+    //public const float BASE_MOVE_SPEED = 10.0f;
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
-    public const float BASE_RAM_DAMAGE = 5.0f;
+    //public const float BASE_RAM_DAMAGE = 5.0f;
     public const float MAX_SHOTS = 4.0f;
     public static int[] UPGRADE_SCALE = { 1, 5, 20 };
+
+	public static float[] SCALE_MAX_HEALTH = { 100f, 150f, 250f, 400f };
+	public static float[] SCALE_RAM_DAMAGE = { 15f, 20f, 30f, 50f };
+	public static float[] SCALE_MOVE_SPEED = { 10f, 15f, 20f, 25f };
+	public static float[] SCALE_ROTATION_SPEED = { 35f, 35f*4f/3f, 35f*5f/3f, 70f };
+	public static float[] SCALE_BOOST_LENGTH = { 1.0f, 1.25f, 1.5f, 1.75f };
+	public static float[] SCALE_BOOST_DELAY = { 5.0f, 4.0f, 3.0f, 2.0f };
+	public static float[] SPEED_LEVELS = { 10f, 20f, 50f, 70f, 100f };
+	public static float[] SCALE_RAM_SPEED_MOD = { 0.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f };
 
 
     [SyncVar]
@@ -37,7 +46,7 @@ public class Player : NetworkBehaviour {
     public int highUpgrades = 0;
 
     [SyncVar(hook = "OnChangePlayer")]
-    public float currentHealth = BASE_MAX_HEALTH;
+	public float currentHealth = SCALE_MAX_HEALTH[0];
     [SyncVar(hook = "OnChangeResources")]
     public int resources;
     [SyncVar]
@@ -98,20 +107,23 @@ public class Player : NetworkBehaviour {
     // upgrade menu ranks
     public SyncListInt upgradeRanks = new SyncListInt();
     // base stats
-    public float currMoveSpeed = BASE_MOVE_SPEED;
-    public float currRotationSpeed = BASE_ROTATION_SPEED;
+    public float currMoveSpeed = SCALE_MOVE_SPEED[0];
+	public float currRotationSpeed = SCALE_ROTATION_SPEED[0];
     public float currFiringDelay = BASE_FIRING_DELAY;
-    public float currBoostDelay = BASE_BOOST_DELAY;
+    public float currBoostDelay = SCALE_BOOST_DELAY[0];
     //public float currProjectileSpeed = BASE_PROJECTILE_SPEED;
-    public float currRamDamage = BASE_RAM_DAMAGE;
+	public float currRamDamage = SCALE_RAM_DAMAGE[0];
     public float currProjectileStrength = BASE_PROJECTILE_STRENGTH;
     public float firingTimerLeft = BASE_FIRING_DELAY;
     public float firingTimerRight = BASE_FIRING_DELAY;
-    public float boostTimer = BASE_BOOST_DELAY;
-    public float currMaxHealth = BASE_MAX_HEALTH;
+    public float boostTimer = SCALE_BOOST_DELAY[0];
+	public float currBoostLength = SCALE_BOOST_LENGTH[0];
+	public float currMaxHealth = SCALE_MAX_HEALTH [0];
     public float currVelocity = 0.0f;
     public float numPurpleShots = MAX_SHOTS;
-    public float numRedShots = MAX_SHOTS;
+	public float numRedShots = MAX_SHOTS;
+	private float savedMoveSpeed = 0f;
+	private float savedRotationSpeed = 0f;
     [SyncVar]
     public float appliedRamDamage = 0.0f;
     // menu checks
@@ -134,7 +146,7 @@ public class Player : NetworkBehaviour {
     [SyncVar]
     public bool dead;
     public bool gofast = false;
-    public float boost = BASE_BOOST;
+	public float boost = SCALE_BOOST_LENGTH[0];
     [SyncVar]
     public int pSpawned = 0;
 
@@ -286,11 +298,13 @@ public class Player : NetworkBehaviour {
 
         if (gofast == true && boost > 0) {
             boost -= Time.deltaTime;
-            currMoveSpeed -= Time.deltaTime * currMoveSpeed;
-            currRotationSpeed += Time.deltaTime * currRotationSpeed;
+            //currMoveSpeed -= Time.deltaTime * currMoveSpeed;
+            //currRotationSpeed += Time.deltaTime * currRotationSpeed;
+			currMoveSpeed = savedMoveSpeed + savedMoveSpeed * 4f * Mathf.Max(0f, boost) / currBoostLength;
+			currRotationSpeed = savedRotationSpeed / (1f + 4f * Mathf.Max(0f, boost) / currBoostLength);
         } else if (boost < 0) {
             gofast = false;
-            boost = BASE_BOOST;
+			boost = currBoostLength;
         }
     }
     void GetCannonFire() {
@@ -354,7 +368,9 @@ public class Player : NetworkBehaviour {
     }
 
     void SpeedBoost() {
-        currMoveSpeed *= 5;
+		savedMoveSpeed = currMoveSpeed;
+		savedRotationSpeed = currRotationSpeed;
+		currMoveSpeed *= 5;
         currRotationSpeed /= 5;
     }
 
@@ -576,7 +592,7 @@ public class Player : NetworkBehaviour {
         if (Input.GetKey(up)) {
             currVelocity = Mathf.Min(currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
         } else if (Input.GetKey(down)) {
-            currVelocity = Mathf.Max(-currMoveSpeed * (1 + (currRotationSpeed / BASE_ROTATION_SPEED / 4)) / 2f, currVelocity - currMoveSpeed * .85f * Time.deltaTime);
+            currVelocity = Mathf.Max(-currMoveSpeed * (1 + (currRotationSpeed / SCALE_ROTATION_SPEED[0] / 4)) / 2f, currVelocity - currMoveSpeed * .85f * Time.deltaTime);
         } else {
             if (currVelocity > 0) {
                 currVelocity = Mathf.Max(0f, currVelocity - currMoveSpeed / 2f * Time.deltaTime);
@@ -585,7 +601,19 @@ public class Player : NetworkBehaviour {
             }
         }
         transform.Translate(0.0f, currVelocity * Time.deltaTime, 0.0f);
-        CmdSetRamDamage(currRamDamage * currVelocity / BASE_MOVE_SPEED);
+
+		float ramDam = -1f;
+		for (int i = 0; i < SPEED_LEVELS.Length; i++) {
+			if (currVelocity < SPEED_LEVELS [i]) {
+				ramDam = currRamDamage * SCALE_RAM_SPEED_MOD [i];
+				break;
+			}
+		}
+		if (ramDam == -1f) {
+			ramDam = currRamDamage * SCALE_RAM_SPEED_MOD [SCALE_RAM_SPEED_MOD.Length - 1];
+		}
+		CmdSetRamDamage (ramDam);
+        //CmdSetRamDamage(currRamDamage * currVelocity / SCALE_MOVE_SPEED[0]);
     }
 
     IEnumerator Death() {
@@ -691,15 +719,17 @@ public class Player : NetworkBehaviour {
     private void UpdateVariables() {
         if (gofast == false) // only update movement speed if not in boost mode
         {
-            currMoveSpeed = BASE_MOVE_SPEED * (1 + (upgradeRanks[(int)Upgrade.SPEED] / 2.0f));
-            currRotationSpeed = BASE_ROTATION_SPEED * (1 + (upgradeRanks[(int)Upgrade.AGILITY] / 3.0f));
+			currMoveSpeed = SCALE_MOVE_SPEED [upgradeRanks[(int)Upgrade.SPEED]];
+			currRotationSpeed = SCALE_ROTATION_SPEED [upgradeRanks [(int)Upgrade.AGILITY]];
         }
-        currRamDamage = BASE_RAM_DAMAGE * (1 + (upgradeRanks[(int)Upgrade.RAM] / 1.5f));
-        currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)Upgrade.CANNON] / 1.0f));
-        currBoostDelay = BASE_BOOST_DELAY * (1 - (upgradeRanks[(int)Upgrade.AGILITY] / 5.0f));
+		currRamDamage = SCALE_RAM_DAMAGE [upgradeRanks[(int)Upgrade.RAM]];
+		currBoostDelay = SCALE_BOOST_DELAY [upgradeRanks[(int)Upgrade.AGILITY]];
+		currBoostLength = SCALE_BOOST_LENGTH [upgradeRanks[(int)Upgrade.SPEED]];
+
+		currProjectileStrength = BASE_PROJECTILE_STRENGTH * (1 + (upgradeRanks[(int)Upgrade.CANNON] / 1.0f));
 
         float oldMaxHealth = currMaxHealth;
-        currMaxHealth = BASE_MAX_HEALTH * (1 + (upgradeRanks[(int)Upgrade.HULL] / 2.0f));
+		currMaxHealth = SCALE_MAX_HEALTH [upgradeRanks[(int)Upgrade.HULL]];
         if (oldMaxHealth != currMaxHealth) {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
