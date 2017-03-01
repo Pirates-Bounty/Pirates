@@ -46,9 +46,6 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public float maxResources;
 
-    public GameObject canvas;
-    private Camera minMap;
-    private Sprite minMapBorder;
     private bool addResources = false;
     public MapGenerator Instance;
     public Slider landSlider;
@@ -59,6 +56,8 @@ public class MapGenerator : NetworkBehaviour {
     public Material boundaryMat;
     public RawImage mapPic;
     private BoundaryGenerator bg;
+    private Texture2D minimapTexture;
+    private GameObject minimap;
 
     void Start() {
         if (!Instance) {
@@ -140,6 +139,11 @@ public class MapGenerator : NetworkBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (!minimap) {
+            minimap = GameObject.Find("Canvas/Minimap");
+            return;
+        }
+        minimap.GetComponent<RawImage>().texture = minimapTexture;
     }
 
 
@@ -263,8 +267,7 @@ public class MapGenerator : NetworkBehaviour {
         quad.transform.parent = transform;
 
         // minimap
-        RawImage miniMap = canvas.GetComponentInChildren<RawImage>();
-        miniMap.texture = GenerateTexture();
+        minimapTexture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
