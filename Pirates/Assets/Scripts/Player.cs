@@ -12,17 +12,11 @@ public enum DamageType {
 }
 public class Player : NetworkBehaviour {
     // const vars
-    //public const float BASE_MAX_HEALTH = 100.0f;
     public const float BASE_PROJECTILE_SPEED = 70.0f;
     public const float BASE_PROJECTILE_STRENGTH = 10.0f;
     public const float BASE_FIRING_DELAY = 1.0f;
-    //public const float BASE_BOOST_DELAY = 5.0f;
-    //public const float BASE_BOOST = 1.2f;
-    //public const float BASE_ROTATION_SPEED = 35.0f;
-    //public const float BASE_MOVE_SPEED = 10.0f;
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
-    //public const float BASE_RAM_DAMAGE = 5.0f;
     public const float MAX_SHOTS = 4.0f;
     public static int[] UPGRADE_SCALE = { 1, 5, 20 };
 
@@ -150,8 +144,8 @@ public class Player : NetworkBehaviour {
     [SyncVar]
     public int pSpawned = 0;
 
-
-
+	[SyncVar]
+	public float score = 0f;
 
     //ramming cooldown
     private IEnumerator coroutine;
@@ -163,11 +157,11 @@ public class Player : NetworkBehaviour {
     void Start() {
         //StartCoroutine(BoatRepairs());
 
-
-        for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
+		for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
             upgradeRanks.Add(0);
         }
         dead = false;
+		score = 0f;
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -254,8 +248,6 @@ public class Player : NetworkBehaviour {
         if (GameObject.Find("SoundManager") != null) {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
-
-
     }
 
     void DrawLineToLeader() {

@@ -22,9 +22,11 @@ GameObject:
   - 212: {fileID: 212000010082536080}
   - 114: {fileID: 114000014208915168}
   - 114: {fileID: 114000010409583830}
+  - 58: {fileID: 58000011461643378}
+  - 114: {fileID: 114000011175764726}
   m_Layer: 0
   m_Name: Hill
-  m_TagString: Untagged
+  m_TagString: Hill
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42,6 +44,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!58 &58000011461643378
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010432489534}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 2.465
 --- !u!114 &114000010409583830
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -62,6 +78,18 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114000011175764726
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010432489534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c2737020f4b3f48ae927262efbf56f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets: []
 --- !u!114 &114000014208915168
 MonoBehaviour:
   m_ObjectHideFlags: 1
