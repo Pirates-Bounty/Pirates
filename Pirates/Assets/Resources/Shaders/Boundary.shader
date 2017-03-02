@@ -31,7 +31,7 @@
                 fixed4 color;
 
 				float2 v = i.texcoord0.xy - float2(0.5, 0.5);
-				if(dot(v,v) < .14){
+				if(dot(v,v) < .0625){
 					color = fixed4(0.0,0.0,0.0,0.0);
 				}else{
 					color = fixed4(0.0,0.0,0.0,0.65);

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(EdgeCollider2D))]
 [RequireComponent(typeof(MapGenerator))]
 public class BoundaryGenerator : MonoBehaviour {
-    private float padding = 5f;
+    private float padding = 0f;
     public int points = 30;
 
     public void Generate(float width) {

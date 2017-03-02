@@ -72,7 +72,7 @@ MonoBehaviour:
   width: 300
   height: 300
   frequency: 15
-  borderRadius: 0.75
+  borderRadius: 0.5
   landFreq: 0.45
   seed: 200
   sprites:
@@ -101,7 +101,6 @@ MonoBehaviour:
   quadWidth: 6
   quadHeight: 6
   maxResources: 0.4
-  canvas: {fileID: 1000010242255770, guid: 962aad46b4d389b4e9ab9e97ca10d20f, type: 2}
   Instance: {fileID: 0}
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
@@ -110,7 +109,6 @@ MonoBehaviour:
   waterMat: {fileID: 2100000, guid: 91ffbfb29bfd2154a9d15ee583a910e2, type: 2}
   boundaryMat: {fileID: 2100000, guid: 3dad96c43f707434c9bd7253bcb88abb, type: 2}
   mapPic: {fileID: 0}
-  miniMap: {fileID: 0}
 --- !u!114 &114000011153274272
 MonoBehaviour:
   m_ObjectHideFlags: 1

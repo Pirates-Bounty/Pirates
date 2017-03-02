@@ -18,7 +18,7 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public float landFreq;
 
-    [SyncVar ]
+    [SyncVar]
     public int seed = 200;
 
     //[HideInInspector]
@@ -164,19 +164,25 @@ public class MapGenerator : NetworkBehaviour {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (map[x, y] == (int)TileType.WATER) {
-                    tex.SetPixel(x, y, Color.blue);
-                } else if (map[x, y] == (int)TileType.GRASS) {
-                    tex.SetPixel(x, y, Color.green);
-                } else if (map[x, y] == (int)TileType.SAND) {
-                    tex.SetPixel(x, y, Color.yellow);
+                if (IsInCircle(x - width / 2, y - height / 2, width / 2)) {
+                    if (map[x, y] == (int)TileType.WATER) {
+                        tex.SetPixel(x, y, Color.blue);
+                    } else if (map[x, y] == (int)TileType.GRASS) {
+                        tex.SetPixel(x, y, Color.green);
+                    } else if (map[x, y] == (int)TileType.SAND) {
+                        tex.SetPixel(x, y, Color.yellow);
+                    }
+                }else {
+                    tex.SetPixel(x, y, new Color(0, 0, 0, 0));
                 }
             }
         }
         tex.Apply();
         return tex;
     }
-
+    public static bool IsInCircle(int x, int y, int radius) {
+        return x * x + y * y < radius * radius;
+    }
     public void Generate() {
 
         Random.InitState(seed);
@@ -188,31 +194,34 @@ public class MapGenerator : NetworkBehaviour {
 
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
-                if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
-                    map[i, j] = (int)TileType.WATER;
-                    continue;
-                }
-
-                //Mathf.PerlinNoise(x + xOffset, y + yOffset);
-                float noise = PerlinFractal(new Vector2(i + xOffset, j + yOffset), octaves, frequency / 1000.0f);
-                // change the noise so that it is also weighted based on the euclidean distance from the center of the map
-                // this way, there will be a larger island in the middle of the map
-                // comment this line to go back to the old generation
-                //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
-                if (noise < landFreq) {
-                    if (noise > Random.Range(0, 40f)) {
-                        map[i, j] = (int)TileType.TREE;
-                    } else {
-                        map[i, j] = (int)TileType.GRASS;
+                if(IsInCircle(i - width/2,j-height/2,width/2)) {
+                    if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                        map[i, j] = (int)TileType.WATER;
+                        continue;
                     }
 
-                } else if (noise < landFreq + .05) {
-                    map[i, j] = (int)TileType.SAND;
-                } else if (noise >= landFreq + .05) {
+                    //Mathf.PerlinNoise(x + xOffset, y + yOffset);
+                    float noise = PerlinFractal(new Vector2(i + xOffset, j + yOffset), octaves, frequency / 1000.0f);
+                    // change the noise so that it is also weighted based on the euclidean distance from the center of the map
+                    // this way, there will be a larger island in the middle of the map
+                    // comment this line to go back to the old generation
+                    //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
+                    if (noise < landFreq) {
+                        if (noise > Random.Range(0, 40f)) {
+                            map[i, j] = (int)TileType.TREE;
+                        } else {
+                            map[i, j] = (int)TileType.GRASS;
+                        }
 
-                    map[i, j] = (int)TileType.WATER;
+                    } else if (noise < landFreq + .05) {
+                        map[i, j] = (int)TileType.SAND;
+                    } else if (noise >= landFreq + .05) {
+
+                        map[i, j] = (int)TileType.WATER;
+                    }
                 }
             }
+
         }
     }
 
@@ -256,13 +265,13 @@ public class MapGenerator : NetworkBehaviour {
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
-        plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 5, height / 5);
-        plane.transform.localScale = new Vector3(width / 5, 1, height / 5);
+        plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 7.5f, height / 7.5f);
+        plane.transform.localScale = new Vector3(width / 5f, 1, height / 5f);
         plane.transform.parent = transform;
 
         // boundary mesh
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        quad.transform.localScale = new Vector3(width * 2, width * 2, 1);
+        quad.transform.localScale = new Vector3(width*2f, width*2f, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
         quad.transform.parent = transform;
 
@@ -340,10 +349,12 @@ public class MapGenerator : NetworkBehaviour {
         int tile = map[xRand, yRand];
         Vector2 tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
         while ((TileType)tile != TileType.WATER) {
-            xRand = Random.Range(0, width);
-            yRand = Random.Range(0, height);
+            int radius = width / 2;
+            Vector2 inBounds = Random.insideUnitCircle * radius;
+            xRand = (int)inBounds.x;
+            yRand = (int)inBounds.y;
             tile = map[xRand, yRand];
-            tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+            tilePos = new Vector2(xRand - radius, yRand - radius);
         }
 
         return tilePos;
