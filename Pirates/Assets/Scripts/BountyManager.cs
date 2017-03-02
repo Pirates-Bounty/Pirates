@@ -37,6 +37,9 @@ public class BountyManager : NetworkBehaviour {
     public int hillSize;
     public Vector2 moveHillRange;
     private GameObject currHill;
+    private GameObject hillRep;
+    private RectTransform hillRepRect;
+    private RectTransform minimapRect;
 
 
     // Use this for initialization
@@ -56,6 +59,9 @@ public class BountyManager : NetworkBehaviour {
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");
         iconSprite = Resources.Load<Sprite>("Art/Lobby/In Game UI/PlayerIndicator");
+        hillRep = GameObject.Find("Canvas/Minimap/Hill");
+        hillRepRect = hillRep.GetComponent<RectTransform>();
+        minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
         bountyBoard = GameObject.Find("Canvas/Bounty Board");
         bountyBoard.SetActive(false);
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -92,6 +98,7 @@ public class BountyManager : NetworkBehaviour {
         currHill = Instantiate(Hill, MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck), Quaternion.identity) as GameObject;
         currHill.transform.localScale *= hillSize;
         NetworkServer.Spawn(currHill);
+        UpdateMinimapHill();
     }
 
     [Command]
@@ -102,11 +109,14 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
         currHill.transform.position = MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck);
+        UpdateMinimapHill();
     }
 
+    void UpdateMinimapHill() {
+        hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* currHill.transform.position.x, minimapRect.rect.height * currHill.transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
+    }
     // Update is called once per frame
     void Update() {
-
         if (Input.GetKey(KeyCode.Tab)) {
             bountyBoard.SetActive(true);
         } else if (Input.GetKeyUp(KeyCode.Tab)) {
@@ -202,8 +212,6 @@ public class BountyManager : NetworkBehaviour {
             return 100;
         } else if (p.streak >= 3) {
             return 50;
-        } else if (p.streak >= 0) {
-            return 0;
         } else {
             return 10 * p.streak;
         }

@@ -344,18 +344,18 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     public Vector2 GetRandWaterTile() {
-        int radius = width / 2;
+        int radius = width / 2 - 5;
         Vector2 inBounds = Random.insideUnitCircle * radius;
         int xRand = (int)inBounds.x;
         int yRand = (int)inBounds.y;
-        int tile = map[xRand, yRand];
-        Vector2 tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+        int tile = map[xRand + radius, yRand + radius];
+        Vector2 tilePos = new Vector2(xRand, yRand);
         while ((TileType)tile != TileType.WATER) {
             inBounds = Random.insideUnitCircle * radius;
             xRand = (int)inBounds.x;
             yRand = (int)inBounds.y;
-            tile = map[xRand, yRand];
-            tilePos = new Vector2(xRand - radius, yRand - radius);
+            tile = map[xRand + radius, yRand + radius];
+            tilePos = new Vector2(xRand, yRand);
         }
 
         return tilePos;

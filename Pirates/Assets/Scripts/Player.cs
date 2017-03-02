@@ -91,7 +91,7 @@ public class Player : NetworkBehaviour {
     private Text deathsText;
     private Text bountyText;
     //private FogOfWar fogOfWar;
-    //private MapGenerator mapGenerator;
+    private MapGenerator mapGenerator;
     // GameObject references
     //private GameObject inGameMenu;
     private UpgradePanel upgradePanel;
@@ -151,7 +151,8 @@ public class Player : NetworkBehaviour {
     private IEnumerator coroutine;
     private bool invuln = false;
     private bool registered = false;
-
+    private RectTransform minimapRect;
+    private RectTransform playerRect;
 
     // Use this for initialization
     void Start() {
@@ -192,6 +193,8 @@ public class Player : NetworkBehaviour {
         killsText = GameObject.Find("Canvas/UI/KDR/Kills Text").GetComponent<Text>();
         deathsText = GameObject.Find("Canvas/UI/KDR/Deaths Text").GetComponent<Text>();
         bountyText = GameObject.Find("Canvas/UI/KDR/Bounty Text").GetComponent<Text>();
+        minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
+        playerRect = GameObject.Find("Canvas/Minimap/Player").GetComponent<RectTransform>();
 
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);
@@ -199,7 +202,7 @@ public class Player : NetworkBehaviour {
         Text timerText = respawnTimerText.GetComponent<Text>();
         timerText.resizeTextMaxSize = timerText.fontSize;
 
-        //mapGenerator = FindObjectOfType<MapGenerator>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
         /*fogOfWar = FindObjectOfType<FogOfWar>();
         fogOfWar.player = this;
         fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);*/
@@ -213,7 +216,10 @@ public class Player : NetworkBehaviour {
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
         InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
+    void UpdateMinimapPlayer() {
+        playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / mapGenerator.width;
 
+    }
     void Update() {
 
         //if (Input.GetKeyDown(KeyCode.V))
@@ -606,6 +612,7 @@ public class Player : NetworkBehaviour {
 		}
 		CmdSetRamDamage (ramDam);
         //CmdSetRamDamage(currRamDamage * currVelocity / SCALE_MOVE_SPEED[0]);
+        UpdateMinimapPlayer();
     }
 
     IEnumerator Death() {
