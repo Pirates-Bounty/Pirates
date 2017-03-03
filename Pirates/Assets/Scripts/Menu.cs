@@ -21,6 +21,7 @@ public class Menu : MonoBehaviour {
     private GameObject waves4;
     private float maxRotation = 2f;
     private float currentRotation = 0.0f;
+    private int fontSize = 20;
     private bool positive = true;
     private bool forward = true;
 
@@ -38,15 +39,15 @@ public class Menu : MonoBehaviour {
         waves4 = GameObject.Find("Waves 4");
         leftArm = GameObject.Find("leftarm");
         rightArm = GameObject.Find("rightarm");
-        font = Resources.Load<Font>("Art/Fonts/Angel Tears");
+        font = Resources.Load<Font>("Art/Fonts/SHOWG");
         sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
         highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         //background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
         //Background
         //backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
-        playButton = UI.CreateButton("Play", "Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.2f, 0.35f), new Vector2(0.8f, 0.5f),
+        playButton = UI.CreateButton("Play", "Play", font, color, fontSize, canvas, sprite, highlightedSprite,
+            Vector3.zero, new Vector2(0.05f, 0.05f), new Vector2(0.325f, 0.2f),
             delegate {
                 Navigator.Instance.LoadLevel("Lobby");
                 SoundManager.Instance.PlaySFXTransition(Resources.Load<AudioClip>("Sound/SFX/UI/DoorOpen"),0.2f);
@@ -54,12 +55,12 @@ public class Menu : MonoBehaviour {
             } );
 
         // Instructions Button
-        instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.2f, 0.2f), new Vector2(0.8f, 0.35f), delegate { Navigator.Instance.LoadLevel("Lobby Tutorial"); });
+        instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, fontSize, canvas, sprite, highlightedSprite,
+            Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
 
         // Quit Button
-        quitButton = UI.CreateButton("Quit", "Quit", font, color, 64, canvas, sprite, highlightedSprite,
-            Vector3.zero, new Vector2(0.2f, 0.05f), new Vector2(0.8f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
+        quitButton = UI.CreateButton("Quit", "Quit", font, color, fontSize, canvas, sprite, highlightedSprite,
+            Vector3.zero, new Vector2(0.675f, 0.05f), new Vector2(0.95f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
 
         //=== SOUND SECTION - BEGIN ===
         //preparing highlight entries

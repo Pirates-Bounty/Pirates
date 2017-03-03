@@ -6,9 +6,14 @@ using UnityEngine.UI;
 
 
 public class MapGenerator : NetworkBehaviour {
+
+    [SyncVar]
     public int width = 6;
+
+    [SyncVar]
     public int height = 6;
     public float frequency;
+    public float borderRadius = 0.75f;
 
     [SyncVar]
     public float landFreq;
@@ -16,8 +21,8 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public int seed = 200;
 
-    [HideInInspector]
-    public float centerWeight = 7;
+    //[HideInInspector]
+    //public float centerWeight = 7;
 
     public static bool gameStart = false;
     //public float amplitude;
@@ -26,6 +31,7 @@ public class MapGenerator : NetworkBehaviour {
     public GameObject resourcePrefab;
     public GameObject mapPanel;
     private GameObject plane;
+    private GameObject quad;
     public string[] tileNames;
 
     [HideInInspector]
@@ -40,9 +46,6 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public float maxResources;
 
-    private Transform canvas;
-    private Camera minMap;
-    private Sprite minMapBorder;
     private bool addResources = false;
     public MapGenerator Instance;
     public Slider landSlider;
@@ -50,7 +53,11 @@ public class MapGenerator : NetworkBehaviour {
     public Slider resourceSlider;
     public InputField seedInputField;
     public Material waterMat;
+    public Material boundaryMat;
     public RawImage mapPic;
+    private BoundaryGenerator bg;
+    private Texture2D minimapTexture;
+    private GameObject minimap;
 
     void Start() {
         if (!Instance) {
@@ -59,12 +66,11 @@ public class MapGenerator : NetworkBehaviour {
         } else if (Instance != this) {
             Destroy(gameObject);
         }
+        bg = GetComponent<BoundaryGenerator>();
         Generate();
-        GenerateGameObjects();
+        //GenerateGameObjects();
         int numPlayers = LobbyManager.numPlayers;
         maxResources = (.2f * 20000) / width ;
-
-
     }
 
     [Command]
@@ -73,18 +79,20 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     [Command]
-    public void CmdChangeLandFreq(int newLandFreq) {
+    public void CmdChangeLandFreq(float newLandFreq) {
         landFreq = newLandFreq;
     }
 
     [Command]
     public void CmdChangeWidth(int newWidth) {
         width = newWidth;
+        height = newWidth;
     }
 
     public void WidthChange() {
         width = (int)(widthSlider.value * 1000);
         height = (int)(widthSlider.value * 1000);
+        CmdChangeWidth(width);
     }
 
     [Command]
@@ -99,6 +107,7 @@ public class MapGenerator : NetworkBehaviour {
 
     public void SliderChange() {
         landFreq = landSlider.value;
+        CmdChangeLandFreq(landFreq);
     }
 
     public void MaxResourceChange() {
@@ -116,12 +125,13 @@ public class MapGenerator : NetworkBehaviour {
     public void SeedChange() {
         seed = System.DateTime.Now.Millisecond;
         seedInputField.text = seed.ToString();
+        CmdChangeSeed(seed);
     }
 
 
     public void LobbyButton() {
         mapPanel.SetActive(false);
-        CmdReGenerate();
+        //CmdReGenerate();
     }
 
 
@@ -129,6 +139,11 @@ public class MapGenerator : NetworkBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (!minimap) {
+            minimap = GameObject.Find("Canvas/Minimap");
+            return;
+        }
+        minimap.GetComponent<RawImage>().texture = minimapTexture;
     }
 
 
@@ -139,24 +154,35 @@ public class MapGenerator : NetworkBehaviour {
         }
     }
 
-    public void GenerateTexture() {
+    public void GeneratePreviewTexture() {
+        Texture2D tex = GenerateTexture();
+        mapPic.texture = tex;
+    }
+
+    public Texture2D GenerateTexture() {
         Texture2D tex = new Texture2D(width, height);
-        mapPic.GetComponent<RawImage>().texture = tex;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (map[x, y] == (int)TileType.WATER) {
-                    tex.SetPixel(x, y, Color.blue);
-                } else if (map[x, y] == (int)TileType.GRASS) {
-                    tex.SetPixel(x, y, Color.green);
-                } else if (map[x, y] == (int)TileType.SAND) {
-                    tex.SetPixel(x, y, Color.yellow);
+                if (IsInCircle(x - width / 2, y - height / 2, width / 2)) {
+                    if (map[x, y] == (int)TileType.WATER) {
+                        tex.SetPixel(x, y, Color.blue);
+                    } else if (map[x, y] == (int)TileType.GRASS) {
+                        tex.SetPixel(x, y, Color.green);
+                    } else if (map[x, y] == (int)TileType.SAND) {
+                        tex.SetPixel(x, y, Color.yellow);
+                    }
+                }else {
+                    tex.SetPixel(x, y, new Color(0, 0, 0, 0));
                 }
             }
         }
         tex.Apply();
+        return tex;
     }
-
+    public static bool IsInCircle(int x, int y, int radius) {
+        return x * x + y * y < radius * radius;
+    }
     public void Generate() {
 
         Random.InitState(seed);
@@ -168,31 +194,34 @@ public class MapGenerator : NetworkBehaviour {
 
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
-                if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
-                    map[i, j] = (int)TileType.WATER;
-                    continue;
-                }
-
-                //Mathf.PerlinNoise(x + xOffset, y + yOffset);
-                float noise = PerlinFractal(new Vector2(i + xOffset, j + yOffset), octaves, frequency / 1000.0f);
-                // change the noise so that it is also weighted based on the euclidean distance from the center of the map
-                // this way, there will be a larger island in the middle of the map
-                // comment this line to go back to the old generation
-                noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
-                if (noise < landFreq) {
-                    if (noise > Random.Range(0, 40f)) {
-                        map[i, j] = (int)TileType.TREE;
-                    } else {
-                        map[i, j] = (int)TileType.GRASS;
+                if(IsInCircle(i - width/2,j-height/2,width/2)) {
+                    if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
+                        map[i, j] = (int)TileType.WATER;
+                        continue;
                     }
 
-                } else if (noise < landFreq + .05) {
-                    map[i, j] = (int)TileType.SAND;
-                } else if (noise >= landFreq + .05) {
+                    //Mathf.PerlinNoise(x + xOffset, y + yOffset);
+                    float noise = PerlinFractal(new Vector2(i + xOffset, j + yOffset), octaves, frequency / 1000.0f);
+                    // change the noise so that it is also weighted based on the euclidean distance from the center of the map
+                    // this way, there will be a larger island in the middle of the map
+                    // comment this line to go back to the old generation
+                    //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
+                    if (noise < landFreq) {
+                        if (noise > Random.Range(0, 40f)) {
+                            map[i, j] = (int)TileType.TREE;
+                        } else {
+                            map[i, j] = (int)TileType.GRASS;
+                        }
 
-                    map[i, j] = (int)TileType.WATER;
+                    } else if (noise < landFreq + .05) {
+                        map[i, j] = (int)TileType.SAND;
+                    } else if (noise >= landFreq + .05) {
+
+                        map[i, j] = (int)TileType.WATER;
+                    }
                 }
             }
+
         }
     }
 
@@ -229,27 +258,25 @@ public class MapGenerator : NetworkBehaviour {
     }
 
 
-    void GenerateGameObjects() {
-        // Background tiles
+    public void GenerateGameObjects() {
+        // Background tiles and boundary
+        bg.Generate(width * borderRadius);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
-        plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 5, height / 5);
-        plane.transform.localScale = new Vector3(width / 10, 1, height / 10);
+        plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 7.5f, height / 7.5f);
+        plane.transform.localScale = new Vector3(width / 5f, 1, height / 5f);
         plane.transform.parent = transform;
 
-		float numPoints = 1000f;
-		for (float i = 0; i < numPoints; i++) {
-			GameObject border = new GameObject ("Borderline" + i);
-			border.transform.position = new Vector2 (width*0.55f * Mathf.Cos(i * (2f*Mathf.PI/numPoints)), width*0.55f * Mathf.Sin(i * (2*Mathf.PI/numPoints)));
-			border.AddComponent<CircleCollider2D>();
-			border.transform.parent = transform;
-			SpriteRenderer sR = border.AddComponent<SpriteRenderer> ();
-			sR.sprite = sprites[2];
-			sR.sortingOrder = 0;
-		}
+        // boundary mesh
+        quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        quad.transform.localScale = new Vector3(width*2f, width*2f, 1);
+        quad.GetComponent<MeshRenderer>().material = boundaryMat;
+        quad.transform.parent = transform;
 
+        // minimap
+        minimapTexture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
@@ -259,7 +286,7 @@ public class MapGenerator : NetworkBehaviour {
                 //Don't want to spawn water tiles if we don't need to
                 //We already have seperate water tile background so only spawn water tiles that create
                 //boundary for the map
-                if (map[i, j] != (int)TileType.WATER || (i == 0 || j == 0 || i == width - 1 || j == height - 1)) {
+                if (map[i, j] != (int)TileType.WATER) {
                     GameObject Tile = new GameObject(tileNames[id]);
 
                     //Don't add a sprite renderer to boundary water tiles
@@ -313,20 +340,71 @@ public class MapGenerator : NetworkBehaviour {
 
             }
         }
+
     }
 
     public Vector2 GetRandWaterTile() {
-        int xRand = Random.Range(0, width);
-        int yRand = Random.Range(0, height);
-        int tile = map[xRand, yRand];
-        Vector2 tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+        int radius = width / 2 - 5;
+        Vector2 inBounds = Random.insideUnitCircle * radius;
+        int xRand = (int)inBounds.x;
+        int yRand = (int)inBounds.y;
+        int tile = map[xRand + radius, yRand + radius];
+        Vector2 tilePos = new Vector2(xRand, yRand);
         while ((TileType)tile != TileType.WATER) {
-            xRand = Random.Range(0, width);
-            yRand = Random.Range(0, height);
-            tile = map[xRand, yRand];
-            tilePos = new Vector2(xRand - width / 2, yRand - height / 2);
+            inBounds = Random.insideUnitCircle * radius;
+            xRand = (int)inBounds.x;
+            yRand = (int)inBounds.y;
+            tile = map[xRand + radius, yRand + radius];
+            tilePos = new Vector2(xRand, yRand);
         }
 
         return tilePos;
+    }
+
+    public Vector2 GetRandHillLocation(int size)
+    {
+        Vector2 returnLoc = Vector2.zero;
+        bool end = false;
+        while (!end)
+        {
+            returnLoc = GetRandWaterTile();
+            end = CheckNeighborsForWater(size,returnLoc);
+            
+        }
+        return returnLoc;
+    }
+
+    public bool CheckNeighborsForWater(int size, Vector2 loc)
+    {
+        for (int i = -size/2; i < size/2; i++)
+        {
+            for (int j = -size / 2; j < size / 2; j++)
+            {
+                Vector2 tileLoc = LocToMap(loc);
+                if (tileLoc.x + i < width && tileLoc.x + i >= 0 && tileLoc.y + j < height && tileLoc.y + j >= 0)
+                {
+
+                    int Tile = map[(int)tileLoc.x + i, (int)tileLoc.y + j];
+                    if (((TileType)Tile != TileType.WATER))
+                    {
+                        return false;
+                    }
+
+
+                }
+                else
+                {
+                    return false;
+                }
+
+                   
+            }
+        }
+        return true;
+    }
+
+    public Vector2 LocToMap(Vector2 loc)
+    {
+        return new Vector2(loc.x + width/2, loc.y + height/2);
     }
 }

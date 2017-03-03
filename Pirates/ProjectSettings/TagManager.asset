@@ -9,6 +9,7 @@ TagManager:
   - spawner
   - mapGen
   - bountyManager
+  - Hill
   layers:
   - Default
   - TransparentFX

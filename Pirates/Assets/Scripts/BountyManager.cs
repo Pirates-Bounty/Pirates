@@ -7,19 +7,10 @@ using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
 public class BountyManager : NetworkBehaviour {
-
-    public bool displayLocal;
-
-    public const int BASE_BOUNTY = 100;
-
-    public SyncListInt playerBounties = new SyncListInt();
-    public SyncListInt killStreak = new SyncListInt();
-    public SyncListInt scoreOrder = new SyncListInt();
-
-    //public int localID;
-	public Sprite bountyBoardSprite;
-	private GameObject bountyPanel;
-    private List<GameObject> bountyTexts = new List<GameObject>();
+    public const int BASE_BOUNTY = 200;
+    public const int MAX_BOUNTY = 1000;
+    public const int MAX_PLAYERS = 20;
+    private GameObject bountyPanel;
     private Canvas canvas;
     private Font font;
     private int fontSize = 10;
@@ -27,38 +18,61 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
-    private Player[] playerList;
+    public Player[] playerList = new Player[LobbyManager.numPlayers];
     private GameObject bountyBoard;
     private RectTransform bountyBoardRect;
-
+    public float iconHeight = 0.1f;
+    public float iconPadding = 15f;
+    public float iconStartY = 0.82f;
+    private GameObject broadcastText;
     public bool victoryUndeclared;
+    private bool createdPlayerIcons;
+    private Sprite iconSprite;
+    private GameObject[] playerIconGOs = new GameObject[LobbyManager.numPlayers];
+    private int currentIndex = 0;
+    public static BountyManager Instance;
+	public UpgradePanel upgradePanel;
+    public GameObject Hill;
+    public int hillCheck;
+    public int hillSize;
+    public Vector2 moveHillRange;
+    private GameObject currHill;
+    private GameObject hillRep;
+    private RectTransform hillRepRect;
+    private RectTransform minimapRect;
+
 
     // Use this for initialization
     void Start() {
+        if (!Instance) {
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        } else if (Instance != this) {
+            Destroy(gameObject);
+        }
         playerList = FindObjectsOfType<Player>();
+		//upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
         maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
         //maxResources = Mathf.RoundToInt((width + height) / 50);
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");
-        bountyBoard = GameObject.Find("Canvas/UI/Bounty Board");
-        bountyBoardRect = bountyBoard.GetComponent<RectTransform>();
+        iconSprite = Resources.Load<Sprite>("Art/Lobby/In Game UI/PlayerIndicator");
+        hillRep = GameObject.Find("Canvas/Minimap/Hill");
+        hillRepRect = hillRep.GetComponent<RectTransform>();
+        minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
+        bountyBoard = GameObject.Find("Canvas/Bounty Board");
+        bountyBoard.SetActive(false);
+        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
+
+        StartCoroutine(MoveHill((int)moveHillRange.x,(int)moveHillRange.y));
         Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < maxResources; i++) {
             if (isServer) {
                 CmdSpawnResource();
             }
-        }
-
-        if (!isLocalPlayer) {
-            return;
-        }
-
-        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-        if (canvas != null) {
-            CreateBountyPanel();
         }
     }
 
@@ -73,202 +87,159 @@ public class BountyManager : NetworkBehaviour {
         NetworkServer.Spawn(instantiatedResource);
     }
 
-
-    /*[Command]
-	void CmdCreateID ()
-	{
-		int newID = playerBounties.Count;
-		playerBounties.Add (100);
-		killStreak.Add (0);
-		if (bountyPanel != null) {
-			int playerCount = playerBounties.Count;
-			bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
-				Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(newID+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-newID)), TextAnchor.UpperLeft, true));
-		}
-	}*/
-
-
-    void OrderBounties() {
-        bool finishedSort = false;
-        int[] orders = new int[scoreOrder.Count];
-        for (int i = 0; i < scoreOrder.Count; i++) {
-            orders[scoreOrder[i]] = i;
+    [Command]
+    void CmdSpawnHill()
+    {
+        if (!isServer)
+        {
+            return;
         }
-        for (int i = scoreOrder.Count - 1; !finishedSort && (i > 0); i--) {
-            finishedSort = true;
-            for (int j = 0; j < i; j++) {
-                if (playerBounties[orders[j]] < playerBounties[orders[j + 1]]) {
-                    int temp = orders[j];
-                    orders[j] = orders[j + 1];
-                    orders[j + 1] = temp;
-                    finishedSort = false;
-                }
-            }
-        }
-        for (int i = 0; i < scoreOrder.Count; i++) {
-            scoreOrder[orders[i]] = i;
-            //print ("Player " + orders [i] + " is ranked " + i + " with " + playerBounties [orders [i]] + "g");
-        }
+        ClientScene.RegisterPrefab(Hill);
+        currHill = Instantiate(Hill, MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck), Quaternion.identity) as GameObject;
+        currHill.transform.localScale *= hillSize;
+        NetworkServer.Spawn(currHill);
+        UpdateMinimapHill();
     }
 
+    [Command]
+    void CmdMoveHill()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        currHill.transform.position = MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck);
+        UpdateMinimapHill();
+    }
 
-
+    void UpdateMinimapHill() {
+        hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* currHill.transform.position.x, minimapRect.rect.height * currHill.transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
+    }
     // Update is called once per frame
     void Update() {
-        displayLocal = isLocalPlayer;
-
-        if (canvas == null) {
-            canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-            if (canvas != null) {
-                CreateBountyPanel();
-                //print ("makin' a bounty board (late)");
-            }
+        if (Input.GetKey(KeyCode.Tab)) {
+            bountyBoard.SetActive(true);
+        } else if (Input.GetKeyUp(KeyCode.Tab)) {
+            bountyBoard.SetActive(false);
         }
 
         if (playerList.Length < LobbyManager.numPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
-
-        if (playerBounties.Count > 0) {
-
-            if (isServer) {
-                OrderBounties();
-            }
-            for (int i = 0; i < playerList.Length; i++) {
-                if (isServer) {
-                    int upgradeBounty = 10 * (int)Mathf.Floor(playerList[i].lowUpgrades / 2)
-                                       + 25 * playerList[i].midUpgrades
-                                       + 100 * playerList[i].highUpgrades;
-                    int killStreakBounty = 15 * killStreak[playerList[i].playerID];
-                    float bonusMod = 1f;
-                    /*if (playerList [i].playerID == GetHighestBounty ()) {
-						bonusMod = 1.2f;
-					}*/
-                    playerBounties[playerList[i].playerID] = (int)((BASE_BOUNTY + upgradeBounty + killStreakBounty) * bonusMod);
-                }
-
-                if (victoryUndeclared && playerBounties[playerList[i].playerID] >= 1000) {
-                    StartCoroutine(DeclareVictory(playerList[i].playerID));
-                    victoryUndeclared = false;
-                }
-
-                if (bountyTexts.Count <= i) {
-                    if (bountyPanel != null) {
-                        int playerCount = playerList.Length;
-                        for (int j = 0; j < bountyTexts.Count; j++) {
-                            /*GameObject oldText = bountyTexts [j];
-							Text tx = oldText.GetComponent<Text> ();
-							GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent, 
-								Vector3.zero, new Vector2 (0.1f, 1f/playerCount * (playerCount-(scoreOrder[j]+1))), new Vector2 (0.9f, 1f/playerCount * (playerCount-scoreOrder[j])), TextAnchor.UpperLeft, true);
-							bountyTexts [j] = newText;
-							GameObject.Destroy (oldText);*/
-                            RectTransform rectMod = bountyTexts[j].GetComponent<RectTransform>();
-							rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[j] + 0));
-							rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[j] + 1));
-                        }
-
-                        bountyTexts.Add(UI.CreateText("Bounty Text " + i, "Player " + (i + 1) + " | " + playerBounties[playerList[i].playerID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-                            Vector3.zero, new Vector2(0.1f, 0.8f / playerCount * (playerCount - (scoreOrder[i] + 1))), new Vector2(0.9f, 1f / playerCount * (playerCount - scoreOrder[i])), TextAnchor.UpperLeft, false));
-                    }
-                } else {
-                    int playerCount = playerList.Length;
-                    bountyTexts[playerList[i].playerID].GetComponent<Text>().text = "Player " + (i + 1) + "  |  " + playerBounties[playerList[i].playerID] + "g";
-                    RectTransform rectMod = bountyTexts[playerList[i].playerID].GetComponent<RectTransform>();
-					rectMod.anchorMin = new Vector2(0.1f, 0.8f / playerCount * (scoreOrder[i] + 0));
-					rectMod.anchorMax = new Vector2(0.9f, 0.8f / playerCount * (scoreOrder[i] + 1));
-                    if (playerList[i].isLocalPlayer) {
-                        bountyTexts[playerList[i].playerID].GetComponent<Text>().color = Color.red;
-                    }
-                }
-                if (GetHighestBounty() == playerList[i].playerID) {
-                    bountyTexts[playerList[i].playerID].GetComponent<Text>().text += " +" + 0.2f * playerBounties[playerList[i].playerID] + "g";
-                }
-            }
-        }
-
-        /*if (Input.GetKeyDown (KeyCode.Q)) {
-			StartCoroutine(DeclareVictory (0));
-		}*/
-    }
-
-    public int AddID() {
-        //localID = CmdCreateID ();
-        //return localID;
-
-        int newID = playerBounties.Count;
-        playerBounties.Add(100);
-        killStreak.Add(0);
-        scoreOrder.Add(newID);
-        if (bountyPanel != null) {
-            int playerCount = playerList.Length;
-
-            for (int j = 0; j < bountyTexts.Count; j++) {
-                GameObject oldText = bountyTexts[j];
-                Text tx = oldText.GetComponent<Text>();
-                GameObject newText = UI.CreateText(oldText.name, tx.text, tx.font, tx.color, tx.fontSize, oldText.transform.parent,
-                    Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (j + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - j)), TextAnchor.UpperLeft, false);
-                bountyTexts[j] = newText;
-                GameObject.Destroy(oldText);
-            }
-
-            bountyTexts.Add(UI.CreateText("Bounty Text " + newID, "Player " + (newID + 1) + " | " + playerBounties[newID] + "g", font, Color.black, fontSize, bountyPanel.transform,
-                Vector3.zero, new Vector2(0.1f, 1f / playerCount * (playerCount - (newID + 1))), new Vector2(0.9f, 0.8f / playerCount * (playerCount - newID)), TextAnchor.UpperLeft, false));
-            /*bountyTexts.Add (UI.CreateText ("Bounty Text " + newID, "Player " + newID + " | " + playerBounties [newID] + "g", font, Color.black, 24, bountyPanel.transform,
-				Vector3.zero, new Vector2 (0.1f, 1.0f / 5f * newID), new Vector2 (0.9f, 1.0f / 5f * (newID+1)), TextAnchor.MiddleCenter, true));*/
-        }
-        return newID;
-    }
-
-    public void ReportHit(int loser, int winner) {
-        if (playerBounties[winner] * 0.5f >= playerBounties[loser]) {
-            killStreak[winner] += 1;
-        } else if (playerBounties[winner] * 0.8f >= playerBounties[loser]) {
-            killStreak[winner] += 3;
-        } else if (playerBounties[winner] * 1.2f >= playerBounties[loser]) {
-            killStreak[winner] += 5;
-        } else if (playerBounties[winner] * 2f >= playerBounties[loser]) {
-            killStreak[winner] += 7;
-        } else {
-            killStreak[winner] += 10;
-        }
-        killStreak[winner] += killStreak[loser] / 2;
-        killStreak[loser] = 0;
-        //playerBounties [loser] = 100;
-
         for (int i = 0; i < playerList.Length; i++) {
-            if (playerList[i].playerID == winner) {
-                float bonusMod = 1.0f;
-                if (GetHighestBounty() == loser) {
-                    bonusMod = 1.2f;
+
+            if (!createdPlayerIcons) {
+                if (playerIconGOs[i] == null) {
+                    GameObject playerIcon = new GameObject("Player Icon " + (i + 1));
+                    playerIcon.transform.parent = bountyBoard.transform;
+                    Image image = playerIcon.AddComponent<Image>();
+                    image.sprite = iconSprite;
+                    RectTransform rect = playerIcon.GetComponent<RectTransform>();
+                    rect.anchorMin = new Vector2((CalculateWorth(playerList[i]) - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
+                    rect.anchorMax = new Vector2((CalculateWorth(playerList[i]) + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
+                    rect.offsetMin = Vector3.zero;
+                    rect.offsetMax = Vector3.zero;
+                    playerIconGOs[i] = playerIcon;
                 }
-                playerList[i].AddGold((int)(playerBounties[loser] * bonusMod));
+            } else {
+                RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
+                rect.anchorMin = new Vector2((CalculateWorth(playerList[i]) - iconPadding) / (float)MAX_BOUNTY, iconStartY - (i + 1) * iconHeight);
+                rect.anchorMax = new Vector2((CalculateWorth(playerList[i]) + iconPadding) / (float)MAX_BOUNTY, iconStartY - i * iconHeight);
+                rect.offsetMin = Vector3.zero;
+                rect.offsetMax = Vector3.zero;
+            }
+
+            if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY) {
+                StartCoroutine(DeclareVictory(playerList[i].ID));
+                victoryUndeclared = false;
+            }
+        }
+        for (int i = 0; i < playerIconGOs.Length; ++i) {
+            if (!playerIconGOs[i]) {
+                createdPlayerIcons = false;
+                break;
+            } else {
+                createdPlayerIcons = true;
             }
         }
     }
 
-
-    private void CreateBountyPanel() {
-        int playerCount = playerList.Length;
-		bountyPanel = UI.CreatePanel("Bounty Panel", bountyBoardSprite, Color.white, canvas.transform,
-            Vector3.zero, new Vector2(0.75f, 0.1f), new Vector3(1f, 0.2f + 0.1f * playerCount));
-		bountyPanel.transform.SetAsFirstSibling ();
-		bountyBoardRect.anchorMax = new Vector2(bountyBoardRect.anchorMax.x, 0.1f + 0.1f * playerCount);
+    public int RegisterPlayer(Player player) {
+        int prevIndex = currentIndex;
+        playerList[currentIndex++] = player;
+        return prevIndex;
     }
 
-    public int GetHighestBounty() {
-        int highestID = 0;
-        for (int i = 1; i < playerBounties.Count; i++) {
-            if (playerBounties[i] > playerBounties[highestID]) {
-                highestID = i;
-            }
+    [Command]
+    public void CmdReportKill(int victimID, int killerID) {
+        Player killer = playerList[killerID];
+        killer.AddGold(CalculateWorth(playerList[victimID]));
+        killer.kills++;
+        if (killer.streak < 0) {
+            killer.streak = 1;
+        } else {
+            killer.streak++;
         }
-        return highestID;
-        //return scoreOrder [0];
+        broadcastText = UI.CreateText("Broadcast", "Player " + (killerID + 1) + " has slain Player " + (victimID + 1),
+            font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
+        Destroy(broadcastText, 5f);
     }
+
+    public static int CalculateWorth(Player p) {
+        return BASE_BOUNTY + GetShipValue(p) + CalculateStreakValue(p) + CalculateKDRValue(p);
+    }
+    static int GetShipValue(Player p) {
+        // for now, returns 1/10th of the player's gold investment into their ship
+        return p.lowUpgrades + p.midUpgrades * 5 + p.highUpgrades * 20;
+    }
+    static int CalculateKDRValue(Player p) {
+        if (p.deaths != 0) {
+            float kdr = p.kills / (float)p.deaths;
+            if (kdr < 1) {
+                return 0;
+            }
+            int value = (int)kdr * 10;
+            value = Mathf.Clamp(value, 0, 100);
+            return value;
+        } else {
+            int value = p.kills * 20;
+            value = Mathf.Clamp(value, 0, 100);
+            return value;
+        }
+    }
+    static int CalculateStreakValue(Player p) {
+        if (p.streak >= 5) {
+            return 100;
+        } else if (p.streak >= 3) {
+            return 50;
+        } else {
+            return 10 * p.streak;
+        }
+    }
+    public Player GetLeader() {
+        if (playerList.Length > 0) {
+            Player p = playerList[0];
+            int bounty = CalculateWorth(p);
+            for (int i = 1; i < playerList.Length; i++) {
+                int newWorth = CalculateWorth(playerList[i]);
+                if (CalculateWorth(playerList[i]) > bounty) {
+                    bounty = newWorth;
+                    p = playerList[i];
+                }
+            }
+            return p;
+        }
+        return null;
+    }
+
+
+	public void UpgradeMenuButton() {
+		upgradePanel.gameObject.SetActive(!upgradePanel.gameObject.activeSelf);
+	}
 
 
     private IEnumerator DeclareVictory(int playerID) {
-        // delcare the winning player to be the pirate king
+        // declare the winning player to be the pirate king
         //print("Victory has been declared!");
         GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID + 1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
@@ -282,5 +253,18 @@ public class BountyManager : NetworkBehaviour {
 
         yield return new WaitForSeconds(5.0f);
         Navigator.Instance.LoadLevel("Menu");
+    }
+
+    private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
+    {
+        if (currHill == null)
+        {
+            CmdSpawnHill();
+            yield return new WaitForSeconds(Random.Range(rangeBegin,rangeEnd));
+        }
+        CmdMoveHill();
+        yield return new WaitForSeconds(Random.Range(rangeBegin, rangeEnd));
+        StartCoroutine(MoveHill(rangeBegin, rangeEnd));
+
     }
 }
