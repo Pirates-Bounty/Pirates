@@ -272,8 +272,8 @@ public class Player : NetworkBehaviour {
             return;
         }
         if (BountyManager.Instance) {
-            Player leader = BountyManager.Instance.GetLeader();
-            if (leader == null || leader == this) {
+			GameObject leader = BountyManager.Instance.GetLeader();
+			if (leader == null || leader == gameObject) {
                 leaderArrow.SetActive(false);
                 return;
             }
@@ -555,7 +555,7 @@ public class Player : NetworkBehaviour {
         sprintCooldownImage.fillAmount = 1f - boostTimer / currBoostDelay;
         killsText.text = "" + kills;
         deathsText.text = "" + deaths;
-        bountyText.text = "" + BountyManager.CalculateWorth(this);
+		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
     void OnChangePlayer(float newHealth) {
         if (!isLocalPlayer) {
