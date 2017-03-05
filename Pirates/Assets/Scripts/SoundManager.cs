@@ -203,6 +203,23 @@ public class SoundManager : MonoBehaviour {
         Destroy(test, audio.length);
     }
 
+    public AudioSource PlaySFXBGM(AudioClip audio, float volume = 1.0f)
+    {
+        AudioSource test = GameObject.Find("SoundManager").AddComponent<AudioSource>();
+        test.clip = audio;
+        test.volume = volume * volumeSFX;
+        test.loop = true;
+        test.Play();
+        return test;
+        //Destroy(test, audio.length);
+    }
+
+    public void StopSFXBGM(AudioSource audio, float volume = 1.0f)
+    {
+        Destroy(audio);
+    }
+
+
     public void UpdateBGMVolume()
     {
         if (trackOnPlay >= 0)

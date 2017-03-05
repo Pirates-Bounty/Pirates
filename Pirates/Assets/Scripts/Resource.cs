@@ -11,10 +11,7 @@ public class Resource : NetworkBehaviour {
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.CompareTag("Player")) {
 			col.gameObject.SendMessage("AddGold", gold);
-			if (col.gameObject.GetComponent<Player> ().isLocalPlayer) {
-				SoundManager.Instance.PlaySFX(coinS, 1.0f);
-				//SoundManager.Instance.PlaySFXTransition (coinS, 1.0f);
-			}
+			
             GameObject.FindGameObjectWithTag("bountyManager").SendMessage("CmdSpawnResource");
 			Destroy(gameObject);
 		}

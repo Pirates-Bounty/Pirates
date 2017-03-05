@@ -788,6 +788,8 @@ MonoBehaviour:
   whooshS: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
   sfx_upgradeMenuOpen: {fileID: 0}
   sfx_upgradeMenuClose: {fileID: 0}
+  captureS: {fileID: 8300000, guid: ed8eb07218d707b4581f883e5f3054be, type: 3}
+  captureAS: {fileID: 0}
   dead: 0
   gofast: 0
   boost: 1.2

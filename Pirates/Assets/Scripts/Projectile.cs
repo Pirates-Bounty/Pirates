@@ -18,7 +18,8 @@ public class Projectile : NetworkBehaviour {
         lifetime -= Time.deltaTime;
         if (lifetime <= 0) {
             //AudioSource.PlayClipAtPoint(splash, transform.position, 100.0f);
-            SoundManager.Instance.PlaySFX(splash, 1.0f);
+            //SoundManager.Instance.PlaySFX(splash, 1.0f);
+            AudioSource.PlayClipAtPoint(splash, transform.position, SoundManager.Instance.volumeSFX);
             Destroy(gameObject);
         }
     }

@@ -133,9 +133,13 @@ public class Player : NetworkBehaviour {
     public AudioClip ramS;
     public AudioClip deathS;
     public AudioClip whooshS;
+    
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
     public AudioClip sfx_upgradeMenuClose;
+
+    public AudioClip captureS;
+    public AudioSource captureAS;
 
     [SyncVar]
     public bool dead;
@@ -763,5 +767,26 @@ public class Player : NetworkBehaviour {
             SoundManager.Instance.SwitchBGM((int)TrackID.BGM_BATTLE, 2.0f);
         if (detectionEscape <= 1)
             SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 2.0f);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isLocalPlayer && collision.CompareTag("Resource"))
+        {
+            SoundManager.Instance.PlaySFX(ramS, 1.0f);
+            //SoundManager.Instance.PlaySFXTransition (coinS, 1.0f);
+        }
+        if (isLocalPlayer && collision.CompareTag("Hill"))
+        {
+            captureAS = SoundManager.Instance.PlaySFXBGM(captureS);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (isLocalPlayer && collision.CompareTag("Hill"))
+        {
+            SoundManager.Instance.StopSFXBGM(captureAS);
+        }
     }
 }
