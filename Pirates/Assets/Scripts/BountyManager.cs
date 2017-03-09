@@ -35,8 +35,8 @@ public class BountyManager : NetworkBehaviour {
     public static BountyManager Instance;
 	public UpgradePanel upgradePanel;
     public GameObject Hill;
-    public int hillCheck;
-    public int hillSize;
+    //public int hillCheck;
+    //public int hillSize;
     public Vector2 moveHillRange;
     private GameObject currHill;
     private GameObject hillRep;
@@ -75,7 +75,9 @@ public class BountyManager : NetworkBehaviour {
 
 
         //StartCoroutine(MoveHill((int)moveHillRange.x,(int)moveHillRange.y));
-		CmdMoveHill();
+		if (isServer) {
+			CmdSpawnHill ();
+		}
         Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < maxResources; i++) {
             if (isServer) {
@@ -98,25 +100,17 @@ public class BountyManager : NetworkBehaviour {
     [Command]
     void CmdSpawnHill()
     {
-        if (!isServer)
-        {
-            return;
-        }
-        ClientScene.RegisterPrefab(Hill);
-        currHill = Instantiate(Hill, MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck), Quaternion.identity) as GameObject;
-        currHill.transform.localScale *= hillSize;
+       //ClientScene.RegisterPrefab(Hill);
+		currHill = Instantiate(Hill, transform.position, Quaternion.identity) as GameObject;
+        //currHill.transform.localScale *= hillSize;
         NetworkServer.Spawn(currHill);
-        UpdateMinimapHill();
+        //UpdateMinimapHill();
     }
 
-    [Command]
+    /*[Command]
     public void CmdMoveHill()
     {
-        if (!isServer)
-        {
-            return;
-        }
-		if (currHill == null)
+        if (currHill == null)
 		{
 			CmdSpawnHill();
 		}
@@ -128,15 +122,19 @@ public class BountyManager : NetworkBehaviour {
 	[ClientRpc]
 	void RpcHideHill()
 	{
-		StartCoroutine(HideHill(15));
+		if (currHill == null) {
+			currHill = GameObject.FindGameObjectWithTag ("Hill");
+		}
+		StartCoroutine (HideHill (25));
 	}
 
     void UpdateMinimapHill() {
 		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* currHill.transform.position.x, minimapRect.rect.height * currHill.transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
-    }
+    }*/
+	
     // Update is called once per frame
     void Update() {
-        if (Input.GetKey(KeyCode.Tab)) {
+		if (Input.GetKey(KeyCode.Tab)) {
             bountyBoard.SetActive(true);
         } else if (Input.GetKeyUp(KeyCode.Tab)) {
             bountyBoard.SetActive(false);
@@ -309,7 +307,7 @@ public class BountyManager : NetworkBehaviour {
 		Destroy (gameObject);
     }
 
-    private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
+    /*private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
     {
         if (currHill == null)
         {
@@ -334,5 +332,5 @@ public class BountyManager : NetworkBehaviour {
 		hillTimerText.SetActive (false);
 		currHill.SetActive (true);
 		hillRep.SetActive (true);
-	}
+	}*/
 }
