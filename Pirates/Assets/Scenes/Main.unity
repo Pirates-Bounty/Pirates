@@ -174,8 +174,6 @@ MonoBehaviour:
   victoryUndeclared: 0
   upgradePanel: {fileID: 175756438}
   Hill: {fileID: 1000010432489534, guid: aaeacb4c4d187a04dac564a554ee9fa9, type: 2}
-  hillCheck: 20
-  hillSize: 4
   moveHillRange: {x: 15, y: 30}
 --- !u!114 &800447155
 MonoBehaviour:
@@ -372,6 +370,36 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 800447154}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: -337.9416
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -116.936005
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: -690.9487
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010279937666, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: -386.70398
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 962aad46b4d389b4e9ab9e97ca10d20f, type: 2}
   m_IsPrefabParent: 0

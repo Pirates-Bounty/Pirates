@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 public class HillScript : NetworkBehaviour {
 
 	public const float SCORE_INCREMENT = 1.0f;
-	public const float TIME_BETWEEN_SPAWNS = 5f;
+	public const float TIME_BETWEEN_SPAWNS = 25f;
 	public int hillCheck = 20;
 	public int hillSize = 4;
 
@@ -80,13 +80,13 @@ public class HillScript : NetworkBehaviour {
 	}
 
 	void OnTriggerEnter2D (Collider2D col) {
-		if (col.gameObject.CompareTag ("Player") && isServer) {
-			targets.Add(col.gameObject.GetComponent<Player>());
+		if (col.gameObject.CompareTag ("Player")) {
+			targets.Add(col.gameObject.GetComponent<Player> ());
 		}
 	}
 
 	void OnTriggerExit2D (Collider2D col) {
-		if (col.gameObject.CompareTag ("Player") && isServer) {
+		if (col.gameObject.CompareTag ("Player")) {
 			targets.Remove(col.gameObject.GetComponent<Player>());
 		}
 	}
