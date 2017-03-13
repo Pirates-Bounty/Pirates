@@ -1257,6 +1257,31 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: captureS
+      value: 
+      objectReference: {fileID: 8300000, guid: ed8eb07218d707b4581f883e5f3054be, type: 3}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: victoryS
+      value: 
+      objectReference: {fileID: 8300000, guid: 19bf003036613c44a80d0bfea5b569f0, type: 3}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: respawnS
+      value: 
+      objectReference: {fileID: 8300000, guid: f5ce22d93992ef743b289412d76f2653, type: 3}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: hillSpawnS
+      value: 
+      objectReference: {fileID: 8300000, guid: 26ed2d7ed52dfcc40b1fe48983970302, type: 3}
+    - target: {fileID: 114000011444850496, guid: 0eb6815df8606524a8515b095d1b6d32,
+        type: 2}
+      propertyPath: hillWarningS
+      value: 
+      objectReference: {fileID: 8300000, guid: 238ec6176738c8745adc5d2fcf2a6c67, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0eb6815df8606524a8515b095d1b6d32, type: 2}
   m_IsPrefabParent: 0

@@ -29,7 +29,16 @@ public class SoundManager : MonoBehaviour {
     // private members
     private AudioSource[] bgm;
     private float[] vol; //volume multiplier of individual bgm;
-    
+
+    //public AudioClip captureS;
+    private AudioSource captureSFX;
+    public AudioClip captureS;
+    public AudioClip victoryS;
+    public AudioClip defeatS;
+    public AudioClip respawnS;
+    public AudioClip hillSpawnS;
+    public AudioClip hillWarningS;
+
     private int trackOnPlay;
     private int trackFadeIn;
     private int trackFadeOut;
@@ -105,6 +114,9 @@ public class SoundManager : MonoBehaviour {
             bgm[i].loop = true;
             bgm[i].clip = audio[i];
         }
+        captureSFX = GameObject.Find("SoundManager").AddComponent<AudioSource>();
+        captureSFX.loop = true;
+        captureSFX.clip = captureS;
     }
 
     private void VolInit()
@@ -194,6 +206,8 @@ public class SoundManager : MonoBehaviour {
         AudioSource.PlayClipAtPoint(audio, Camera.main.transform.position, volume);
     }
 
+    
+
     public void PlaySFXTransition(AudioClip audio, float volume = 1.0f)
     {
         AudioSource test = GameObject.Find("SoundManager").AddComponent<AudioSource>();
@@ -203,22 +217,32 @@ public class SoundManager : MonoBehaviour {
         Destroy(test, audio.length);
     }
 
-    public AudioSource PlaySFXBGM(AudioClip audio, float volume = 1.0f)
+    public void PlaySFX_Victory()
     {
-        AudioSource test = GameObject.Find("SoundManager").AddComponent<AudioSource>();
-        test.clip = audio;
-        test.volume = volume * volumeSFX;
-        test.loop = true;
-        test.Play();
-        return test;
-        //Destroy(test, audio.length);
+        PlaySFX(victoryS, 0.7f);
+    }
+    public void PlaySFX_Defeat()
+    {
+        PlaySFX(defeatS);
+    }
+    public void PlaySFX_Respawn()
+    {
+        PlaySFXTransition(respawnS);
+    }
+    public void PlaySFX_HillSpawn()
+    {
+        PlaySFXTransition(hillSpawnS, 0.6f);
     }
 
-    public void StopSFXBGM(AudioSource audio, float volume = 1.0f)
+    public void PlayCaptureSFX()
     {
-        Destroy(audio);
+        captureSFX.volume = volumeSFX;
+        captureSFX.Play();
     }
-
+    public void StopCaptureSFX()
+    {
+        captureSFX.Stop();
+    }
 
     public void UpdateBGMVolume()
     {
