@@ -1,0 +1,14 @@
+[Command]
+	The Command tag can be applied to functions, which must have names appended with Cmd, such as CmdKillMe().  No matter where a Command function is called from, the function call will be sent to the server and performed there.  ...Although, recent problems suggest that Command functions can only be called from the local player or the server, and cannot be called from non-local player objects on the client side.
+
+[ClientRpc]
+	The ClientRpc tag can be applied to functions, which must have names appended with Rpc, such as RpcOhGodWhy().  ClientRpc functions calls are sent to the clients, and performed there.
+
+isServer
+	This is a boolean variable that can be checked by the script.  It will be true if the script is being called by the server, and false otherwise.
+
+isLocalPlayer
+	This is a boolean variable that can be checked by the script.  It will be true if the script is called by the local player (regardless of whether this is the server player or a client player), and false otherwise.
+
+[SyncVar]
+	The SyncVar tag can be applied to member variables.  If a variable has this tag, then when it is changed on the server, this change will propagate to the clients.  (If you change this variable on the client side, it WILL NOT sync the change to the server!)
