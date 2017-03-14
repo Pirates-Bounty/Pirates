@@ -62,7 +62,7 @@ public class HillScript : NetworkBehaviour {
 				hillTimerText.text = "New Bounty Fountain spawns in " + Mathf.CeilToInt (hideTimer) + " seconds";
 			} else {
 				RevealHill ();
-			}
+            }
 		} else {
 			if (isServer) {
 				for (int i = 0; i < targets.Count; i++) {
@@ -70,18 +70,20 @@ public class HillScript : NetworkBehaviour {
 					scoreReserve -= SCORE_INCREMENT * Time.deltaTime / targets.Count;
 				}
 				if (scoreReserve <= 0f) {
-					scoreReserve = Random.Range (10f, 15f);
+                    RpcStopCaptureSFX();
+                    scoreReserve = Random.Range (10f, 15f);
 					targets.Clear ();
+                    
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
-				}
+                }
 			}
 		}
 	}
 
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.CompareTag ("Player")) {
-			targets.Add(col.gameObject.GetComponent<Player> ());
+			targets.Add(col.gameObject.GetComponent<Player>());
 		}
 	}
 
@@ -109,11 +111,18 @@ public class HillScript : NetworkBehaviour {
 		mySprite.enabled = true;
 		hillRep.SetActive (true);
 		hillTimerTextDisplay.SetActive (false);
-	}
+        SoundManager.Instance.PlaySFX_HillSpawn();
+    }
 
 	[ClientRpc]
 	void RpcMoveHill () {
 		hideTimer = TIME_BETWEEN_SPAWNS;
 		HideHill ();
 	}
+
+    [ClientRpc]
+    void RpcStopCaptureSFX()
+    {
+        SoundManager.Instance.StopCaptureSFX();
+    }
 }

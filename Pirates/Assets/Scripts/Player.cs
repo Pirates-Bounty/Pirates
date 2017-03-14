@@ -133,13 +133,13 @@ public class Player : NetworkBehaviour {
     public AudioClip ramS;
     public AudioClip deathS;
     public AudioClip whooshS;
-    
+    public AudioClip coinS;
+
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
     public AudioClip sfx_upgradeMenuClose;
 
-    public AudioClip captureS;
-    public AudioSource captureAS;
+    
 
     [SyncVar]
     public bool dead;
@@ -254,7 +254,7 @@ public class Player : NetworkBehaviour {
 
         DrawLineToLeader();
 
-        //SOUND - SoundManager reposition & BGMswitch debugger (space key)
+        //SOUND - SoundManager reposition
         if (GameObject.Find("SoundManager") != null) {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
@@ -489,6 +489,7 @@ public class Player : NetworkBehaviour {
         } else {
             GetComponent<Collider2D>().enabled = true;
             gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
+            SoundManager.Instance.PlaySFX_Respawn();
             RpcFinishRespawn();
         }
     }
@@ -773,20 +774,17 @@ public class Player : NetworkBehaviour {
     {
         if (isLocalPlayer && collision.CompareTag("Resource"))
         {
-            SoundManager.Instance.PlaySFX(ramS, 1.0f);
+            SoundManager.Instance.PlaySFX(coinS, 1.0f);
             //SoundManager.Instance.PlaySFXTransition (coinS, 1.0f);
         }
         if (isLocalPlayer && collision.CompareTag("Hill"))
         {
-            captureAS = SoundManager.Instance.PlaySFXBGM(captureS);
+            SoundManager.Instance.PlayCaptureSFX();
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (isLocalPlayer && collision.CompareTag("Hill"))
-        {
-            SoundManager.Instance.StopSFXBGM(captureAS);
-        }
+        SoundManager.Instance.StopCaptureSFX();
     }
 }
