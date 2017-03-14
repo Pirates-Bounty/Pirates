@@ -69,6 +69,7 @@ public class MapGenerator : NetworkBehaviour {
         bg = GetComponent<BoundaryGenerator>();
         Generate();
         //GenerateGameObjects();
+        
         int numPlayers = LobbyManager.numPlayers;
         maxResources = (.2f * 20000) / width ;
     }
