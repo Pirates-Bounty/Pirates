@@ -515,5 +515,5 @@ PlayerSettings:
   tvOS::VR::enabledDevices: []
   cloudProjectId: 39d27249-9acf-4597-b4ec-5bf5eccac032
   projectName: Pirates
-  organizationId: pirate-s-bounty
+  organizationId: pirates-bounty
   cloudEnabled: 0

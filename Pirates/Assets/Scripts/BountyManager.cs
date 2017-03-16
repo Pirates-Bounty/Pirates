@@ -310,6 +310,8 @@ public class BountyManager : NetworkBehaviour {
         }
 
         yield return new WaitForSeconds(5.0f);
+        Destroy(GameObject.Find("LobbyManager"));
+        Destroy(GameObject.Find("MapGen"));
         Navigator.Instance.LoadLevel("Menu");
         Destroy(gameObject);
     }
