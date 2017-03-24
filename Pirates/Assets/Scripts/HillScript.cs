@@ -50,6 +50,7 @@ public class HillScript : NetworkBehaviour {
 		if (isServer) {
 			RpcMoveHill ();
 		} else {
+			BountyManager.Instance.SetHill(gameObject);
 			HideHill ();
 		}
 	}
