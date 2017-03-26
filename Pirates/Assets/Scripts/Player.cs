@@ -139,6 +139,10 @@ public class Player : NetworkBehaviour {
     public AudioClip sfx_upgradeMenuOpen;
     public AudioClip sfx_upgradeMenuClose;
 
+	// PLAYER INFO //
+	public string playerName;
+	public Color playerColor;
+
     
 
     [SyncVar]
@@ -233,7 +237,7 @@ public class Player : NetworkBehaviour {
 		if (isServer && BountyManager.Instance && ID < 0) {
             ID = BountyManager.Instance.RegisterPlayer(this);
             //registered = true;
-        }
+		}
 
         UpdateSprites();
         // networking check
@@ -258,6 +262,7 @@ public class Player : NetworkBehaviour {
         if (GameObject.Find("SoundManager") != null) {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
+
     }
 
     void DrawLineToLeader() {
