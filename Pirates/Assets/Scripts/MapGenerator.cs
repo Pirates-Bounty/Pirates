@@ -372,7 +372,8 @@ public class MapGenerator : NetworkBehaviour {
         return tilePos;
     }
 
-    public Vector2 GetRandHillLocation(int size)
+
+    public Vector2 GetRandLocAwayFromLand(int size)
     {
         Vector2 returnLoc = Vector2.zero;
         bool end = false;
