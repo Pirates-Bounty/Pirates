@@ -246,7 +246,6 @@ public class Player : NetworkBehaviour {
         //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
         HandleBoost();
         // get player's movement
-        GetMovement();
         GetCannonFire();
         UpdateInterface();
         UpdateVariables();
@@ -366,6 +365,7 @@ public class Player : NetworkBehaviour {
 
     void FixedUpdate() {
         UpdateSeagulls();
+        GetMovement();
         creakTimer -= Time.deltaTime;
     }
 
@@ -580,8 +580,7 @@ public class Player : NetworkBehaviour {
                 creakTimer = 3.0f;
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
-            transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
+            rb.MoveRotation(rb.rotation + currRotationSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(right)) {
@@ -589,8 +588,7 @@ public class Player : NetworkBehaviour {
                 creakTimer = 3.0f;
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
-            transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
+            rb.MoveRotation(rb.rotation - currRotationSpeed * Time.deltaTime);
         }
         if (Input.GetKey(up)) {
             currVelocity = Mathf.Min(currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
@@ -603,7 +601,7 @@ public class Player : NetworkBehaviour {
                 currVelocity = Mathf.Min(0f, currVelocity + currMoveSpeed / 2f * Time.deltaTime);
             }
         }
-        transform.Translate(0.0f, currVelocity * Time.deltaTime, 0.0f);
+        rb.MovePosition(transform.position + transform.up * Time.deltaTime * currVelocity);
 
 		float ramDam = -1f;
 		for (int i = 0; i < SPEED_LEVELS.Length; i++) {
