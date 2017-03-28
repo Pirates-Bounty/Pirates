@@ -38,7 +38,7 @@ public class BountyManager : NetworkBehaviour {
     //public int hillCheck;
     //public int hillSize;
     public Vector2 moveHillRange;
-    private GameObject currHill;
+	private GameObject currHill;
     private GameObject hillRep;
     private RectTransform hillRepRect;
     private RectTransform minimapRect;
@@ -205,15 +205,33 @@ public class BountyManager : NetworkBehaviour {
     }
 
     public int RegisterPlayer(Player player) {
-        int prevIndex = currentIndex;
+        /*int prevIndex = currentIndex;
         playerList[currentIndex++] = player;
-        return prevIndex;
+        return prevIndex;*/
+		for (int i = 0; i < playerList.Length; i++) {
+			if (playerList [i] == player) {
+				return i;
+			}
+		}
+		return -1;
     }
 
     [Command]
     public void CmdReportKill(int victimID, int killerID) {
-        Player killer = playerList[killerID];
-        killer.AddGold((int)CalculateBounty(playerList[victimID]));
+		Player killer = null;
+		int victimLoc = -1;
+		for (int i = 0; i < playerList.Length; i++) {
+			if (playerList [i].ID == killerID) {
+				killer = playerList [i];
+			}
+			if (playerList [i].ID == victimID) {
+				victimLoc = i;
+			}
+		}
+		if (killer == null || victimLoc == -1) {
+			return;
+		}
+        killer.AddGold((int)CalculateBounty(playerList[victimLoc]));
         killer.kills++;
         if (killer.streak < 0) {
             killer.streak = 1;
@@ -283,6 +301,10 @@ public class BountyManager : NetworkBehaviour {
         }
         return null;
     }
+
+	public void SetHill (GameObject theHill) {
+		currHill = theHill;
+	}
 
 
     public void UpgradeMenuButton() {

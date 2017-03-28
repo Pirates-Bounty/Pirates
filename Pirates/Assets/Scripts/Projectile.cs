@@ -8,6 +8,7 @@ public class Projectile : NetworkBehaviour {
     public int assignedID = -1;
     public AudioClip hit;
     public AudioClip splash;
+	public Vector2 playerVel;
 
     // Use this for initialization
     void Start() {
@@ -22,6 +23,7 @@ public class Projectile : NetworkBehaviour {
             AudioSource.PlayClipAtPoint(splash, transform.position, SoundManager.Instance.volumeSFX);
             Destroy(gameObject);
         }
+		transform.Translate (Time.deltaTime * playerVel);
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
