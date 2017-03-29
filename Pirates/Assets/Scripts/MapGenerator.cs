@@ -274,7 +274,17 @@ public class MapGenerator : NetworkBehaviour {
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
         quad.transform.localScale = new Vector3(width*2f, width*2f, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
+        quad.gameObject.layer = 12;
+        MeshCollider mc = quad.GetComponent<MeshCollider>();
+        mc.convex = true;
         quad.transform.parent = transform;
+        Rigidbody rb = quad.AddComponent<Rigidbody>();
+        rb.useGravity = false;
+        quad.gameObject.isStatic = true;
+        rb.isKinematic = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        
+
 
         // minimap
         minimapTexture = GenerateTexture();
@@ -362,7 +372,8 @@ public class MapGenerator : NetworkBehaviour {
         return tilePos;
     }
 
-    public Vector2 GetRandHillLocation(int size)
+
+    public Vector2 GetRandLocAwayFromLand(int size)
     {
         Vector2 returnLoc = Vector2.zero;
         bool end = false;

@@ -93,7 +93,7 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
         ClientScene.RegisterPrefab(resourcePrefab);
-        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandWaterTile(), Quaternion.identity) as GameObject;
+        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(5), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
     }
 

@@ -101,7 +101,7 @@ public class HillScript : NetworkBehaviour {
 		hillRep.SetActive (false);
 		hillTimerTextDisplay.SetActive (true);
 		if (isServer) {
-			transform.position = MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck);
+			transform.position = MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(hillCheck);
 		}
 	}
 
