@@ -19,11 +19,13 @@ public class Menu : MonoBehaviour {
     private GameObject waves2;
     private GameObject waves3;
     private GameObject waves4;
+    
     private float maxRotation = 2f;
     private float currentRotation = 0.0f;
     private int fontSize = 20;
     private bool positive = true;
     private bool forward = true;
+    
 
 	private AudioClip menuM;
     private AudioClip highlightAudio;
