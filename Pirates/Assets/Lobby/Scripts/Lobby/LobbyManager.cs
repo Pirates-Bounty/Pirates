@@ -17,7 +17,6 @@ namespace Prototype.NetworkLobby
         static short MsgKicked = MsgType.Highest + 1;
 
         static public LobbyManager s_Singleton;
-        static public int numPlayers;
 
         public GameObject gameSetUp;
 
@@ -286,7 +285,6 @@ namespace Prototype.NetworkLobby
         public void OnPlayersNumberModified(int count)
         {
             _playerNumber += count;
-            numPlayers = _playerNumber;
 
             int localPlayerCount = 0;
             foreach (PlayerController p in ClientScene.localPlayers)
@@ -414,7 +412,6 @@ namespace Prototype.NetworkLobby
                     (lobbySlots[i] as LobbyPlayer).RpcUpdateCountdown(0);
                 }
             }
-            numPlayers = _playerNumber;
 
             mapGen.SetActive(true);
             ServerChangeScene(playScene);

@@ -4,8 +4,6 @@ using System.Collections;
 public class Menu : MonoBehaviour {
     private Transform canvas;
     private Font font;
-    private Sprite sprite;
-    private Sprite highlightedSprite;
     //private Sprite background;
     private Color color = Color.black;
 
@@ -42,13 +40,12 @@ public class Menu : MonoBehaviour {
         leftArm = GameObject.Find("leftarm");
         rightArm = GameObject.Find("rightarm");
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
-        sprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Unpushed");
-        highlightedSprite = Resources.Load<Sprite>("Art/Sprites/UPDATED 12-19-16/UI 11-19-16/Golden Button Pushed");
         //background = Resources.Load<Sprite>("Art/Backgrounds/Pirate's Bounty");
         //Background
         //backgroundPanel = UI.CreatePanel("Background", background, Color.white, canvas, Vector3.zero, Vector2.zero, Vector2.one);
         // Play Button
-        playButton = UI.CreateButton("Play", "Play", font, color, fontSize, canvas, sprite, highlightedSprite,
+        playButton = UI.CreateButton("Play", "", font, color, fontSize, canvas,
+            Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/PlayButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/PlayButtonClicked"),
             Vector3.zero, new Vector2(0.05f, 0.05f), new Vector2(0.325f, 0.2f),
             delegate {
                 Navigator.Instance.LoadLevel("Lobby");
@@ -57,11 +54,13 @@ public class Menu : MonoBehaviour {
             } );
 
         // Instructions Button
-        instructionsButton = UI.CreateButton("How To Play", "How To Play", font, color, fontSize, canvas, sprite, highlightedSprite,
+        instructionsButton = UI.CreateButton("How To Play", "", font, color, fontSize, canvas,
+            Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonClicked"),
             Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
 
         // Quit Button
-        quitButton = UI.CreateButton("Quit", "Quit", font, color, fontSize, canvas, sprite, highlightedSprite,
+        quitButton = UI.CreateButton("Quit", "", font, color, fontSize, canvas,
+            Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/QuitButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/QuitButtonClicked"),
             Vector3.zero, new Vector2(0.675f, 0.05f), new Vector2(0.95f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
 
         //=== SOUND SECTION - BEGIN ===

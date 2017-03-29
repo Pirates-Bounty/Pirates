@@ -122,7 +122,6 @@ public class Player : NetworkBehaviour {
     public float appliedRamDamage = 0.0f;
     // menu checks
     private bool inGameMenuActive = false;
-    private bool anchorDown = false;
     // ayy it's dem seagulls
     public AudioClip seagullS;
     private float seagullTimer = 10;

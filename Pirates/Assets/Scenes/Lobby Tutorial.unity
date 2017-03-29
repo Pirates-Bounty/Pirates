@@ -173,35 +173,9 @@ Prefab:
       propertyPath: gameSetUp
       value: 
       objectReference: {fileID: 1466607908}
-    - target: {fileID: 11465630, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: m_Text
-      value: 127.0.0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: m_MaxPlayersPerConnection
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: m_OfflineScene
-      value: Lobby Tutorial
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: m_LobbyScene
-      value: Lobby Tutorial
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: m_PlayScene
-      value: Tutorial
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &612959461 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114000012240236644, guid: c0978251ff7b10d4fb954a4b56acd9f0,
-    type: 2}
-  m_PrefabInternal: {fileID: 612959460}
-  m_Script: {fileID: 11500000, guid: da0df42657c9aa847a246f5815a62813, type: 3}
 --- !u!1001 &624321980
 Prefab:
   m_ObjectHideFlags: 0
@@ -556,7 +530,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 1000010141130924, guid: 4106d905dedfae047aa67ddaa0383d52, type: 2}
-  mapGen: {fileID: 612959461}
 --- !u!4 &1466607910
 Transform:
   m_ObjectHideFlags: 0

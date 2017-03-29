@@ -28,13 +28,13 @@ public class gameSetUpScript : MonoBehaviour {
         int rad = (mg.width / 2) - 20;
         float deg = 90;
         deg *= Mathf.Deg2Rad;
-        if (LobbyManager.numPlayers != 0) {
-            deg = 360 / LobbyManager.numPlayers;
+        if (LobbyManager.singleton.numPlayers != 0) {
+            deg = 360 / LobbyManager.singleton.numPlayers;
             deg *= Mathf.Deg2Rad;
         }
 
         //Loop through the players and spawn a spawn point for each player along the circle
-        for (int i = 0; i < LobbyManager.numPlayers; i++) {
+        for (int i = 0; i < LobbyManager.singleton.numPlayers; i++) {
             //bool spawnable = false;
             GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
             int x = (int)(rad * Mathf.Cos(deg * i));

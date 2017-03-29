@@ -18,7 +18,7 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
-    public Player[] playerList = new Player[LobbyManager.numPlayers];
+    public Player[] playerList = new Player[LobbyManager.singleton.numPlayers];
     private GameObject bountyBoard;
     private RectTransform bountyBoardRect;
     private GameObject scoreBar;
@@ -29,7 +29,7 @@ public class BountyManager : NetworkBehaviour {
     public bool victoryUndeclared;
     private bool createdPlayerIcons;
     private Sprite iconSprite;
-    private GameObject[] playerIconGOs = new GameObject[LobbyManager.numPlayers];
+    private GameObject[] playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
     private GameObject localPlayerIcon = null;
     private int currentIndex = 0;
     public static BountyManager Instance;
@@ -140,7 +140,7 @@ public class BountyManager : NetworkBehaviour {
             bountyBoard.SetActive(false);
         }
 
-        if (playerList.Length < LobbyManager.numPlayers) {
+        if (playerList.Length < LobbyManager.singleton.numPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
         for (int i = 0; i < playerList.Length; i++) {

@@ -6,18 +6,12 @@ using System.Collections.Generic;
 [RequireComponent(typeof(EdgeCollider2D))]
 [RequireComponent(typeof(MapGenerator))]
 public class BoundaryGenerator : MonoBehaviour {
-    private float padding = 0f;
     public int points = 30;
 
     public void Generate(float width) {
         EdgeCollider2D edge = gameObject.GetComponent<EdgeCollider2D>();
 
         List<Vector2> ps = new List<Vector2>();
-        ps.Add(new Vector2(-width - padding, width + padding));
-        ps.Add(new Vector2(-width - padding, width - padding));
-        ps.Add(new Vector2(width + padding, width - padding));
-        ps.Add(new Vector2(width + padding, width + padding));
-        ps.Add(new Vector2(width - padding, width + padding));
 
         for (int i = 0; i <= points; i++) {
             float angle = (float)i / points * Mathf.PI * 2f;
