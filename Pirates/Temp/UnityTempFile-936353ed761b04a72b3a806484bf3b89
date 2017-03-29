@@ -98,6 +98,7 @@
 'Assets/Lobby/Scripts/Lobby/LobbyServerEntry.cs'
 'Assets/Lobby/Scripts/Lobby/LobbyServerList.cs'
 'Assets/Lobby/Scripts/Lobby/LobbyTopPanel.cs'
+'Assets/Lobby/Scripts/Lobby/PirateHook.cs'
 'Assets/Scripts/BoundaryGenerator.cs'
 'Assets/Scripts/BountyManager.cs'
 'Assets/Scripts/FogOfWar.cs'
