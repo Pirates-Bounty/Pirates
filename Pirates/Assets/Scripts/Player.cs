@@ -225,7 +225,11 @@ public class Player : NetworkBehaviour {
         InvokeRepeating("EnemyDetection", 1f, 0.5f);
     }
     void UpdateMinimapPlayer() {
-        playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / mapGenerator.width;
+        if (playerRect)
+        {
+            playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / mapGenerator.width;
+        }
+        
 
     }
     void Update() {
