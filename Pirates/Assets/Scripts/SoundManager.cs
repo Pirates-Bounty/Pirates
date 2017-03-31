@@ -246,8 +246,7 @@ public class SoundManager : MonoBehaviour {
 
     public void UpdateBGMVolume()
     {
-        float volMultiplier = GameObject.Find("Slider").GetComponent<UnityEngine.UI.Slider>().value;
         if (trackOnPlay >= 0)
-            bgm[trackOnPlay].volume = vol[trackOnPlay] * volumeBGM * volMultiplier;
+            bgm[trackOnPlay].volume = vol[trackOnPlay] * volumeBGM;
     }
 }

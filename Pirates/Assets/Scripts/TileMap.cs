@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 
 
 public enum TileType
@@ -19,11 +20,13 @@ public class TileMap {
     private int width;
     private int height;
     public int[,] map;
-    public TileMap(int width, int height, float frequency)
+    public Tilemap tMap;
+    public TileMap(int width, int height, float frequency, Tilemap tMap)
     {
         this.width = width;
         this.height = height;
         map = new int[width, height];
+        this.tMap = tMap;
     }
 	
     public void Generate(float frequency)
@@ -58,9 +61,5 @@ public class TileMap {
             }
         }
     }
-
 	// Update is called once per frame
-	void Update () {
-	
-	}
 }

@@ -22,11 +22,11 @@ public class Player : NetworkBehaviour {
 
 	public static float[] SCALE_MAX_HEALTH = { 100f, 150f, 250f, 400f };
 	public static float[] SCALE_RAM_DAMAGE = { 15f, 20f, 30f, 50f };
-	public static float[] SCALE_MOVE_SPEED = { 10f, 15f, 20f, 25f };
+	public static float[] SCALE_MOVE_SPEED = { 25f, 15f, 20f, 25f };
 	public static float[] SCALE_ROTATION_SPEED = { 35f, 35f*4f/3f, 35f*5f/3f, 70f };
-	public static float[] SCALE_BOOST_LENGTH = { 1.0f, 1.25f, 1.5f, 1.75f };
+	public static float[] SCALE_BOOST_LENGTH = { 1.75f, 1.25f, 1.5f, 1.75f };
 	public static float[] SCALE_BOOST_DELAY = { 5.0f, 4.0f, 3.0f, 2.0f };
-	public static float[] SPEED_LEVELS = { 10f, 20f, 50f, 70f, 100f };
+	public static float[] SPEED_LEVELS = { 100f, 20f, 50f, 70f, 100f };
 	public static float[] SCALE_RAM_SPEED_MOD = { 0.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f };
 
 
@@ -134,14 +134,11 @@ public class Player : NetworkBehaviour {
     public AudioClip deathS;
     public AudioClip whooshS;
     public AudioClip coinS;
+    public LayerMask lm;
 
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
     public AudioClip sfx_upgradeMenuClose;
-
-	// PLAYER INFO //
-	public string playerName;
-	public Color playerColor;
 
     
 
@@ -158,9 +155,12 @@ public class Player : NetworkBehaviour {
     //ramming cooldown
     private IEnumerator coroutine;
     private bool invuln = false;
-    //private bool registered = false;
+    private bool registered = false;
     private RectTransform minimapRect;
     private RectTransform playerRect;
+
+
+    private Ray collisionCheck;
 
     // Use this for initialization
     void Start() {
@@ -216,9 +216,9 @@ public class Player : NetworkBehaviour {
         fogOfWar.transform.localScale = new Vector3(mapGenerator.width, mapGenerator.height, 1);*/
 
         lowUpgrades = 0; midUpgrades = 0; highUpgrades = 0;
-		if (isServer && BountyManager.Instance && ID < 0) {
+        if (BountyManager.Instance && !registered) {
             ID = BountyManager.Instance.RegisterPlayer(this);
-            //registered = true;
+            registered = true;
         }
 
         SoundManager.Instance.SwitchBGM((int)TrackID.BGM_FIELD, 1.0f);
@@ -234,10 +234,19 @@ public class Player : NetworkBehaviour {
         //{
         //    RpcRespawn();
         //}
-		if (isServer && BountyManager.Instance && ID < 0) {
+
+        Debug.DrawRay(transform.position, transform.up * 10, Color.red);
+        RaycastHit2D Hit = Physics2D.Raycast(transform.position, transform.up * 100, 100,12);
+        if (Hit)
+        {
+            GetComponent<Rigidbody>().velocity *= .5f;
+            Debug.Log("true");
+        }
+
+        if (BountyManager.Instance && !registered) {
             ID = BountyManager.Instance.RegisterPlayer(this);
-            //registered = true;
-		}
+            registered = true;
+        }
 
         UpdateSprites();
         // networking check
@@ -250,6 +259,7 @@ public class Player : NetworkBehaviour {
         //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
         HandleBoost();
         // get player's movement
+        GetMovement();
         GetCannonFire();
         UpdateInterface();
         UpdateVariables();
@@ -261,7 +271,6 @@ public class Player : NetworkBehaviour {
         if (GameObject.Find("SoundManager") != null) {
             GameObject.Find("SoundManager").transform.position = GameObject.Find("Camera").transform.position;
         }
-
     }
 
     void DrawLineToLeader() {
@@ -370,7 +379,6 @@ public class Player : NetworkBehaviour {
 
     void FixedUpdate() {
         UpdateSeagulls();
-        GetMovement();
         creakTimer -= Time.deltaTime;
     }
 
@@ -387,9 +395,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED;
-			Projectile newProjectile = instantiatedProjectile.GetComponent<Projectile> ();
-			newProjectile.assignedID = ID;
-			newProjectile.playerVel = transform.up * currVelocity;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -398,9 +404,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, rightSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = rightSpawners[i].up * BASE_PROJECTILE_SPEED;
-			Projectile newProjectile = instantiatedProjectile.GetComponent<Projectile> ();
-			newProjectile.assignedID = ID;
-			newProjectile.playerVel = transform.up * currVelocity;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -410,9 +414,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < 3; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, leftSpawners[i].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = leftSpawners[i].up * BASE_PROJECTILE_SPEED / 2;
-			Projectile newProjectile = instantiatedProjectile.GetComponent<Projectile> ();
-			newProjectile.assignedID = ID;
-			newProjectile.playerVel = transform.up * currVelocity;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -422,24 +424,18 @@ public class Player : NetworkBehaviour {
 
         GameObject instantiatedProjectile1 = (GameObject)Instantiate(projectile, leftSpawners[0].position, Quaternion.identity);
         instantiatedProjectile1.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, 45) * leftSpawners[0].up * BASE_PROJECTILE_SPEED;
-		Projectile newProjectile1 = instantiatedProjectile1.GetComponent<Projectile> ();
-		newProjectile1.assignedID = ID;
-		newProjectile1.playerVel = transform.up * currVelocity;
+        instantiatedProjectile1.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile1);
 
         //angled 45 degrees backward
         GameObject instantiatedProjectile2 = (GameObject)Instantiate(projectile, leftSpawners[1].position, Quaternion.identity);
         instantiatedProjectile2.GetComponent<Rigidbody2D>().velocity = leftSpawners[1].up * BASE_PROJECTILE_SPEED;
-		Projectile newProjectile2 = instantiatedProjectile2.GetComponent<Projectile> ();
-		newProjectile2.assignedID = ID;
-		newProjectile2.playerVel = transform.up * currVelocity;
+        instantiatedProjectile2.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile2);
 
         GameObject instantiatedProjectile3 = (GameObject)Instantiate(projectile, leftSpawners[2].position, Quaternion.identity);
         instantiatedProjectile3.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, -45) * leftSpawners[2].up * BASE_PROJECTILE_SPEED;
-		Projectile newProjectile3 = instantiatedProjectile3.GetComponent<Projectile> ();
-		newProjectile3.assignedID = ID;
-		newProjectile3.playerVel = transform.up * currVelocity;
+        instantiatedProjectile3.GetComponent<Projectile>().assignedID = ID;
         NetworkServer.Spawn(instantiatedProjectile3);
     }
     [Command]
@@ -448,9 +444,7 @@ public class Player : NetworkBehaviour {
         for (int i = 0; i < damageStrength / 10; i++) {
             GameObject instantiatedProjectile = (GameObject)Instantiate(projectile, frontSpawners[0].position, Quaternion.identity);
             instantiatedProjectile.GetComponent<Rigidbody2D>().velocity = frontSpawners[0].up * BASE_PROJECTILE_SPEED;
-			Projectile newProjectile = instantiatedProjectile.GetComponent<Projectile> ();
-			newProjectile.assignedID = ID;
-			newProjectile.playerVel = transform.up * currVelocity;
+            instantiatedProjectile.GetComponent<Projectile>().assignedID = ID;
             NetworkServer.Spawn(instantiatedProjectile);
         }
     }
@@ -599,7 +593,8 @@ public class Player : NetworkBehaviour {
                 creakTimer = 3.0f;
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-            rb.MoveRotation(rb.rotation + currRotationSpeed * Time.deltaTime);
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
+            transform.Rotate(new Vector3(0.0f, 0.0f, turnVelocity * Time.deltaTime));
         }
 
         if (Input.GetKey(right)) {
@@ -607,7 +602,8 @@ public class Player : NetworkBehaviour {
                 creakTimer = 3.0f;
                 SoundManager.Instance.PlaySFX(turnS, 0.7f);
             }
-            rb.MoveRotation(rb.rotation - currRotationSpeed * Time.deltaTime);
+            float turnVelocity = Mathf.Max(currRotationSpeed, currRotationSpeed * currVelocity * 0.1f);
+            transform.Rotate(new Vector3(0.0f, 0.0f, -turnVelocity * Time.deltaTime));
         }
         if (Input.GetKey(up)) {
             currVelocity = Mathf.Min(currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
@@ -620,7 +616,7 @@ public class Player : NetworkBehaviour {
                 currVelocity = Mathf.Min(0f, currVelocity + currMoveSpeed / 2f * Time.deltaTime);
             }
         }
-        rb.MovePosition(transform.position + transform.up * Time.deltaTime * currVelocity);
+        transform.Translate(0.0f, currVelocity * Time.deltaTime, 0.0f);
 
 		float ramDam = -1f;
 		for (int i = 0; i < SPEED_LEVELS.Length; i++) {

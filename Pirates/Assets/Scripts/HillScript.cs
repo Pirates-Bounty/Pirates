@@ -50,7 +50,6 @@ public class HillScript : NetworkBehaviour {
 		if (isServer) {
 			RpcMoveHill ();
 		} else {
-			BountyManager.Instance.SetHill(gameObject);
 			HideHill ();
 		}
 	}
@@ -101,7 +100,7 @@ public class HillScript : NetworkBehaviour {
 		hillRep.SetActive (false);
 		hillTimerTextDisplay.SetActive (true);
 		if (isServer) {
-			transform.position = MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(hillCheck);
+			transform.position = MapGen.GetComponent<MapGenerator>().GetRandHillLocation(hillCheck);
 		}
 	}
 

@@ -16,13 +16,13 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000010342813736}
-  - 114: {fileID: 114000010229539288}
-  - 114: {fileID: 114000011153274272}
-  - 114: {fileID: 114000013906915664}
-  - 68: {fileID: 68000013219574218}
+  - component: {fileID: 4000010342813736}
+  - component: {fileID: 114000010229539288}
+  - component: {fileID: 114000011153274272}
+  - component: {fileID: 114000013906915664}
+  - component: {fileID: 68000013219574218}
   m_Layer: 0
   m_Name: MapGen
   m_TagString: mapGen
@@ -39,10 +39,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!68 &68000013219574218
 EdgeCollider2D:
   m_ObjectHideFlags: 1
@@ -54,6 +54,7 @@ EdgeCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
+  m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_Points:
   - {x: -0.5, y: 0}

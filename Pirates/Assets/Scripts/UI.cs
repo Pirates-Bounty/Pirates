@@ -3,9 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 
 public static class UI {
-    public static GameObject CreateButton(string name, string text, Font font,
-    Color fontColor, int fontSize, Transform parent, Sprite sprite, Sprite highlightedSprite,
-    Vector3 position, Vector2 minAnchor, Vector2 maxAnchor, UnityEngine.Events.UnityAction method) {
+    public static GameObject CreateButton(string name, string text, Font font, Color fontColor, int fontSize, Transform parent, Sprite sprite, Sprite highlightedSprite, Vector3 position, Vector2 minAnchor, Vector2 maxAnchor, UnityEngine.Events.UnityAction method) {
         GameObject buttonGO = new GameObject(name);
         buttonGO.transform.parent = parent;
         buttonGO.AddComponent<RectTransform>();
@@ -181,46 +179,6 @@ public static class UI {
         CreateButton("Yes Button", "Yes", font, fontColor, fontSize, panelGO.transform, buttonSprite, highlightedButtonSprite, Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.4f, 0.4f), yesAction);
         CreateButton("No Button", "No", font, fontColor, fontSize, panelGO.transform, buttonSprite, highlightedButtonSprite, Vector3.zero, new Vector2(0.6f, 0.1f), new Vector2(0.9f, 0.4f), delegate { GameObject.Destroy(panelGO); });
         return panelGO;
-    }
-
-    //function not fully implemented, only the knob appears, the bar is still missing
-    public static GameObject CreateSlider(string name, Transform parent, Sprite sliderImage, Vector2 minAnchor, Vector2 maxAnchor, UnityEngine.Events.UnityAction<float> method)
-    {
-        Debug.LogWarning("CreateSlider function not fully implemented, only the knob appears, the bar is still missing");
-        GameObject sliderGO = new GameObject(name);
-        sliderGO.transform.parent = parent;
-
-        RectTransform rectTransform = sliderGO.AddComponent<RectTransform>();
-        rectTransform.anchorMin = minAnchor;
-        rectTransform.anchorMax = maxAnchor;
-        rectTransform.position = Vector3.zero;
-        rectTransform.offsetMin = Vector2.zero;
-        rectTransform.offsetMax = Vector2.zero;
-        rectTransform.localScale = Vector3.one;
-        rectTransform.localRotation = Quaternion.identity;
-
-
-        Slider sliderComp = sliderGO.AddComponent<Slider>();
-        sliderComp.value = 1;
-        sliderComp.onValueChanged.AddListener(method);
-        //sliderComp.targetGraphic = sliderImage;
-        GameObject handleGO = new GameObject();
-        handleGO.transform.parent = sliderGO.transform;
-
-        RectTransform tempRT1 = new RectTransform();
-        
-        //sliderComp.fillRect = tempRT1;
-        
-        Image tempImg = handleGO.AddComponent<Image>();
-        tempImg.sprite = sliderImage;
-        sliderComp.targetGraphic = tempImg;
-
-        if (!sliderImage)
-            Debug.Log("RAWR NOT FOUND");
-        else
-            Debug.Log("RAWR FOUND");
-
-        return sliderGO;
     }
 }
 
