@@ -380,8 +380,13 @@ public class Player : NetworkBehaviour {
 
     void FixedUpdate() {
         UpdateSeagulls();
-        GetMovement();
+
         creakTimer -= Time.deltaTime;
+        if (!isLocalPlayer || dead)
+        {
+            return;
+        }
+        GetMovement();
     }
 
     void SpeedBoost() {
