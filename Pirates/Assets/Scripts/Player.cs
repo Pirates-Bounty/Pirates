@@ -93,7 +93,9 @@ public class Player : NetworkBehaviour {
     //private FogOfWar fogOfWar;
     private MapGenerator mapGenerator;
     // GameObject references
-    //private GameObject inGameMenu;
+    private GameObject inGameUI;
+    private Quaternion uiQuat;
+    private RectTransform inGameHealthBar;
     private UpgradePanel upgradePanel;
     private GameObject respawnTimerText;
     private Image sprintCooldownImage;
@@ -175,7 +177,12 @@ public class Player : NetworkBehaviour {
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
-
+        inGameUI = transform.Find("Canvas").gameObject;
+        inGameHealthBar = inGameUI.transform.GetChild(0).GetComponent<RectTransform>();
+        Text t = inGameUI.transform.GetChild(2).GetComponent<Text>();
+        t.text = playerName;
+        t.color = playerColor;
+        uiQuat = inGameUI.transform.rotation;
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
 
@@ -373,8 +380,13 @@ public class Player : NetworkBehaviour {
 
     void FixedUpdate() {
         UpdateSeagulls();
-        GetMovement();
+
         creakTimer -= Time.deltaTime;
+        if (!isLocalPlayer || dead)
+        {
+            return;
+        }
+        GetMovement();
     }
 
     void SpeedBoost() {
@@ -558,6 +570,9 @@ public class Player : NetworkBehaviour {
         rudder.GetComponent<SpriteRenderer>().sprite = rudders[upgradeRanks[(int)Upgrade.AGILITY]];
         cannon.GetComponent<SpriteRenderer>().sprite = cannons[upgradeRanks[(int)Upgrade.CANNON]];
         ram.GetComponent<SpriteRenderer>().sprite = rams[upgradeRanks[(int)Upgrade.RAM]];
+        inGameUI.transform.position = new Vector3(transform.position.x, -10 + transform.position.y, transform.position.z);
+        inGameUI.transform.rotation = uiQuat;
+
     }
     private void UpdateInterface() {
         if (Input.GetKeyDown(menu)) {
@@ -586,6 +601,7 @@ public class Player : NetworkBehaviour {
         }
         currentHealth = newHealth;
         healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
+        inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
@@ -741,7 +757,7 @@ public class Player : NetworkBehaviour {
     }
 
     private void UpdateVariables() {
-        if (gofast == false) // only update movement speed if not in boost mode
+        if (!gofast) // only update movement speed if not in boost mode
         {
 			currMoveSpeed = SCALE_MOVE_SPEED [upgradeRanks[(int)Upgrade.SPEED]];
 			currRotationSpeed = SCALE_ROTATION_SPEED [upgradeRanks [(int)Upgrade.AGILITY]];
