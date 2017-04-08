@@ -159,6 +159,7 @@ public class Player : NetworkBehaviour {
     //ramming cooldown
     private IEnumerator coroutine;
     private bool invuln = false;
+    public bool inHill = false;
     //private bool registered = false;
     private RectTransform minimapRect;
     private RectTransform playerRect;

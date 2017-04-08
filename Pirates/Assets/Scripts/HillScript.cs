@@ -7,13 +7,17 @@ using UnityEngine.Networking;
 public class HillScript : NetworkBehaviour {
 
 	public const float SCORE_INCREMENT = 1.0f;
-	public const float TIME_BETWEEN_SPAWNS = 25f;
+	public const float TIME_BETWEEN_SPAWNS = 5f;
 	public int hillCheck = 20;
 	public int hillSize = 4;
+    public int timeToCapture = 3;
+    public Color nullColor = Color.grey;
+    private Player hillController = null;
 
 	public float scoreReserve;
-	public List<Player> targets;
-	public bool hiding;
+	public Dictionary<Player,float> targets;
+    private bool foundAllPlayers = false;
+	public bool hiding; 
 
 	private Collider2D myCollider;
 	private SpriteRenderer mySprite;
@@ -24,18 +28,25 @@ public class HillScript : NetworkBehaviour {
 	private RectTransform minimapRect;
 	private GameObject hillTimerTextDisplay;
 	private Text hillTimerText;
+    private int totalPlayersInHill = 0;
+
+    private List<Player> keys;
 
 	//private GameObject bountyManager;
 
 	[SyncVar]
 	public float hideTimer = 0f;
 
+
+
 	// Use this for initialization
 	void Start () {
+        GetComponent<SpriteRenderer>().color = nullColor;
+        keys = new List<Player>();
 		transform.localScale *= hillSize;
 		hiding = true;
 
-		targets = new List<Player>();
+		targets = new Dictionary<Player,float>();
 		scoreReserve = Random.Range (10f, 15f);
 		myCollider = GetComponent<Collider2D> ();
 		mySprite = GetComponent<SpriteRenderer> ();
@@ -57,6 +68,7 @@ public class HillScript : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
 		if (hiding) {
 			if (hideTimer > 0) {
 				hideTimer -= Time.deltaTime;
@@ -66,33 +78,101 @@ public class HillScript : NetworkBehaviour {
             }
 		} else {
 			if (isServer) {
-				for (int i = 0; i < targets.Count; i++) {
-					targets [i].score += SCORE_INCREMENT * Time.deltaTime / targets.Count;
-					scoreReserve -= SCORE_INCREMENT * Time.deltaTime / targets.Count;
-				}
+
+                if(hillController != null)
+                {
+                    hillController.score += SCORE_INCREMENT * Time.deltaTime / targets.Count;
+                    scoreReserve -= SCORE_INCREMENT * Time.deltaTime / targets.Count;
+
+                }
 				if (scoreReserve <= 0f) {
                     RpcStopCaptureSFX();
                     scoreReserve = Random.Range (10f, 15f);
-					targets.Clear ();
-                    
+
+                    ClearTargetsValues();
+                    GetComponent<SpriteRenderer>().color = nullColor;
+                    hillController = null;
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
                 }
-			}
+
+                
+                foreach (Player p in keys)
+                {
+                    if (p != hillController && targets[p] > 0 && !(p.inHill))
+                    {
+                        targets[p] = targets[p] -= Time.deltaTime;
+                    }
+                }
+            }
 		}
+
+
+
+
+
+        
 	}
 
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.CompareTag ("Player")) {
-			targets.Add(col.gameObject.GetComponent<Player>());
+            if (!foundAllPlayers)
+            {
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                if (targets.Count != players.Length)
+                {
+                    for (int i = 0; i < players.Length; i++)
+                    {
+                        Player p = players[i].GetComponent<Player>();
+                        targets[p] = 0;
+                    }
+                    List<Player> keys = new List<Player>(targets.Keys);
+                }
+                else
+                {
+                    foundAllPlayers = true;
+                }
+            }
+            totalPlayersInHill += 1;
 		}
 	}
 
-	void OnTriggerExit2D (Collider2D col) {
-		if (col.gameObject.CompareTag ("Player")) {
-			targets.Remove(col.gameObject.GetComponent<Player>());
-		}
-	}
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if(totalPlayersInHill < 2)
+            {
+                Player p = other.gameObject.GetComponent<Player>();
+                if (hillController != p)
+                {
+                    p.inHill = true;
+                    targets[p] = targets[p] + Time.deltaTime;
+                    if (targets[p] >= timeToCapture)
+                    {
+                        targets[p] = timeToCapture;
+                        hillController = p;
+                        GetComponent<SpriteRenderer>().color = p.playerColor;
+                        ClearTargetsValues();
+
+                    }
+                }
+            }
+
+
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            totalPlayersInHill -= 1;
+            Player p = other.gameObject.GetComponent<Player>();
+            p.inHill = false;
+        }
+    }
 
 	void HideHill () {
 		hiding = true;
@@ -105,6 +185,7 @@ public class HillScript : NetworkBehaviour {
 		}
 	}
 
+
 	void RevealHill () {
 		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
 		hiding = false;
@@ -113,6 +194,16 @@ public class HillScript : NetworkBehaviour {
 		hillRep.SetActive (true);
 		hillTimerTextDisplay.SetActive (false);
         SoundManager.Instance.PlaySFX_HillSpawn();
+    }
+
+
+    void ClearTargetsValues()
+    {
+        
+        foreach (Player p in keys)
+        {
+            targets[p] = 0;
+        }
     }
 
 	[ClientRpc]
