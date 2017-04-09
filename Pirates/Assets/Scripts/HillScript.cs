@@ -83,10 +83,17 @@ public class HillScript : NetworkBehaviour {
         totalPlayersInHill = 0;
         foreach(Player p in keys)
         {
+            if (hillController == p && p.dead)
+            {
+                totalPlayersInHill = 0;
+                ClearTargetsValues();
+                break;
+            }
             if (targets[p].capturing)
             {
                 totalPlayersInHill++;
             }
+
         }
 
 		if (hiding) {
