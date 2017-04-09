@@ -954,7 +954,9 @@ MonoBehaviour:
   numRedShots: 4
   appliedRamDamage: 0
   seagullS: {fileID: 8300000, guid: 09e636280fff23342a5f5e3305217153, type: 3}
-  shotS: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
+  shotS1: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
+  shotS2: {fileID: 8300000, guid: 1597aef4e8cc41a48ade24d1dbc6f60a, type: 3}
+  shotS3: {fileID: 8300000, guid: f2d7b8a978cb4be4d8b82396bb2d455e, type: 3}
   turnS: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
   ramS: {fileID: 8300000, guid: 812801548bde36048b6e157424c3ddf9, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
@@ -969,6 +971,7 @@ MonoBehaviour:
   boost: 1.2
   pSpawned: 0
   score: 0
+  inHill: 0
 --- !u!114 &114000013507435706
 MonoBehaviour:
   m_ObjectHideFlags: 1

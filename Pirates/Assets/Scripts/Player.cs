@@ -128,7 +128,10 @@ public class Player : NetworkBehaviour {
     public AudioClip seagullS;
     private float seagullTimer = 10;
     // other sounds
-    public AudioClip shotS;
+    public AudioClip shotS1;
+	public AudioClip shotS2;
+	public AudioClip shotS3;
+	private AudioClip currentShotS;
     public AudioClip turnS;
     private float creakTimer = 0;
     public AudioClip ramS;
@@ -324,14 +327,26 @@ public class Player : NetworkBehaviour {
 			boost = currBoostLength;
         }
     }
-    void GetCannonFire() {
+	void GetCannonFire() {
+		int shotNum = Random.Range (1, 4);
+		switch(shotNum) {
+		case 1:
+			currentShotS = shotS1;
+			break;
+		case 2:
+			currentShotS = shotS2;
+			break;
+		case 3:
+			currentShotS = shotS3;
+			break;
+		}
         if (firingTimerLeft > 0) {
             firingTimerLeft -= Time.deltaTime;
         } else {
             // fire cannons
 			if (((Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
 				// left cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+				SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay;
@@ -344,7 +359,7 @@ public class Player : NetworkBehaviour {
         } else {
 			if (((Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
                 // right cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimerRight = currFiringDelay;
@@ -354,7 +369,7 @@ public class Player : NetworkBehaviour {
         if (firingTimerLeft > 0 && firingTimerRight > 0) {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf) {
                 // triple volley - fire all at once
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
@@ -362,7 +377,7 @@ public class Player : NetworkBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf) {
                 // triple shotgun spray
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
@@ -370,7 +385,7 @@ public class Player : NetworkBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf) {
                 // front shot
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
