@@ -148,6 +148,7 @@ public class HillScript : NetworkBehaviour {
 						targets [p] = timeToCapture;
 						hillController = p;
 						GetComponent<SpriteRenderer> ().color = p.playerColor;
+						RpcColorChange (p.playerColor);
 						ClearTargetsValues ();
 					}
 				}
@@ -207,4 +208,10 @@ public class HillScript : NetworkBehaviour {
     {
         SoundManager.Instance.StopCaptureSFX();
     }
+
+	[ClientRpc]
+	void RpcColorChange(Color pColor)
+	{
+		GetComponent<SpriteRenderer> ().color = pColor;
+	}
 }
