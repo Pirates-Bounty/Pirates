@@ -661,7 +661,6 @@ public class Player : NetworkBehaviour {
         if (inHill)
         {
             inHill = false;
-            HillScript.totalPlayersInHill -= 1;
         }
         yield return new WaitForSeconds(2f);
 

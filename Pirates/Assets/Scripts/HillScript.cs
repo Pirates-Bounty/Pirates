@@ -8,7 +8,7 @@ public class HillScript : NetworkBehaviour {
 
 	public const float SCORE_INCREMENT = 1.0f;
 	public const float TIME_BETWEEN_SPAWNS = 5f;
-    public static int totalPlayersInHill = 0;
+    public int totalPlayersInHill = 0;
     public int hillCheck = 20;
 	public int hillSize = 4;
     public int timeToCapture = 3;
@@ -80,6 +80,15 @@ public class HillScript : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        totalPlayersInHill = 0;
+        foreach(Player p in keys)
+        {
+            if (targets[p].capturing)
+            {
+                totalPlayersInHill++;
+            }
+        }
+
 		if (hiding) {
 			if (hideTimer > 0) {
 				if (isServer) {
@@ -102,7 +111,7 @@ public class HillScript : NetworkBehaviour {
                     scoreReserve = Random.Range (10f, 15f);
 
                     ClearTargetsValues();
-                    GetComponent<SpriteRenderer>().color = nullColor;
+                    RpcColorChange(nullColor);
                     hillController = null;
 					totalPlayersInHill = 0;
 					//BountyManager.Instance.CmdMoveHill ();
@@ -141,7 +150,6 @@ public class HillScript : NetworkBehaviour {
                     foundAllPlayers = true;
                 }
             }
-            totalPlayersInHill += 1;
 		}
 	}
 
