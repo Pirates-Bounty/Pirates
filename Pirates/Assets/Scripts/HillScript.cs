@@ -118,7 +118,6 @@ public class HillScript : NetworkBehaviour {
                     scoreReserve = Random.Range (10f, 15f);
 
                     ClearTargetsValues();
-                    RpcColorChange(nullColor);
                     hillController = null;
 					totalPlayersInHill = 0;
 					//BountyManager.Instance.CmdMoveHill ();
@@ -228,6 +227,7 @@ public class HillScript : NetworkBehaviour {
         {
             targets[p] = new Capture(0, false);
         }
+        RpcColorChange(nullColor);
     }
 
     [ClientRpc]
