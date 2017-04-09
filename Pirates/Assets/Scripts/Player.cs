@@ -673,6 +673,11 @@ public class Player : NetworkBehaviour {
     }
 
     IEnumerator Death() {
+        if (inHill)
+        {
+            inHill = false;
+            HillScript.totalPlayersInHill -= 1;
+        }
         yield return new WaitForSeconds(2f);
 
         Text timerText = respawnTimerText.GetComponent<Text>();

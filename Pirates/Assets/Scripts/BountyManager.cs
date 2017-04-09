@@ -56,6 +56,7 @@ public class BountyManager : NetworkBehaviour {
             Destroy(gameObject);
         }
         playerList = FindObjectsOfType<Player>();
+		playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
@@ -143,6 +144,9 @@ public class BountyManager : NetworkBehaviour {
         if (playerList.Length < LobbyManager.singleton.numPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
+		if (playerIconGOs.Length < playerList.Length) {
+			playerIconGOs = new GameObject[playerList.Length];
+		}
         for (int i = 0; i < playerList.Length; i++) {
 
             if (!createdPlayerIcons) {
