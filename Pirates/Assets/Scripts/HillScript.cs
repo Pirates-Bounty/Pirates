@@ -166,7 +166,7 @@ public class HillScript : NetworkBehaviour {
         {
 			if (totalPlayersInHill < 2) {
 				Player p = other.gameObject.GetComponent<Player> ();
-				if (hillController != p) {
+				if (hillController != p && !p.dead) {
 					p.inHill = true;
 					targets[p] = new Capture(targets[p].time + Time.deltaTime,true);
 					if (targets[p].time >= timeToCapture) {
@@ -177,6 +177,10 @@ public class HillScript : NetworkBehaviour {
                         ClearTargetsValuesCapture();
 					}
 				}
+                else
+                {
+                    targets[p] = new Capture(0, false);
+                }
 			}
         }
     }
@@ -185,8 +189,8 @@ public class HillScript : NetworkBehaviour {
     {
 		if (isServer && other.gameObject.CompareTag("Player"))
         {
-            totalPlayersInHill -= 1;
             Player p = other.gameObject.GetComponent<Player>();
+            targets[p] = new Capture(targets[p].time, false);
             p.inHill = false;
         }
     }
