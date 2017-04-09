@@ -71,7 +71,9 @@ public class HillScript : NetworkBehaviour {
 
 		if (hiding) {
 			if (hideTimer > 0) {
-				hideTimer -= Time.deltaTime;
+				if (isServer) {
+					hideTimer -= Time.deltaTime;
+				}
 				hillTimerText.text = "New Bounty Fountain spawns in " + Mathf.CeilToInt (hideTimer) + " seconds";
 			} else {
 				RevealHill ();
@@ -83,7 +85,6 @@ public class HillScript : NetworkBehaviour {
                 {
                     hillController.score += SCORE_INCREMENT * Time.deltaTime / targets.Count;
                     scoreReserve -= SCORE_INCREMENT * Time.deltaTime / targets.Count;
-
                 }
 				if (scoreReserve <= 0f) {
                     RpcStopCaptureSFX();
@@ -92,8 +93,10 @@ public class HillScript : NetworkBehaviour {
                     ClearTargetsValues();
                     GetComponent<SpriteRenderer>().color = nullColor;
                     hillController = null;
+					totalPlayersInHill = 0;
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
+					hideTimer = TIME_BETWEEN_SPAWNS;
                 }
 
                 
@@ -106,16 +109,10 @@ public class HillScript : NetworkBehaviour {
                 }
             }
 		}
-
-
-
-
-
-        
 	}
 
 	void OnTriggerEnter2D (Collider2D col) {
-		if (col.gameObject.CompareTag ("Player")) {
+		if (isServer && col.gameObject.CompareTag ("Player")) {
             if (!foundAllPlayers)
             {
                 GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -126,7 +123,7 @@ public class HillScript : NetworkBehaviour {
                         Player p = players[i].GetComponent<Player>();
                         targets[p] = 0;
                     }
-                    List<Player> keys = new List<Player>(targets.Keys);
+                    keys = new List<Player>(targets.Keys);
                 }
                 else
                 {
@@ -140,33 +137,27 @@ public class HillScript : NetworkBehaviour {
 
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player"))
+		if (isServer && other.gameObject.CompareTag("Player"))
         {
-            if(totalPlayersInHill < 2)
-            {
-                Player p = other.gameObject.GetComponent<Player>();
-                if (hillController != p)
-                {
-                    p.inHill = true;
-                    targets[p] = targets[p] + Time.deltaTime;
-                    if (targets[p] >= timeToCapture)
-                    {
-                        targets[p] = timeToCapture;
-                        hillController = p;
-                        GetComponent<SpriteRenderer>().color = p.playerColor;
-                        ClearTargetsValues();
-
-                    }
-                }
-            }
-
-
+			if (totalPlayersInHill < 2) {
+				Player p = other.gameObject.GetComponent<Player> ();
+				if (hillController != p) {
+					p.inHill = true;
+					targets [p] = targets [p] + Time.deltaTime;
+					if (targets [p] >= timeToCapture) {
+						targets [p] = timeToCapture;
+						hillController = p;
+						GetComponent<SpriteRenderer> ().color = p.playerColor;
+						ClearTargetsValues ();
+					}
+				}
+			}
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player"))
+		if (isServer && other.gameObject.CompareTag("Player"))
         {
             totalPlayersInHill -= 1;
             Player p = other.gameObject.GetComponent<Player>();
@@ -199,7 +190,6 @@ public class HillScript : NetworkBehaviour {
 
     void ClearTargetsValues()
     {
-        
         foreach (Player p in keys)
         {
             targets[p] = 0;
@@ -208,7 +198,7 @@ public class HillScript : NetworkBehaviour {
 
 	[ClientRpc]
 	void RpcMoveHill () {
-		hideTimer = TIME_BETWEEN_SPAWNS;
+		//hideTimer = TIME_BETWEEN_SPAWNS;
 		HideHill ();
 	}
 
