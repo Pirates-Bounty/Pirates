@@ -231,18 +231,15 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
-        type: 2}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
+      propertyPath: mapGen
       value: 
-      objectReference: {fileID: 819246376}
-    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
-        type: 2}
+      objectReference: {fileID: 819246375}
+    - target: {fileID: 11491566, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 819246376}
-    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
-        type: 2}
+    - target: {fileID: 11491566, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 819246376}
@@ -251,18 +248,21 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 819246376}
-    - target: {fileID: 11491566, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
+    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 819246376}
+    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 819246376}
-    - target: {fileID: 11491566, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
+    - target: {fileID: 114000012742326100, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 819246376}
-    - target: {fileID: 11475086, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
-      propertyPath: mapGen
-      value: 
-      objectReference: {fileID: 819246375}
     - target: {fileID: 114000012797109786, guid: c0978251ff7b10d4fb954a4b56acd9f0,
         type: 2}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -313,6 +313,21 @@ Prefab:
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 819246376}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_MaxValue
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_Value
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_MinValue
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
   m_IsPrefabParent: 0
@@ -647,6 +662,21 @@ Prefab:
       propertyPath: mapPic
       value: 
       objectReference: {fileID: 1330757677}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: tileSize
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: width
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: height
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
   m_IsPrefabParent: 0
@@ -660,6 +690,7 @@ GameObject:
   - component: {fileID: 2056244201}
   - component: {fileID: 2056244203}
   - component: {fileID: 2056244202}
+  - component: {fileID: 2056244204}
   m_Layer: 0
   m_Name: Layer
   m_TagString: Untagged
@@ -756,3 +787,16 @@ Tilemap:
     e32: 0
     e33: 1
   m_TileRefreshArray: []
+--- !u!331 &2056244204
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2056244200}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}

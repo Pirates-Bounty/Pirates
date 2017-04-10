@@ -52,6 +52,7 @@ public class MapGenerator : NetworkBehaviour {
 
     private bool addResources = false;
     public MapGenerator Instance;
+    public int tileSize = 2;
     public Slider landSlider;
     public Slider widthSlider;
     public Slider resourceSlider;
@@ -73,6 +74,7 @@ public class MapGenerator : NetworkBehaviour {
         tMap = GameObject.Find("Tile Map").GetComponentInChildren<Tilemap>();
         bg = GetComponent<BoundaryGenerator>();
         Generate();
+
         //GenerateGameObjects();
         
         int numPlayers = LobbyManager.numPlayers;
@@ -266,18 +268,18 @@ public class MapGenerator : NetworkBehaviour {
 
     public void GenerateGameObjects() {
         // Background tiles and boundary
-        bg.Generate(width * borderRadius);
+        bg.Generate(width * borderRadius * tileSize);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
         plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 7.5f, height / 7.5f);
-        plane.transform.localScale = new Vector3(width / 5f, 1, height / 5f);
+        plane.transform.localScale = new Vector3(width * tileSize / 5f, 1, height * tileSize / 5f);
         plane.transform.parent = transform;
 
         // boundary mesh
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        quad.transform.localScale = new Vector3(width*2f, width*2f, 1);
+        quad.transform.localScale = new Vector3(width*2f * tileSize, width*2f * tileSize, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
         quad.gameObject.layer = 12;
         MeshCollider mc = quad.GetComponent<MeshCollider>();
@@ -295,7 +297,7 @@ public class MapGenerator : NetworkBehaviour {
         minimapTexture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
+                Vector2 tilePos = new Vector2((i * tileSize) - (width * tileSize) / 2, (j * tileSize) - (height * tileSize) / 2);
                 Sprite sp = null;
                 int id = map[i, j];
 
@@ -344,6 +346,7 @@ public class MapGenerator : NetworkBehaviour {
                             //Tile.AddComponent<BoxCollider2D>();
                             //GameObject plant = new GameObject();
                             //plant.transform.parent = Tile.transform;
+                            AddTileToMap(tilePos, sprites[1], null);
                             AddTileToMap(tilePos, plantSprites[Random.Range(0, plantSprites.Length)], null);
                             //plant.transform.localPosition = Vector3.zero;
                             //SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();

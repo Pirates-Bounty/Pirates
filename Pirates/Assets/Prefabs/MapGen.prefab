@@ -70,8 +70,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0df42657c9aa847a246f5815a62813, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 300
-  height: 300
+  width: 50
+  height: 50
   frequency: 15
   borderRadius: 0.5
   landFreq: 0.45
@@ -103,6 +103,7 @@ MonoBehaviour:
   quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
+  tileSize: 5
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
   resourceSlider: {fileID: 0}
