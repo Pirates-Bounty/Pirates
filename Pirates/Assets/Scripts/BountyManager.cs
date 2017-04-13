@@ -65,14 +65,14 @@ public class BountyManager : NetworkBehaviour {
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");
         iconSprite = Resources.Load<Sprite>("Art/Lobby/In Game UI/PlayerIndicator");
-        hillRep = GameObject.Find("Canvas/Minimap/Hill");
+        hillRep = GameObject.Find("MainCanvas/Minimap/Hill");
         hillRepRect = hillRep.GetComponent<RectTransform>();
-        minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
-        bountyBoard = GameObject.Find("Canvas/Bounty Board");
+        minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+        bountyBoard = GameObject.Find("MainCanvas/Bounty Board");
         bountyBoard.SetActive(false);
-        scoreBar = GameObject.Find("Canvas/UI/ScoreBar");
-        hillTimerText = GameObject.Find("Canvas/UI/HillTimerText");
-        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        scoreBar = GameObject.Find("MainCanvas/UI/ScoreBar");
+        hillTimerText = GameObject.Find("MainCanvas/UI/HillTimerText");
+        canvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
 
 
         //StartCoroutine(MoveHill((int)moveHillRange.x,(int)moveHillRange.y));

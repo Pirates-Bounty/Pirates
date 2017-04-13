@@ -62,10 +62,10 @@ public class HillScript : NetworkBehaviour {
 		myCollider = GetComponent<Collider2D> ();
 		mySprite = GetComponent<SpriteRenderer> ();
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
-		hillRep = GameObject.Find("Canvas/Minimap/Hill");
+		hillRep = GameObject.Find("MainCanvas/Minimap/Hill");
 		hillRepRect = hillRep.GetComponent<RectTransform>();
-		minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
-		hillTimerTextDisplay = GameObject.Find("Canvas/UI/HillTimerText");
+		minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+		hillTimerTextDisplay = GameObject.Find("MainCanvas/UI/HillTimerText");
 		hillTimerText = hillTimerTextDisplay.GetComponent<Text> ();
 		//bountyManager = GameObject.Find ("BountyManager");
 
@@ -208,7 +208,7 @@ public class HillScript : NetworkBehaviour {
 
 
 	void RevealHill () {
-		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
+		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (MapGen.GetComponent<MapGenerator>().width * MapGen.GetComponent<MapGenerator>().tileSize);
 		hiding = false;
 		myCollider.enabled = true;
 		mySprite.enabled = true;
