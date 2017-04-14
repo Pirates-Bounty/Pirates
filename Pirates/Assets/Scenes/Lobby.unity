@@ -252,6 +252,21 @@ Prefab:
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 819246376}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_MinValue
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_MaxValue
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012999366058, guid: c0978251ff7b10d4fb954a4b56acd9f0,
+        type: 2}
+      propertyPath: m_Value
+      value: 0.04
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c0978251ff7b10d4fb954a4b56acd9f0, type: 2}
   m_IsPrefabParent: 0
@@ -324,6 +339,21 @@ Prefab:
       propertyPath: mapPic
       value: 
       objectReference: {fileID: 1330757677}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: width
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: height
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: frequency
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
   m_IsPrefabParent: 0

@@ -375,6 +375,7 @@ public class MapGenerator : NetworkBehaviour {
 
     public Vector2 GetRandWaterTile() {
         int radius = width / 2 - 5;
+        Random.InitState(System.DateTime.Now.Millisecond);
         Vector2 inBounds = Random.insideUnitCircle * radius;
         int xRand = (int)inBounds.x;
         int yRand = (int)inBounds.y;
