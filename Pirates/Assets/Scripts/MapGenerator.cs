@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 
 public class MapGenerator : NetworkBehaviour {
@@ -46,8 +47,12 @@ public class MapGenerator : NetworkBehaviour {
     [SyncVar]
     public float maxResources;
 
+
+    private Tilemap tMap;
+
     private bool addResources = false;
     public MapGenerator Instance;
+    public int tileSize = 2;
     public Slider landSlider;
     public Slider widthSlider;
     public Slider resourceSlider;
@@ -66,8 +71,10 @@ public class MapGenerator : NetworkBehaviour {
         } else if (Instance != this) {
             Destroy(gameObject);
         }
+        tMap = GameObject.Find("Tile Map").GetComponentInChildren<Tilemap>();
         bg = GetComponent<BoundaryGenerator>();
         Generate();
+
         //GenerateGameObjects();
         
         int numPlayers = LobbyManager.singleton.numPlayers;
@@ -141,7 +148,7 @@ public class MapGenerator : NetworkBehaviour {
     // Update is called once per frame
     void Update() {
         if (!minimap) {
-            minimap = GameObject.Find("Canvas/Minimap");
+            minimap = GameObject.Find("MainCanvas/Minimap");
             return;
         }
         minimap.GetComponent<RawImage>().texture = minimapTexture;
@@ -261,18 +268,18 @@ public class MapGenerator : NetworkBehaviour {
 
     public void GenerateGameObjects() {
         // Background tiles and boundary
-        bg.Generate(width * borderRadius);
+        bg.Generate(width * borderRadius * tileSize);
         plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z + 5);
         plane.transform.Rotate(new Vector3(90, 0, 180));
         plane.GetComponent<MeshRenderer>().material = waterMat;
         plane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(width / 7.5f, height / 7.5f);
-        plane.transform.localScale = new Vector3(width / 5f, 1, height / 5f);
+        plane.transform.localScale = new Vector3(width * tileSize / 5f, 1, height * tileSize / 5f);
         plane.transform.parent = transform;
 
         // boundary mesh
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        quad.transform.localScale = new Vector3(width*2f, width*2f, 1);
+        quad.transform.localScale = new Vector3(width*2f * tileSize, width*2f * tileSize, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
         quad.gameObject.layer = 12;
         MeshCollider mc = quad.GetComponent<MeshCollider>();
@@ -290,25 +297,27 @@ public class MapGenerator : NetworkBehaviour {
         minimapTexture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                Vector2 tilePos = new Vector2(i - width / 2, j - height / 2);
-
+                Vector2 tilePos = new Vector2((i * tileSize) - (width * tileSize) / 2, (j * tileSize) - (height * tileSize) / 2);
+                Sprite sp = null;
                 int id = map[i, j];
 
                 //Don't want to spawn water tiles if we don't need to
                 //We already have seperate water tile background so only spawn water tiles that create
                 //boundary for the map
                 if (map[i, j] != (int)TileType.WATER) {
-                    GameObject Tile = new GameObject(tileNames[id]);
+                    //GameObject Tile = new GameObject(tileNames[id]);
 
                     //Don't add a sprite renderer to boundary water tiles
                     if (map[i, j] != (int)TileType.WATER) {
-                        SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
-                        sR.sprite = sprites[id];
-                        sR.sortingOrder = 0;
+                        //SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                        //sR.sprite = sprites[id];
+                        sp = sprites[id];
+                        //sR.sortingOrder = 0;
+
                     }
                     //sR.color = colors[id];
-                    Tile.transform.position = tilePos;
-                    Tile.transform.parent = transform;
+                    //Tile.transform.position = tilePos;
+                    //Tile.transform.parent = transform;
 
 
 
@@ -326,22 +335,32 @@ public class MapGenerator : NetworkBehaviour {
 
 
                         case (int)TileType.GRASS:
-                            Tile.AddComponent<BoxCollider2D>();
+                            //GameObject grass = new GameObject();
+                            //grass.name = "Grass";
+                            //grass.AddComponent<BoxCollider2D>();
+                            AddTileToMap(tilePos, sp, null);
+                            //Tile.AddComponent<BoxCollider2D>();
                             break;
 
                         case (int)TileType.TREE:
-                            Tile.AddComponent<BoxCollider2D>();
-                            GameObject plant = new GameObject();
-                            plant.transform.parent = Tile.transform;
-                            plant.transform.localPosition = Vector3.zero;
-                            SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();
-                            sP.sprite = plantSprites[Random.Range(0, plantSprites.Length)];
-                            sP.sortingOrder = 1;
+                            //Tile.AddComponent<BoxCollider2D>();
+                            //GameObject plant = new GameObject();
+                            //plant.transform.parent = Tile.transform;
+                            AddTileToMap(tilePos, sprites[1], null);
+                            AddTileToMap(tilePos, plantSprites[Random.Range(0, plantSprites.Length)], null);
+                            //plant.transform.localPosition = Vector3.zero;
+                            //SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();
+                            //sP.sprite = plantSprites[Random.Range(0, plantSprites.Length)];
+                            //sP.sortingOrder = 1;
                             break;
 
 
                         case (int)TileType.SAND:
-                            Tile.AddComponent<BoxCollider2D>();
+                            //GameObject sand = new GameObject();
+                            //sand.name = "Sand";
+                            //sand.AddComponent<BoxCollider2D>();
+                            AddTileToMap(tilePos, sp, null);
+                            //Tile.AddComponent<BoxCollider2D>();
                             break;
                         default:
 
@@ -356,22 +375,22 @@ public class MapGenerator : NetworkBehaviour {
 
     public Vector2 GetRandWaterTile() {
         int radius = width / 2 - 5;
+        Random.InitState(System.DateTime.Now.Millisecond);
         Vector2 inBounds = Random.insideUnitCircle * radius;
         int xRand = (int)inBounds.x;
         int yRand = (int)inBounds.y;
         int tile = map[xRand + radius, yRand + radius];
-        Vector2 tilePos = new Vector2(xRand, yRand);
+        Vector2 tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
         while ((TileType)tile != TileType.WATER) {
             inBounds = Random.insideUnitCircle * radius;
             xRand = (int)inBounds.x;
             yRand = (int)inBounds.y;
             tile = map[xRand + radius, yRand + radius];
-            tilePos = new Vector2(xRand, yRand);
+            tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
         }
 
         return tilePos;
     }
-
 
     public Vector2 GetRandLocAwayFromLand(int size)
     {
@@ -380,8 +399,8 @@ public class MapGenerator : NetworkBehaviour {
         while (!end)
         {
             returnLoc = GetRandWaterTile();
-            end = CheckNeighborsForWater(size,returnLoc);
-            
+            end = CheckNeighborsForWater(size, returnLoc);
+
         }
         return returnLoc;
     }
@@ -417,6 +436,19 @@ public class MapGenerator : NetworkBehaviour {
 
     public Vector2 LocToMap(Vector2 loc)
     {
-        return new Vector2(loc.x + width/2, loc.y + height/2);
+        return new Vector2((loc.x/tileSize) + width/2, (loc.y/tileSize) + height/2);
+    }
+
+
+    public void AddTileToMap(Vector3 pos, Sprite sp, GameObject g)
+    {
+        Tile tile = Tile.CreateInstance<Tile>();
+        tile.sprite = sp;
+        Vector3Int v3pos = new Vector3Int((int)pos.x, (int)pos.y, (int)pos.z);
+        if (g)
+        {
+            tile.gameObject = g;
+        }
+        tMap.SetTile(v3pos, tile);
     }
 }

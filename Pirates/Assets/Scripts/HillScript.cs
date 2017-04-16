@@ -8,17 +8,17 @@ public class HillScript : NetworkBehaviour {
 
 	public const float SCORE_INCREMENT = 1.0f;
 	public const float TIME_BETWEEN_SPAWNS = 5f;
-	public int hillCheck = 20;
+    public int totalPlayersInHill = 0;
+    public int hillCheck = 20;
 	public int hillSize = 4;
     public int timeToCapture = 3;
     public Color nullColor = Color.grey;
     private Player hillController = null;
 
 	public float scoreReserve;
-	public Dictionary<Player,float> targets;
+	public Dictionary<Player,Capture> targets;
     private bool foundAllPlayers = false;
-	public bool hiding;
-    private bool hillPrepareSFX = true;
+	public bool hiding; 
 
 	private Collider2D myCollider;
 	private SpriteRenderer mySprite;
@@ -29,7 +29,7 @@ public class HillScript : NetworkBehaviour {
 	private RectTransform minimapRect;
 	private GameObject hillTimerTextDisplay;
 	private Text hillTimerText;
-    private int totalPlayersInHill = 0;
+
 
     private List<Player> keys;
 
@@ -39,6 +39,16 @@ public class HillScript : NetworkBehaviour {
 	public float hideTimer = 0f;
 
 
+    public struct Capture
+    {
+        public float time;
+        public bool capturing;
+        public Capture(float t,bool cap)
+        {
+            time = t;
+            capturing = cap;
+        }
+    }
 
 	// Use this for initialization
 	void Start () {
@@ -47,15 +57,15 @@ public class HillScript : NetworkBehaviour {
 		transform.localScale *= hillSize;
 		hiding = true;
 
-		targets = new Dictionary<Player,float>();
+		targets = new Dictionary<Player,Capture>();
 		scoreReserve = Random.Range (10f, 15f);
 		myCollider = GetComponent<Collider2D> ();
 		mySprite = GetComponent<SpriteRenderer> ();
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
-		hillRep = GameObject.Find("Canvas/Minimap/Hill");
+		hillRep = GameObject.Find("MainCanvas/Minimap/Hill");
 		hillRepRect = hillRep.GetComponent<RectTransform>();
-		minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
-		hillTimerTextDisplay = GameObject.Find("Canvas/UI/HillTimerText");
+		minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+		hillTimerTextDisplay = GameObject.Find("MainCanvas/UI/HillTimerText");
 		hillTimerText = hillTimerTextDisplay.GetComponent<Text> ();
 		//bountyManager = GameObject.Find ("BountyManager");
 
@@ -69,12 +79,24 @@ public class HillScript : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (hiding) {
-            if (hideTimer < 5.0f && !hillPrepareSFX)
+
+        totalPlayersInHill = 0;
+        foreach(Player p in keys)
+        {
+            if (hillController == p && p.dead)
             {
-                SoundManager.Instance.PlaySFX_HillPrepare();
-                hillPrepareSFX = true;
+                totalPlayersInHill = 0;
+                ClearTargetsValues();
+                break;
             }
+            if (targets[p].capturing)
+            {
+                totalPlayersInHill++;
+            }
+
+        }
+
+		if (hiding) {
 			if (hideTimer > 0) {
 				if (isServer) {
 					hideTimer -= Time.deltaTime;
@@ -96,21 +118,19 @@ public class HillScript : NetworkBehaviour {
                     scoreReserve = Random.Range (10f, 15f);
 
                     ClearTargetsValues();
-                    GetComponent<SpriteRenderer>().color = nullColor;
                     hillController = null;
 					totalPlayersInHill = 0;
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
 					hideTimer = TIME_BETWEEN_SPAWNS;
-                    hillPrepareSFX = false;
                 }
 
                 
                 foreach (Player p in keys)
                 {
-                    if (p != hillController && targets[p] > 0 && !(p.inHill))
+                    if (p != hillController && targets[p].time > 0 && !(p.inHill))
                     {
-                        targets[p] = targets[p] -= Time.deltaTime;
+                        targets[p] = new Capture(targets[p].time - Time.deltaTime,false);
                     }
                 }
             }
@@ -127,7 +147,7 @@ public class HillScript : NetworkBehaviour {
                     for (int i = 0; i < players.Length; i++)
                     {
                         Player p = players[i].GetComponent<Player>();
-                        targets[p] = 0;
+                        targets[p] = new Capture(0,false);
                     }
                     keys = new List<Player>(targets.Keys);
                 }
@@ -136,7 +156,6 @@ public class HillScript : NetworkBehaviour {
                     foundAllPlayers = true;
                 }
             }
-            totalPlayersInHill += 1;
 		}
 	}
 
@@ -147,16 +166,21 @@ public class HillScript : NetworkBehaviour {
         {
 			if (totalPlayersInHill < 2) {
 				Player p = other.gameObject.GetComponent<Player> ();
-				if (hillController != p) {
+				if (hillController != p && !p.dead) {
 					p.inHill = true;
-					targets [p] = targets [p] + Time.deltaTime;
-					if (targets [p] >= timeToCapture) {
-						targets [p] = timeToCapture;
+					targets[p] = new Capture(targets[p].time + Time.deltaTime,true);
+					if (targets[p].time >= timeToCapture) {
+						targets[p] = new Capture(timeToCapture,true);
 						hillController = p;
-						GetComponent<SpriteRenderer> ().color = p.playerColor;
-						ClearTargetsValues ();
+						//GetComponent<SpriteRenderer> ().color = p.playerColor;
+                        RpcColorChange(p.playerColor);
+                        ClearTargetsValuesCapture();
 					}
 				}
+                else
+                {
+                    targets[p] = new Capture(0, false);
+                }
 			}
         }
     }
@@ -165,8 +189,8 @@ public class HillScript : NetworkBehaviour {
     {
 		if (isServer && other.gameObject.CompareTag("Player"))
         {
-            totalPlayersInHill -= 1;
             Player p = other.gameObject.GetComponent<Player>();
+            targets[p] = new Capture(targets[p].time, false);
             p.inHill = false;
         }
     }
@@ -184,7 +208,7 @@ public class HillScript : NetworkBehaviour {
 
 
 	void RevealHill () {
-		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / MapGen.GetComponent<MapGenerator>().width;
+		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (MapGen.GetComponent<MapGenerator>().width * MapGen.GetComponent<MapGenerator>().tileSize);
 		hiding = false;
 		myCollider.enabled = true;
 		mySprite.enabled = true;
@@ -194,15 +218,23 @@ public class HillScript : NetworkBehaviour {
     }
 
 
+    void ClearTargetsValuesCapture()
+    {
+        foreach (Player p in keys)
+        {
+            targets[p] = new Capture(0,targets[p].capturing);
+        }
+    }
     void ClearTargetsValues()
     {
         foreach (Player p in keys)
         {
-            targets[p] = 0;
+            targets[p] = new Capture(0, false);
         }
+        RpcColorChange(nullColor);
     }
 
-	[ClientRpc]
+    [ClientRpc]
 	void RpcMoveHill () {
 		//hideTimer = TIME_BETWEEN_SPAWNS;
 		HideHill ();
@@ -212,5 +244,11 @@ public class HillScript : NetworkBehaviour {
     void RpcStopCaptureSFX()
     {
         SoundManager.Instance.StopCaptureSFX();
+    }
+
+    [ClientRpc]
+    void RpcColorChange(Color pColor)
+    {
+        GetComponent<SpriteRenderer>().color = pColor;
     }
 }

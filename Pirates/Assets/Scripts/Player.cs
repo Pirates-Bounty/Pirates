@@ -22,11 +22,11 @@ public class Player : NetworkBehaviour {
 
 	public static float[] SCALE_MAX_HEALTH = { 100f, 150f, 250f, 400f };
 	public static float[] SCALE_RAM_DAMAGE = { 15f, 20f, 30f, 50f };
-	public static float[] SCALE_MOVE_SPEED = { 10f, 15f, 20f, 25f };
-	public static float[] SCALE_ROTATION_SPEED = { 35f, 35f*4f/3f, 35f*5f/3f, 70f };
+	public static float[] SCALE_MOVE_SPEED = { 20f, 30f, 40f, 50f };
+	public static float[] SCALE_ROTATION_SPEED = { 50f, 50f*4f/3f, 50f*5f/3f, 70f };
 	public static float[] SCALE_BOOST_LENGTH = { 1.0f, 1.25f, 1.5f, 1.75f };
 	public static float[] SCALE_BOOST_DELAY = { 5.0f, 4.0f, 3.0f, 2.0f };
-	public static float[] SPEED_LEVELS = { 10f, 20f, 50f, 70f, 100f };
+	public static float[] SPEED_LEVELS = { 20f, 40f, 100f, 140f, 200f };
 	public static float[] SCALE_RAM_SPEED_MOD = { 0.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f };
 
 
@@ -128,7 +128,10 @@ public class Player : NetworkBehaviour {
     public AudioClip seagullS;
     private float seagullTimer = 10;
     // other sounds
-    public AudioClip shotS;
+    public AudioClip shotS1;
+	public AudioClip shotS2;
+	public AudioClip shotS3;
+	private AudioClip currentShotS;
     public AudioClip turnS;
     private float creakTimer = 0;
     public AudioClip ramS;
@@ -175,7 +178,7 @@ public class Player : NetworkBehaviour {
 		score = 0f;
 
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
-        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        canvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
         inGameUI = transform.Find("Canvas").gameObject;
@@ -191,25 +194,25 @@ public class Player : NetworkBehaviour {
             return;
         }
 
-        leaderArrow = GameObject.Find("Canvas/UI/Compass");
+        leaderArrow = GameObject.Find("MainCanvas/UI/Compass");
 
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
-        healthBar = GameObject.Find("Canvas/UI/Health Bar");
+        healthBar = GameObject.Find("MainCanvas/UI/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
-        purpleCannon = GameObject.Find("Canvas/UI/Purple Cannon");
+        purpleCannon = GameObject.Find("MainCanvas/UI/Purple Cannon");
         purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
-        redCannon = GameObject.Find("Canvas/UI/Red Cannon");
+        redCannon = GameObject.Find("MainCanvas/UI/Red Cannon");
         redCannonRect = redCannon.GetComponent<RectTransform>();
-        sprintCooldownImage = GameObject.Find("Canvas/UI/Sprint Cooldown").GetComponent<Image>();
-        resourcesText = GameObject.Find("Canvas/UI/Bounty Display Text").GetComponent<Text>();
-        killsText = GameObject.Find("Canvas/UI/KDR/Kills Text").GetComponent<Text>();
-        deathsText = GameObject.Find("Canvas/UI/KDR/Deaths Text").GetComponent<Text>();
-        bountyText = GameObject.Find("Canvas/UI/KDR/Bounty Text").GetComponent<Text>();
-        minimapRect = GameObject.Find("Canvas/Minimap").GetComponent<RectTransform>();
-        playerRect = GameObject.Find("Canvas/Minimap/Player").GetComponent<RectTransform>();
+        sprintCooldownImage = GameObject.Find("MainCanvas/UI/Sprint Cooldown").GetComponent<Image>();
+        resourcesText = GameObject.Find("MainCanvas/UI/Bounty Display Text").GetComponent<Text>();
+        killsText = GameObject.Find("MainCanvas/UI/KDR/Kills Text").GetComponent<Text>();
+        deathsText = GameObject.Find("MainCanvas/UI/KDR/Deaths Text").GetComponent<Text>();
+        bountyText = GameObject.Find("MainCanvas/UI/KDR/Bounty Text").GetComponent<Text>();
+        minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+        playerRect = GameObject.Find("MainCanvas/Minimap/Player").GetComponent<RectTransform>();
 
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);
@@ -234,7 +237,7 @@ public class Player : NetworkBehaviour {
     void UpdateMinimapPlayer() {
         if (playerRect)
         {
-            playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / mapGenerator.width;
+            playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (mapGenerator.width * mapGenerator.tileSize);
         }
         
 
@@ -324,14 +327,26 @@ public class Player : NetworkBehaviour {
 			boost = currBoostLength;
         }
     }
-    void GetCannonFire() {
+	void GetCannonFire() {
+		int shotNum = Random.Range (1, 4);
+		switch(shotNum) {
+		case 1:
+			currentShotS = shotS1;
+			break;
+		case 2:
+			currentShotS = shotS2;
+			break;
+		case 3:
+			currentShotS = shotS3;
+			break;
+		}
         if (firingTimerLeft > 0) {
             firingTimerLeft -= Time.deltaTime;
         } else {
             // fire cannons
 			if (((Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.LeftArrow)) && !upgradePanel.gameObject.activeSelf && numPurpleShots >= 1) {
 				// left cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+				SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay;
@@ -344,7 +359,7 @@ public class Player : NetworkBehaviour {
         } else {
 			if (((Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject ()) || Input.GetKeyDown(KeyCode.RightArrow)) && !upgradePanel.gameObject.activeSelf && numRedShots >= 1) {
                 // right cannon
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
                 // reset timer
                 firingTimerRight = currFiringDelay;
@@ -354,7 +369,7 @@ public class Player : NetworkBehaviour {
         if (firingTimerLeft > 0 && firingTimerRight > 0) {
             if (Input.GetKeyDown(KeyCode.Alpha1) && !upgradePanel.gameObject.activeSelf) {
                 // triple volley - fire all at once
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeftVolley((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
@@ -362,7 +377,7 @@ public class Player : NetworkBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Alpha2) && !upgradePanel.gameObject.activeSelf) {
                 // triple shotgun spray
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeftTriple((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
@@ -370,7 +385,7 @@ public class Player : NetworkBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.Alpha3) && !upgradePanel.gameObject.activeSelf) {
                 // front shot
-                SoundManager.Instance.PlaySFX(shotS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireBowChaser((int)currProjectileStrength);
                 // reset timer
                 firingTimerLeft = currFiringDelay; //+2.0f;
@@ -658,6 +673,10 @@ public class Player : NetworkBehaviour {
     }
 
     IEnumerator Death() {
+        if (inHill)
+        {
+            inHill = false;
+        }
         yield return new WaitForSeconds(2f);
 
         Text timerText = respawnTimerText.GetComponent<Text>();
