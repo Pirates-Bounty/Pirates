@@ -17,7 +17,8 @@ public class HillScript : NetworkBehaviour {
 	public float scoreReserve;
 	public Dictionary<Player,float> targets;
     private bool foundAllPlayers = false;
-	public bool hiding; 
+	public bool hiding;
+    private bool hillPrepareSFX = true;
 
 	private Collider2D myCollider;
 	private SpriteRenderer mySprite;
@@ -68,8 +69,12 @@ public class HillScript : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
 		if (hiding) {
+            if (hideTimer < 5.0f && !hillPrepareSFX)
+            {
+                SoundManager.Instance.PlaySFX_HillPrepare();
+                hillPrepareSFX = true;
+            }
 			if (hideTimer > 0) {
 				if (isServer) {
 					hideTimer -= Time.deltaTime;
@@ -97,6 +102,7 @@ public class HillScript : NetworkBehaviour {
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
 					hideTimer = TIME_BETWEEN_SPAWNS;
+                    hillPrepareSFX = false;
                 }
 
                 

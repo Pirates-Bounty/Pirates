@@ -38,6 +38,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClip respawnS;
     public AudioClip hillSpawnS;
     public AudioClip hillWarningS;
+    public AudioClip prepareS;
 
     private int trackOnPlay;
     private int trackFadeIn;
@@ -232,6 +233,10 @@ public class SoundManager : MonoBehaviour {
     public void PlaySFX_HillSpawn()
     {
         PlaySFXTransition(hillSpawnS, 0.6f);
+    }
+    public void PlaySFX_HillPrepare()
+    {
+        PlaySFXTransition(prepareS);
     }
 
     public void PlayCaptureSFX()
