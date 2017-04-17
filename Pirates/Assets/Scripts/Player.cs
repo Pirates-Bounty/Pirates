@@ -11,6 +11,9 @@ public enum DamageType {
     RAM
 }
 public class Player : NetworkBehaviour {
+
+    private ParticleSystem explosion;
+
     // const vars
     public const float BASE_PROJECTILE_SPEED = 70.0f;
     public const float BASE_PROJECTILE_STRENGTH = 10.0f;
@@ -177,6 +180,7 @@ public class Player : NetworkBehaviour {
         dead = false;
 		score = 0f;
 
+        explosion = GetComponent<ParticleSystem>();
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
@@ -733,9 +737,14 @@ public class Player : NetworkBehaviour {
 
 
     public void OnCollisionEnter2D(Collision2D collision) {
+
         if (!isLocalPlayer) {
             return;
         }
+
+
+        var emitParams = new ParticleSystem.EmitParams();
+        explosion.Emit(emitParams, 90);
 
         //if rammed
         Player otherPlayer = collision.collider.gameObject.GetComponent<Player>();
