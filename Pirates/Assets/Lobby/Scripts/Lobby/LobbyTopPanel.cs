@@ -19,18 +19,40 @@ namespace Prototype.NetworkLobby
 
         void Update()
         {
-            if (!isInGame)
+            if (!isInGame) { 
+                ToggleInGameVisibility(false);
                 return;
+            }
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                ToggleVisibility(!isDisplayed);
+                ToggleInGameVisibility(!isDisplayed);
+
             }
 
         }
 
         public void ToggleVisibility(bool visible)
         {
+            isDisplayed = visible;
+            foreach (Transform t in transform)
+            {
+                t.gameObject.SetActive(isDisplayed);
+            }
+
+            if (panelImage != null)
+            {
+                panelImage.enabled = isDisplayed;
+            }
+        }
+
+
+        public void ToggleInGameVisibility(bool visible)
+        {
+            if(gameObject.name != "InGameMenu" || GameObject.FindGameObjectWithTag("UpgradePanel") != null)
+            {
+                return;
+            }
             isDisplayed = visible;
             foreach (Transform t in transform)
             {
