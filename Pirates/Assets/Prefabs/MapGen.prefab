@@ -98,12 +98,13 @@ MonoBehaviour:
   - grass
   - sand
   - tree
+  grassTile: {fileID: 21300000, guid: d49697504fbdc40368ed3c1036bc9104, type: 3}
   octaves: 4
   quadWidth: 6
   quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
-  tileSize: 7
+  tileSize: 5
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
   resourceSlider: {fileID: 0}
