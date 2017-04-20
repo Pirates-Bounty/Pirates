@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/Boundary" {
+﻿Shader "Custom/Boundary" {
     SubShader {
 		Tags { "Queue"="Overlay" "RenderType"="Transparent" }
 		ZWrite Off
@@ -24,7 +22,7 @@ Shader "Custom/Boundary" {
 
             fragmentInput vert(vertexInput i){
                 fragmentInput o;
-                o.position = UnityObjectToClipPos (i.vertex);
+                o.position = mul (UNITY_MATRIX_MVP, i.vertex);
                 o.texcoord0 = i.texcoord0;
                 return o;
             }

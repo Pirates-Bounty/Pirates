@@ -34,14 +34,12 @@ public class MapGenerator : NetworkBehaviour {
     private GameObject plane;
     private GameObject quad;
     public string[] tileNames;
-    public Sprite grassTile;
 
     [HideInInspector]
     public int octaves = 3;
 
     [HideInInspector]
     public int[,] map;
-    public int[,] bitmaskedMap;
 
     public int quadWidth;
     public int quadHeight;
@@ -54,7 +52,7 @@ public class MapGenerator : NetworkBehaviour {
 
     private bool addResources = false;
     public MapGenerator Instance;
-    public float tileSize;
+    public int tileSize = 2;
     public Slider landSlider;
     public Slider widthSlider;
     public Slider resourceSlider;
@@ -78,9 +76,9 @@ public class MapGenerator : NetworkBehaviour {
         Generate();
 
         //GenerateGameObjects();
-
+        
         int numPlayers = LobbyManager.singleton.numPlayers;
-        maxResources = (.2f * 20000) / width;
+        maxResources = (.2f * 20000) / width ;
     }
 
     [Command]
@@ -182,7 +180,7 @@ public class MapGenerator : NetworkBehaviour {
                     } else if (map[x, y] == (int)TileType.SAND) {
                         tex.SetPixel(x, y, Color.yellow);
                     }
-                } else {
+                }else {
                     tex.SetPixel(x, y, new Color(0, 0, 0, 0));
                 }
             }
@@ -201,13 +199,16 @@ public class MapGenerator : NetworkBehaviour {
 
 
         map = new int[width, height];
+
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
-                if (IsInCircle(i - width / 2, j - height / 2, width / 2)) {
+                if(IsInCircle(i - width/2,j-height/2,width/2)) {
                     if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
                         map[i, j] = (int)TileType.WATER;
                         continue;
                     }
+
+                    //Mathf.PerlinNoise(x + xOffset, y + yOffset);
                     float noise = PerlinFractal(new Vector2(i + xOffset, j + yOffset), octaves, frequency / 1000.0f);
                     // change the noise so that it is also weighted based on the euclidean distance from the center of the map
                     // this way, there will be a larger island in the middle of the map
@@ -228,30 +229,11 @@ public class MapGenerator : NetworkBehaviour {
                     }
                 }
             }
+
         }
-        GenerateBitmaskedMap();
     }
 
-    private void GenerateBitmaskedMap() {
-        bitmaskedMap = new int[width, height];
-        for (int j = 0; j < height; ++j) {
-            for (int i = 0; i < width; ++i) {
-                int count = 0;
-                bitmaskedMap[i, j] = 0;
-                for (int y = -1; y <= 1; ++y) {
-                    for (int x = -1; x <= 1; ++x) {
-                        if (x == 0 && y == 0) {
-                            continue;
-                        }
-                        if (IsInBounds(i + x, j - y) && map[i + x, j - y] != (int)TileType.WATER && map[i, j] != (int)TileType.WATER) {
-                            bitmaskedMap[i, j] += (int)Mathf.Pow(2, count);
-                        }
-                        count++;
-                    }
-                }
-            }
-        }
-    }
+
 
     public static float PerlinFractal(Vector2 v, int octaves, float frequency, float persistence = 0.5f, float lacunarity = 2.0f) {
         float total = 0.0f;
@@ -283,9 +265,6 @@ public class MapGenerator : NetworkBehaviour {
         RpcReGenerate();
     }
 
-   private bool IsInBounds(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
 
     public void GenerateGameObjects() {
         // Background tiles and boundary
@@ -300,7 +279,7 @@ public class MapGenerator : NetworkBehaviour {
 
         // boundary mesh
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        quad.transform.localScale = new Vector3(width * 2f * tileSize, width * 2f * tileSize, 1);
+        quad.transform.localScale = new Vector3(width*2f * tileSize, width*2f * tileSize, 1);
         quad.GetComponent<MeshRenderer>().material = boundaryMat;
         quad.gameObject.layer = 12;
         MeshCollider mc = quad.GetComponent<MeshCollider>();
@@ -311,7 +290,7 @@ public class MapGenerator : NetworkBehaviour {
         quad.gameObject.isStatic = true;
         rb.isKinematic = true;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
+        
 
 
         // minimap
@@ -319,20 +298,76 @@ public class MapGenerator : NetworkBehaviour {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Vector2 tilePos = new Vector2((i * tileSize) - (width * tileSize) / 2, (j * tileSize) - (height * tileSize) / 2);
-                int id = bitmaskedMap[i, j];
-                if(i == 0 && j == 0)
-                switch((TileType)map[i, j]) {
-                    case TileType.WATER:
-                        //AddTileToMap(tilePos, waterTile, null);
-                        break;
-                    case TileType.GRASS:
-                    case TileType.TREE:
-                    case TileType.SAND:
-                        Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + id);
-                        AddTileToMap(tilePos, (s != null ? s : null), null);
-                        break;
+                Sprite sp = null;
+                int id = map[i, j];
+
+                //Don't want to spawn water tiles if we don't need to
+                //We already have seperate water tile background so only spawn water tiles that create
+                //boundary for the map
+                if (map[i, j] != (int)TileType.WATER) {
+                    //GameObject Tile = new GameObject(tileNames[id]);
+
+                    //Don't add a sprite renderer to boundary water tiles
+                    if (map[i, j] != (int)TileType.WATER) {
+                        //SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                        //sR.sprite = sprites[id];
+                        sp = sprites[id];
+                        //sR.sortingOrder = 0;
+
+                    }
+                    //sR.color = colors[id];
+                    //Tile.transform.position = tilePos;
+                    //Tile.transform.parent = transform;
+
+
+
+
+                    switch (map[i, j]) {
+                        case (int)TileType.WATER: {
+                                /*Tile.AddComponent<BoxCollider2D>();
+                                SpriteRenderer sR = Tile.AddComponent<SpriteRenderer>();
+                                sR.sortingOrder = 1;*/
+                            }
+                            //Change Sprite
+
+                            //Move parts out, only have switch for gameObject
+                            break;
+
+
+                        case (int)TileType.GRASS:
+                            //GameObject grass = new GameObject();
+                            //grass.name = "Grass";
+                            //grass.AddComponent<BoxCollider2D>();
+                            AddTileToMap(tilePos, sp, null);
+                            //Tile.AddComponent<BoxCollider2D>();
+                            break;
+
+                        case (int)TileType.TREE:
+                            //Tile.AddComponent<BoxCollider2D>();
+                            //GameObject plant = new GameObject();
+                            //plant.transform.parent = Tile.transform;
+                            AddTileToMap(tilePos, sprites[1], null);
+                            AddTileToMap(tilePos, plantSprites[Random.Range(0, plantSprites.Length)], null);
+                            //plant.transform.localPosition = Vector3.zero;
+                            //SpriteRenderer sP = plant.AddComponent<SpriteRenderer>();
+                            //sP.sprite = plantSprites[Random.Range(0, plantSprites.Length)];
+                            //sP.sortingOrder = 1;
+                            break;
+
+
+                        case (int)TileType.SAND:
+                            //GameObject sand = new GameObject();
+                            //sand.name = "Sand";
+                            //sand.AddComponent<BoxCollider2D>();
+                            AddTileToMap(tilePos, sp, null);
+                            //Tile.AddComponent<BoxCollider2D>();
+                            break;
+                        default:
+
+                            break;
+                    }
                 }
-                
+
             }
         }
 
@@ -357,10 +392,12 @@ public class MapGenerator : NetworkBehaviour {
         return tilePos;
     }
 
-    public Vector2 GetRandLocAwayFromLand(int size) {
+    public Vector2 GetRandLocAwayFromLand(int size)
+    {
         Vector2 returnLoc = Vector2.zero;
         bool end = false;
-        while (!end) {
+        while (!end)
+        {
             returnLoc = GetRandWaterTile();
             end = CheckNeighborsForWater(size, returnLoc);
 
@@ -368,38 +405,48 @@ public class MapGenerator : NetworkBehaviour {
         return returnLoc;
     }
 
-    public bool CheckNeighborsForWater(int size, Vector2 loc) {
-        for (int i = -size / 2; i < size / 2; i++) {
-            for (int j = -size / 2; j < size / 2; j++) {
+    public bool CheckNeighborsForWater(int size, Vector2 loc)
+    {
+        for (int i = -size/2; i < size/2; i++)
+        {
+            for (int j = -size / 2; j < size / 2; j++)
+            {
                 Vector2 tileLoc = LocToMap(loc);
-                if (tileLoc.x + i < width && tileLoc.x + i >= 0 && tileLoc.y + j < height && tileLoc.y + j >= 0) {
+                if (tileLoc.x + i < width && tileLoc.x + i >= 0 && tileLoc.y + j < height && tileLoc.y + j >= 0)
+                {
 
                     int Tile = map[(int)tileLoc.x + i, (int)tileLoc.y + j];
-                    if (((TileType)Tile != TileType.WATER)) {
+                    if (((TileType)Tile != TileType.WATER))
+                    {
                         return false;
                     }
 
 
-                } else {
+                }
+                else
+                {
                     return false;
                 }
 
-
+                   
             }
         }
         return true;
     }
 
-    public Vector2 LocToMap(Vector2 loc) {
-        return new Vector2((loc.x / tileSize) + width / 2, (loc.y / tileSize) + height / 2);
+    public Vector2 LocToMap(Vector2 loc)
+    {
+        return new Vector2((loc.x/tileSize) + width/2, (loc.y/tileSize) + height/2);
     }
 
 
-    public void AddTileToMap(Vector3 pos, Sprite sp, GameObject g) {
+    public void AddTileToMap(Vector3 pos, Sprite sp, GameObject g)
+    {
         Tile tile = Tile.CreateInstance<Tile>();
         tile.sprite = sp;
         Vector3Int v3pos = new Vector3Int((int)pos.x, (int)pos.y, (int)pos.z);
-        if (g) {
+        if (g)
+        {
             tile.gameObject = g;
         }
         tMap.SetTile(v3pos, tile);
