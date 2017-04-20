@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/InvCircleShadow" {
+﻿Shader "Custom/InvCircleShadow" {
 	Properties
 	{
 		Radius("radius", float) = 0.01
@@ -30,7 +28,7 @@ Shader "Custom/InvCircleShadow" {
 
             fragmentInput vert(vertexInput i){
                 fragmentInput o;
-                o.position = UnityObjectToClipPos (i.vertex);
+                o.position = mul (UNITY_MATRIX_MVP, i.vertex);
                 o.texcoord0 = i.texcoord0;
                 return o;
             }
