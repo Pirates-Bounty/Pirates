@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Login : MonoBehaviour {
 
+	private GameObject playButton;
     private Transform canvas;
     private Font font;
     private Sprite sprite;
@@ -13,13 +14,16 @@ public class Login : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// playButton = UI.CreateButton("Skip", "Skip", font, color, fontSize, canvas, sprite, highlightedSprite,
-  //       Vector3.zero, new Vector2(0.05f, 0.05f), new Vector2(0.325f, 0.2f),
-  //       delegate {
-  //           Navigator.Instance.LoadLevel("Menu");
-  //       } );
+		canvas = GameObject.Find("Canvas").transform;
+
+		playButton = UI.CreateButton("Skip", "Skip", font, color, fontSize, canvas, 
+		Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/PlayButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/PlayButtonClicked"),
+        Vector3.zero, new Vector2(0.05f, 0.05f), new Vector2(0.325f, 0.2f),
+        delegate {
+            Application.LoadLevel("Menu");
+        } );
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 	
