@@ -12,6 +12,11 @@ public enum DamageType {
 }
 public class Player : NetworkBehaviour {
 
+    // camera shake stuff
+    Vector3 originalPos;
+    bool CameraShakeBool = false;
+    public float Shake = 0.9f;
+
     private ParticleSystem explosion;
 
     // const vars
@@ -265,6 +270,17 @@ public class Player : NetworkBehaviour {
 
         // update the camera's position
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, playerCamera.transform.position.z);
+
+        if (CameraShakeBool)
+        {
+            Shake = currVelocity * 0.02f;
+            playerCamera.transform.localPosition = originalPos + Random.insideUnitSphere * 0.7f;
+
+            Shake -= Time.deltaTime * 1.0f;
+
+        }
+
+
         //fogOfWar.position = new Vector3(-transform.position.x / mapGenerator.width, -transform.position.y / mapGenerator.height, 0);
         HandleBoost();
         // get player's movement
@@ -735,6 +751,22 @@ public class Player : NetworkBehaviour {
         CmdApplyDamage(damage, enemyID);
     }
 
+    public void CamShake()
+    {
+        originalPos = playerCamera.transform.localPosition;
+        CameraShakeBool = true;
+        StartCoroutine(ShakeTime());
+
+    }
+
+    IEnumerator ShakeTime()
+    {
+        print(Time.time);
+        yield return new WaitForSeconds(0.4f);
+        print(Time.time);
+        CameraShakeBool = false;
+    }
+
 
     public void OnCollisionEnter2D(Collision2D collision) {
 
@@ -742,16 +774,18 @@ public class Player : NetworkBehaviour {
             return;
         }
 
-
-        var emitParams = new ParticleSystem.EmitParams();
-        explosion.Emit(emitParams, 90);
-
         //if rammed
         Player otherPlayer = collision.collider.gameObject.GetComponent<Player>();
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
         RaycastHit2D hit = Physics2D.Raycast(collision.gameObject.transform.position, collision.gameObject.transform.up);
 
         if (otherPlayer != null && collision.collider.gameObject.CompareTag("Player") && hit.collider != null && hit.collider.tag == "Player" && !invuln) {
+        
+            CamShake();
+
+            var emitParams = new ParticleSystem.EmitParams();
+            explosion.Emit(emitParams, 90);
+
             ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.ID);
             SoundManager.Instance.PlaySFX(ramS, 1.0f);
             //3 second invulnerability before you can take ram damage again
