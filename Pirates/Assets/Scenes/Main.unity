@@ -379,6 +379,55 @@ Prefab:
       propertyPath: m_TagString
       value: UpgradePanel
       objectReference: {fileID: 0}
+    - target: {fileID: 114000013320692546, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: efe01c7426997eb438dd77560b0af24b,
+        type: 3}
+    - target: {fileID: 114000013652588806, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: efe01c7426997eb438dd77560b0af24b,
+        type: 3}
+    - target: {fileID: 114000011061078544, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_FontData.m_FontSize
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000014016970380, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011061078544, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: efe01c7426997eb438dd77560b0af24b,
+        type: 3}
+    - target: {fileID: 114000013963046840, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: efe01c7426997eb438dd77560b0af24b,
+        type: 3}
+    - target: {fileID: 114000013320692546, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_Text
+      value: Use 'W A S D' to move
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011061078544, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_Text
+      value: Open the upgrade menu by pressing the resource button or hitting 'X'
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013963046840, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
+        type: 2}
+      propertyPath: m_Text
+      value: Use shift to activate your speed boost
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 962aad46b4d389b4e9ab9e97ca10d20f, type: 2}
   m_IsPrefabParent: 0
