@@ -190,7 +190,7 @@ public class Player : NetworkBehaviour {
         Text t = inGameUI.transform.GetChild(2).GetComponent<Text>();
         t.text = playerName;
         t.color = playerColor;
-        uiQuat = inGameUI.transform.rotation;
+        uiQuat = Quaternion.identity;
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
 
