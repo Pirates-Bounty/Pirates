@@ -29,19 +29,10 @@ namespace Prototype.NetworkLobby
 
         void JoinMatch(NetworkID networkID, LobbyManager lobbyManager)
         {
-            if(lobbyManager.numPlayers > 0)
-            {
-                Debug.Log(lobbyManager.numPlayers);
                 lobbyManager.matchMaker.JoinMatch(networkID, "", "", "", 0, 0, lobbyManager.OnMatchJoined);
                 lobbyManager.backDelegate = lobbyManager.StopClientClbk;
                 lobbyManager._isMatchmaking = true;
                 lobbyManager.DisplayIsConnecting();
-            }
-            else
-            {
-                //lobbyManager.matchMaker.DestroyMatch(networkID, 0, lobbyManager.OnDestroyMatch);
-
-            }
 
         }
     }

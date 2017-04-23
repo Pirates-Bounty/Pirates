@@ -482,8 +482,6 @@ namespace Prototype.NetworkLobby
             }
 
 
-            NetworkManager.singleton.StopHost();
-
 
             SceneManager.LoadScene(SceneManager.GetSceneByName("Lobby").buildIndex);
             Destroy(gameObject);
