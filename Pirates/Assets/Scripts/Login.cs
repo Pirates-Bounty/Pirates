@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+// using System.Net.Http;
 
 public class Login : MonoBehaviour {
 
+  	// private static readonly HttpClient client = new HttpClient();
+
 	private GameObject playButton;
+	private GameObject loginButton;
     private Transform canvas;
     private Font font;
     private Sprite sprite;
     private Sprite highlightedSprite;
-	private GameObject skipButton;
     private Color color = Color.black;
     private int fontSize = 20;
 
@@ -22,10 +25,30 @@ public class Login : MonoBehaviour {
         delegate {
             Application.LoadLevel("Menu");
         } );
+
+        loginButton = GameObject.Find("LoginButton");
 	}
 
 	// Update is called once per frame
 	void Update () {
-	
 	}
+
+	// public async void createUser() {
+	//     // Values that we will send to the server. AKA Request Data
+	//     // Replace foo and bar with values that the user inputted
+	//     var values = new Dictionary<string, string>
+	//     {
+	//        { "username", "foo" },
+	//        { "password", "bar" }
+	//     };
+
+	//     var content = new FormUrlEncodedContent(values);
+
+	//     // Make POST request
+	//     var response = await client.PostAsync("http://pirates.chrisbanh.com/user/create", content);
+
+	//     var responseString = await response.Content.ReadAsStringAsync();
+
+	//     // not sure what to do from here
+ //  }
 }
