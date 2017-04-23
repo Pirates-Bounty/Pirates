@@ -496,7 +496,7 @@ public class Player : NetworkBehaviour {
     }
     [Command]
     void CmdUpgrade(Upgrade upgrade, bool positive) {
-        if (positive) {
+        if (positive && (int)upgrade < upgradeRanks.Count) {
             int upgradePrice = UPGRADE_COST * UPGRADE_SCALE[upgradeRanks[(int)upgrade]];
 
             if ((upgradeRanks[(int)upgrade] < MAX_UPGRADES) && (resources >= upgradePrice)) {
