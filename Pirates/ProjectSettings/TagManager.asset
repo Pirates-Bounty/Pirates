@@ -10,6 +10,8 @@ TagManager:
   - mapGen
   - bountyManager
   - Hill
+  - UpgradePanel
+  - TileMap
   layers:
   - Default
   - TransparentFX

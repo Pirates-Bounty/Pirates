@@ -25,20 +25,18 @@ public class gameSetUpScript : MonoBehaviour {
                 Destroy(g);
             }
         }
-        int rad = (mg.width / 2) - 20;
-        float deg = 90;
-        deg *= Mathf.Deg2Rad;
-        if (LobbyManager.singleton.numPlayers != 0) {
-            deg = 360 / LobbyManager.singleton.numPlayers;
-            deg *= Mathf.Deg2Rad;
-        }
+        //int rad = (mg.width / 2) - 20;
+        //float deg = 90;
+        //deg *= Mathf.Deg2Rad;
+        //if (LobbyManager.singleton.numPlayers != 0) {
+        //    deg = 360 / LobbyManager.singleton.numPlayers;
+        //    deg *= Mathf.Deg2Rad;
+        //}
 
         //Loop through the players and spawn a spawn point for each player along the circle
         for (int i = 0; i < LobbyManager.singleton.numPlayers; i++) {
             //bool spawnable = false;
-            GameObject spawn = Instantiate(spawnPoint, transform.position, Quaternion.identity) as GameObject;
-            int x = (int)(rad * Mathf.Cos(deg * i));
-            int y = (int)(rad * Mathf.Sin(deg * i));
+            GameObject spawn = Instantiate(spawnPoint, mapGen.GetRandLocAwayFromLand(5), Quaternion.identity) as GameObject;
             //int qWidth = (x > 0 ? mg.quadWidth : -mg.quadWidth);
             //int qHeight = (y > 0 ? -mg.quadHeight : mg.quadHeight);
             //Checks to see if a good spot to spawn the spawnPoints
@@ -81,7 +79,6 @@ public class gameSetUpScript : MonoBehaviour {
             //        spawnable = true;
             //    }
             //}
-            spawn.transform.position = new Vector2(x, y);
             Vector3 dir = -spawn.transform.position;
             dir = dir.normalized;
             spawn.transform.up = dir;

@@ -72,7 +72,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 100
   height: 100
-  frequency: 15
+  frequency: 100
   borderRadius: 0.5
   landFreq: 0.45
   seed: 200
@@ -103,7 +103,7 @@ MonoBehaviour:
   quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
-  tileSize: 7
+  tileSize: 5
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
   resourceSlider: {fileID: 0}

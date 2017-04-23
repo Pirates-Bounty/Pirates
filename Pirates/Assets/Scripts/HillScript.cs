@@ -9,7 +9,7 @@ public class HillScript : NetworkBehaviour {
 	public const float SCORE_INCREMENT = 1.0f;
 	public const float TIME_BETWEEN_SPAWNS = 5f;
     public int totalPlayersInHill = 0;
-    public int hillCheck = 20;
+    public int hillCheck = 2;
 	public int hillSize = 4;
     public int timeToCapture = 3;
     public Color nullColor = Color.grey;

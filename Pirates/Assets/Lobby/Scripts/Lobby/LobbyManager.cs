@@ -16,7 +16,7 @@ namespace Prototype.NetworkLobby
 
         static short MsgKicked = MsgType.Highest + 1;
 
-        static public LobbyManager s_Singleton;
+        static public LobbyManager s_Singleton = null;
 
         public GameObject gameSetUp;
 
@@ -27,6 +27,7 @@ namespace Prototype.NetworkLobby
         [Space]
         [Header("UI Reference")]
         public LobbyTopPanel topPanel;
+        public LobbyTopPanel inGameTopPanel;
 
         public RectTransform mainMenuPanel;
         public RectTransform lobbyPanel;
@@ -43,6 +44,7 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
+        
        
 
       
@@ -66,6 +68,14 @@ namespace Prototype.NetworkLobby
         {
             
             s_Singleton = this;
+
+
+                if (s_Singleton != null && SceneManager.GetActiveScene() != SceneManager.GetSceneByName("Lobby"))
+                {
+                    Destroy(s_Singleton);//destroy the old instance in favor of the new
+                }
+                s_Singleton = this;//keep the new!
+                DontDestroyOnLoad(gameObject);//preserve for subsequent playScenes
             _lobbyHooks = GetComponent<Prototype.NetworkLobby.LobbyHook>();
             currentPanel = mainMenuPanel;
 
@@ -132,6 +142,7 @@ namespace Prototype.NetworkLobby
 
                 //backDelegate = StopGameClbk;
                 topPanel.isInGame = true;
+                inGameTopPanel.isInGame = true;
                 topPanel.ToggleVisibility(false);
             }
         }
@@ -179,7 +190,8 @@ namespace Prototype.NetworkLobby
         public BackButtonDelegate backDelegate;
         public void GoBackButton()
         {
-            backDelegate();
+            //backDelegate();
+            ResetGame();
 			topPanel.isInGame = false;
         }
 
@@ -208,6 +220,7 @@ namespace Prototype.NetworkLobby
         {
             if (_isMatchmaking)
             {
+
 				matchMaker.DestroyMatch((NetworkID)_currentMatchID, 0, OnDestroyMatch);
 				_disconnectServer = true;
             }
@@ -437,6 +450,45 @@ namespace Prototype.NetworkLobby
                 backDelegate = StopClientClbk;
                 SetServerInfo("Client", networkAddress);
             }
+        }
+
+        public void ResetGame()
+        {
+            BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
+            foreach (BountyManager b in bm)
+            {
+                Destroy(b.gameObject);
+            }
+
+            MapGenerator[] m = GameObject.FindObjectsOfType<MapGenerator>();
+            foreach (MapGenerator mp in m)
+            {
+                Destroy(mp.gameObject);
+            }
+
+            GameObject[] tm = GameObject.FindGameObjectsWithTag("TileMap");
+            foreach (GameObject t in tm)
+            {
+                Destroy(t);
+            }
+
+            LobbyManager[] lm = GameObject.FindObjectsOfType<LobbyManager>();
+            foreach (LobbyManager l in lm)
+            {
+                if (l != this)
+                {
+                    Destroy(l.gameObject);
+                }
+            }
+
+
+            NetworkManager.singleton.StopHost();
+
+
+            SceneManager.LoadScene(SceneManager.GetSceneByName("Lobby").buildIndex);
+            Destroy(gameObject);
+
+
         }
 
 
