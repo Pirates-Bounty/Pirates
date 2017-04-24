@@ -12,6 +12,7 @@ TagManager:
   - Hill
   - UpgradePanel
   - TileMap
+  - MapGenTopLevel
   layers:
   - Default
   - TransparentFX

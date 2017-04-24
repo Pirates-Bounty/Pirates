@@ -32,6 +32,7 @@ namespace Prototype.NetworkLobby
         public RectTransform mainMenuPanel;
         public RectTransform lobbyPanel;
         public GameObject mapPanel;
+        public GameObject inGameMenuPanel;
 
         public LobbyInfoPanel infoPanel;
         public LobbyCountdownPanel countdownPanel;
@@ -66,16 +67,17 @@ namespace Prototype.NetworkLobby
 
         void Start()
         {
-            
-            s_Singleton = this;
 
-
-                if (s_Singleton != null && SceneManager.GetActiveScene() != SceneManager.GetSceneByName("Lobby"))
-                {
-                    Destroy(s_Singleton);//destroy the old instance in favor of the new
-                }
-                s_Singleton = this;//keep the new!
-                DontDestroyOnLoad(gameObject);//preserve for subsequent playScenes
+            if (!s_Singleton)
+            {
+                DontDestroyOnLoad(gameObject);
+                s_Singleton = this;
+            }
+            else if (s_Singleton != this)
+            {
+                Destroy(gameObject);
+            }
+            DontDestroyOnLoad(mapGen);
             _lobbyHooks = GetComponent<Prototype.NetworkLobby.LobbyHook>();
             currentPanel = mainMenuPanel;
 
@@ -415,9 +417,12 @@ namespace Prototype.NetworkLobby
                 }
             }
 
-            mapGen.GetComponent<MapGenerator>().CmdReGenerate();
+            mapGen.GetComponentInChildren<MapGenerator>().CmdReGenerate();
             Instantiate(gameSetUp, transform.position, Quaternion.identity);
-
+            if (inGameMenuPanel != null)
+            {
+                inGameMenuPanel.SetActive(true);
+            }
             for (int i = 0; i < lobbySlots.Length; ++i)
             {
                 if (lobbySlots[i] != null)
@@ -452,6 +457,49 @@ namespace Prototype.NetworkLobby
             }
         }
 
+        public override void OnClientSceneChanged(NetworkConnection conn)
+        {
+            string loadedSceneName = SceneManager.GetSceneAt(0).name;
+            if (loadedSceneName == lobbyScene)
+            {
+                if (client.isConnected)
+                    CallOnClientEnterLobby();
+            }
+            else
+            {
+                CallOnClientExitLobby();
+            }
+
+            /// This call is commented out since it causes a unet "A connection has already been set as ready. There can only be one." error.
+            //base.OnClientSceneChanged(conn);
+            OnLobbyClientSceneChanged(conn);
+        }
+
+        void CallOnClientEnterLobby()
+        {
+            OnLobbyClientEnter();
+            foreach (var player in lobbySlots)
+            {
+                if (player == null)
+                    continue;
+
+                player.readyToBegin = false;
+                player.OnClientEnterLobby();
+            }
+        }
+
+        void CallOnClientExitLobby()
+        {
+            OnLobbyClientExit();
+            foreach (var player in lobbySlots)
+            {
+                if (player == null)
+                    continue;
+
+                player.OnClientExitLobby();
+            }
+        }
+
         public void ResetGame()
         {
             BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
@@ -460,31 +508,37 @@ namespace Prototype.NetworkLobby
                 Destroy(b.gameObject);
             }
 
-            MapGenerator[] m = GameObject.FindObjectsOfType<MapGenerator>();
-            foreach (MapGenerator mp in m)
+            
+            NetworkManager.singleton.StopHost();
+            NetworkManager.singleton.StopClient();
+            NetworkManager.singleton.StopMatchMaker();
+            mapGen = GameObject.FindGameObjectWithTag("MapGenTopLevel");
+            ChangeTo(mainMenuPanel);
+            if(inGameMenuPanel != null)
             {
-                Destroy(mp.gameObject);
-            }
-
-            GameObject[] tm = GameObject.FindGameObjectsWithTag("TileMap");
-            foreach (GameObject t in tm)
-            {
-                Destroy(t);
-            }
-
-            LobbyManager[] lm = GameObject.FindObjectsOfType<LobbyManager>();
-            foreach (LobbyManager l in lm)
-            {
-                if (l != this)
+                inGameMenuPanel.SetActive(true);
+                inGameMenuPanel.GetComponent<Image>().enabled = false;
+                int cCount = inGameMenuPanel.transform.childCount;
+                for(int i = 0; i < cCount; i++)
                 {
-                    Destroy(l.gameObject);
+                    inGameMenuPanel.transform.GetChild(i).gameObject.SetActive(false);
                 }
             }
 
 
-            NetworkManager.singleton.StopHost();
-            SceneManager.LoadScene("Lobby");
-            Destroy(gameObject);
+
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                if(i < 2)
+                {
+                    transform.GetChild(i).gameObject.SetActive(true);
+                }
+                else
+                {
+                    transform.GetChild(i).gameObject.SetActive(false);
+                }
+
+            }
 
 
         }

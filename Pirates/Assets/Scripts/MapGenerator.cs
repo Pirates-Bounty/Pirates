@@ -82,6 +82,7 @@ public class MapGenerator : NetworkBehaviour {
         maxResources = (.2f * 20000) / width;
     }
 
+
     [Command]
     public void CmdChangeSeed(int newSeed) {
         seed = newSeed;
@@ -163,6 +164,18 @@ public class MapGenerator : NetworkBehaviour {
         }
     }
 
+    public void ClearMap()
+    {
+        map = new int[width, height];
+        //tMap.ClearAllTiles();
+
+        int cCount = transform.childCount;
+        for(int i = 0; i < cCount; i++)
+        {
+            Destroy(transform.GetChild(i).gameObject);
+        }
+    }
+
     public void GeneratePreviewTexture() {
         Texture2D tex = GenerateTexture();
         mapPic.texture = tex;
@@ -194,12 +207,15 @@ public class MapGenerator : NetworkBehaviour {
     }
     public void Generate() {
 
+        ClearMap();
+        if(tMap != null)
+        {
+            tMap.ClearAllTiles();
+        }
         Random.InitState(seed);
         float xOffset = Random.Range(-100000, 100000);
         float yOffset = Random.Range(-100000, 100000);
 
-
-        map = new int[width, height];
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 if (IsInCircle(i - width / 2, j - height / 2, width / 2)) {

@@ -7,6 +7,7 @@ namespace Prototype.NetworkLobby
     public class LobbyTopPanel : MonoBehaviour
     {
         public bool isInGame = false;
+        
 
         protected bool isDisplayed = true;
         protected Image panelImage;

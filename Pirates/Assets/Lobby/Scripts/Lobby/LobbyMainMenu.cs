@@ -58,10 +58,10 @@ namespace Prototype.NetworkLobby
 				"", "", "", 0, 0,
 				lobbyManager.OnMatchCreate);
 
-            lobbyManager.backDelegate = lobbyManager.StopHost;
+            //lobbyManager.backDelegate = lobbyManager.StopHost;
             lobbyManager._isMatchmaking = true;
             lobbyManager.DisplayIsConnecting();
-
+            lobbyManager.topPanel.isInGame = true;
             lobbyManager.SetServerInfo("Matchmaker Host", lobbyManager.matchHost);
         }
 

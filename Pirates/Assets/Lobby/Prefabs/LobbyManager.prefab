@@ -1915,7 +1915,7 @@ MonoBehaviour:
   m_ServerBindToIP: 0
   m_ServerBindAddress: 
   m_NetworkAddress: localhost
-  m_DontDestroyOnLoad: 1
+  m_DontDestroyOnLoad: 0
   m_RunInBackground: 1
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
@@ -1993,6 +1993,7 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 224000011499630320}
   lobbyPanel: {fileID: 22443498}
   mapPanel: {fileID: 148054}
+  inGameMenuPanel: {fileID: 1155189133188102}
   infoPanel: {fileID: 11442006}
   countdownPanel: {fileID: 11413810}
   addPlayerButton: {fileID: 144256}
@@ -2324,7 +2325,7 @@ MonoBehaviour:
   m_LineType: 0
   m_HideMobileInput: 0
   m_CharacterValidation: 3
-  m_CharacterLimit: 0
+  m_CharacterLimit: 10
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls: []
@@ -3139,8 +3140,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1020.68274, y: -50}
-  m_SizeDelta: {x: 2041.3655, y: 100}
+  m_AnchoredPosition: {x: 1178.6923, y: -50}
+  m_SizeDelta: {x: 2357.3845, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22440242
 RectTransform:
