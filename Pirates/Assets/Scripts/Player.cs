@@ -140,12 +140,23 @@ public class Player : NetworkBehaviour {
 	public AudioClip shotS2;
 	public AudioClip shotS3;
 	private AudioClip currentShotS;
-    public AudioClip turnS;
+    public AudioClip turnS1;
+	public AudioClip turnS2;
+	public AudioClip turnS3;
+	private AudioClip currentTurnS;
     private float creakTimer = 0;
     public AudioClip ramS;
     public AudioClip deathS;
-    public AudioClip whooshS;
-    public AudioClip coinS;
+	public AudioClip boostS1;
+	public AudioClip boostS2;
+	public AudioClip boostS3;
+    private AudioClip currentBoostS;
+    public AudioClip coinS0;
+	public AudioClip coinS1;
+	public AudioClip coinS2;
+	private AudioClip currentCoinS;
+	private int coinIndex;
+	private int[] MHALL;
 
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
@@ -177,6 +188,8 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
+		MHALL = new int[26]{2,1,0,1,2,2,2,1,1,1,2,2,2,2,1,0,1,2,2,2,2,1,1,2,1,0};
+		coinIndex = 0;
         //StartCoroutine(BoatRepairs());
 
 		for (int i = 0; i < (int)Upgrade.COUNT; ++i) {
@@ -323,13 +336,25 @@ public class Player : NetworkBehaviour {
     }
 
     void HandleBoost() {
+		int boostNum = Random.Range (1, 4);
+		switch(boostNum) {
+		case 1:
+			currentBoostS = boostS1;
+			break;
+		case 2:
+			currentBoostS = boostS2;
+			break;
+		case 3:
+			currentBoostS = boostS3;
+			break;
+		}
         if (boostTimer > 0) {
             boostTimer -= Time.deltaTime;
         } else {
 			sprintCooldownImage.color = Color.green;
 			if (Input.GetKeyDown(KeyCode.LeftShift)) {
                 SpeedBoost();
-                SoundManager.Instance.PlaySFX(whooshS, 1.0f);
+                SoundManager.Instance.PlaySFX(currentBoostS, 1.0f);
                 gofast = true;
                 boostTimer = currBoostDelay;
 				sprintCooldownImage.color = Color.red;
@@ -649,18 +674,30 @@ public class Player : NetworkBehaviour {
     }
 
     private void GetMovement() {
+		int turnNum = Random.Range (1, 4);
+		switch(turnNum) {
+		case 1:
+			currentTurnS = turnS1;
+			break;
+		case 2:
+			currentTurnS = turnS2;
+			break;
+		case 3:
+			currentTurnS = turnS3;
+			break;
+		}
         if (Input.GetKey(left)) { // click left
             if (creakTimer <= 0 && Input.GetKeyDown(left)) {
-                creakTimer = 3.0f;
-                SoundManager.Instance.PlaySFX(turnS, 0.7f);
+                creakTimer = 4.0f;
+                SoundManager.Instance.PlaySFX(currentTurnS, 0.7f);
             }
             rb.MoveRotation(rb.rotation + currRotationSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(right)) {
             if (creakTimer <= 0 && Input.GetKeyDown(right)) {
-                creakTimer = 3.0f;
-                SoundManager.Instance.PlaySFX(turnS, 0.7f);
+                creakTimer = 4.0f;
+                SoundManager.Instance.PlaySFX(currentTurnS, 0.7f);
             }
             rb.MoveRotation(rb.rotation - currRotationSpeed * Time.deltaTime);
         }
@@ -870,10 +907,24 @@ public class Player : NetworkBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
-    {
+	{
         if (isLocalPlayer && collision.CompareTag("Resource"))
-        {
-            SoundManager.Instance.PlaySFX(coinS, 1.0f);
+		{
+			if (coinIndex >= 26)
+				coinIndex = 0;
+			int coinNum = MHALL[coinIndex++];
+			switch(coinNum) {
+			case 0:
+				currentCoinS = coinS0;
+				break;
+			case 1:
+				currentCoinS = coinS1;
+				break;
+			case 2:
+				currentCoinS = coinS2;
+				break;
+			}
+            SoundManager.Instance.PlaySFX(currentCoinS, 0.15f);
             //SoundManager.Instance.PlaySFXTransition (coinS, 1.0f);
         }
         if (isLocalPlayer && collision.CompareTag("Hill"))

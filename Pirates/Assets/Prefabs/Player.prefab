@@ -886,6 +886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54dec94d586c4143863d8e8c5836c0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Shake: 0.9
   ID: -2
   lowUpgrades: 0
   midUpgrades: 0
@@ -970,11 +971,17 @@ MonoBehaviour:
   shotS1: {fileID: 8300000, guid: 0a877a37695ef104099029e9efda5827, type: 3}
   shotS2: {fileID: 8300000, guid: 1597aef4e8cc41a48ade24d1dbc6f60a, type: 3}
   shotS3: {fileID: 8300000, guid: f2d7b8a978cb4be4d8b82396bb2d455e, type: 3}
-  turnS: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
+  turnS1: {fileID: 8300000, guid: c3e3efa503fcb7f4da26f1bb04f83c57, type: 3}
+  turnS2: {fileID: 8300000, guid: d7b9a17728cdf5746b460ed7e926f629, type: 3}
+  turnS3: {fileID: 8300000, guid: 5319a53bec150b049a357991d9c7ba9b, type: 3}
   ramS: {fileID: 8300000, guid: 812801548bde36048b6e157424c3ddf9, type: 3}
   deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
-  whooshS: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
-  coinS: {fileID: 8300000, guid: 70846e39b61279f499a9cdc361d0a49d, type: 3}
+  boostS1: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
+  boostS2: {fileID: 8300000, guid: 5ff1dc798dfe1334b932f2c3b2f0963a, type: 3}
+  boostS3: {fileID: 8300000, guid: ed87d62c723661744918d881039ae976, type: 3}
+  coinS0: {fileID: 8300000, guid: 6f7e8ad1df0811f41b449761ebb381c4, type: 3}
+  coinS1: {fileID: 8300000, guid: 70846e39b61279f499a9cdc361d0a49d, type: 3}
+  coinS2: {fileID: 8300000, guid: 3120f82d47349dd4cbb7042b0b039140, type: 3}
   sfx_upgradeMenuOpen: {fileID: 0}
   sfx_upgradeMenuClose: {fileID: 0}
   playerName: 
