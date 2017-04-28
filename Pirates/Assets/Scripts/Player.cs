@@ -198,7 +198,7 @@ public class Player : NetworkBehaviour {
         dead = false;
 		score = 0f;
 
-        explosion = GetComponent<ParticleSystem>();
+        explosion = gameObject.GetComponentInChildren<ParticleSystem>();
         playerCamera = GameObject.Find("Camera").GetComponent<Camera>();
         canvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
         rb = GetComponent<Rigidbody2D>();
@@ -811,6 +811,7 @@ public class Player : NetworkBehaviour {
             return;
         }
 
+
         //if rammed
         Player otherPlayer = collision.collider.gameObject.GetComponent<Player>();
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up);
@@ -820,8 +821,11 @@ public class Player : NetworkBehaviour {
         
             CamShake();
 
+
             var emitParams = new ParticleSystem.EmitParams();
             explosion.Emit(emitParams, 90);
+
+
 
             ApplyDamage(otherPlayer.appliedRamDamage, otherPlayer.ID);
             SoundManager.Instance.PlaySFX(ramS, 1.0f);
