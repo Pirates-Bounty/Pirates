@@ -188,6 +188,7 @@ public class Player : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
+        Debug.Log("Spawn");
 		MHALL = new int[26]{2,1,0,1,2,2,2,1,1,1,2,2,2,2,1,0,1,2,2,2,2,1,1,2,1,0};
 		coinIndex = 0;
         //StartCoroutine(BoatRepairs());

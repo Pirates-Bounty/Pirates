@@ -471,7 +471,7 @@ namespace Prototype.NetworkLobby
             }
 
             /// This call is commented out since it causes a unet "A connection has already been set as ready. There can only be one." error.
-            //base.OnClientSceneChanged(conn);
+            base.OnClientSceneChanged(conn);
             OnLobbyClientSceneChanged(conn);
         }
 
