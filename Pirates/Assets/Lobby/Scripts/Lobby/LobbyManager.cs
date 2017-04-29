@@ -95,12 +95,74 @@ namespace Prototype.NetworkLobby
         {
         }
 
-        
+        public override void OnClientSceneChanged(NetworkConnection conn)
+        {
+            string loadedSceneName = SceneManager.GetActiveScene().name;
+            if (loadedSceneName == lobbyScene)
+            {
+                if (client.isConnected)
+                    CallOnClientEnterLobby();
+            }
+            else
+            {
+                CallOnClientExitLobby();
+            }
+            if(loadedSceneName == "Main")
+            {
+                topPanel.isInGame = true;
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    if (transform.GetChild(i).name != "InGameMenu")
+                    {
+                        transform.GetChild(i).gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        transform.GetChild(i).GetComponent<LobbyTopPanel>().isInGame = true;
+                    }
+                }
+            }
+
+            /// This call is commented out since it causes a unet "A connection has already been set as ready. There can only be one." error.
+            base.OnLobbyClientSceneChanged(conn);
+            if (!ClientScene.ready)
+            {
+                ClientScene.Ready(conn);
+            }
+
+
+            //OnLobbyClientSceneChanged(conn);
+        }
+
+        void CallOnClientEnterLobby()
+        {
+            OnLobbyClientEnter();
+            foreach (var player in lobbySlots)
+            {
+                if (player == null)
+                    continue;
+
+                player.readyToBegin = false;
+                player.OnClientEnterLobby();
+            }
+        }
+
+        void CallOnClientExitLobby()
+        {
+            OnLobbyClientExit();
+            foreach (var player in lobbySlots)
+            {
+                if (player == null)
+                    continue;
+
+                player.OnClientExitLobby();
+            }
+        }
 
 
         public override void OnLobbyClientSceneChanged(NetworkConnection conn)
         {
-            if (SceneManager.GetSceneAt(0).name == lobbyScene)
+            if (SceneManager.GetActiveScene().name == lobbyScene)
             {
                 if (topPanel.isInGame)
                 {
@@ -441,6 +503,8 @@ namespace Prototype.NetworkLobby
 
         // ----------------- Client callbacks ------------------
 
+
+
         public override void OnClientConnect(NetworkConnection conn)
         {
             base.OnClientConnect(conn);
@@ -457,48 +521,7 @@ namespace Prototype.NetworkLobby
             }
         }
 
-        public override void OnClientSceneChanged(NetworkConnection conn)
-        {
-            string loadedSceneName = SceneManager.GetSceneAt(0).name;
-            if (loadedSceneName == lobbyScene)
-            {
-                if (client.isConnected)
-                    CallOnClientEnterLobby();
-            }
-            else
-            {
-                CallOnClientExitLobby();
-            }
-
-            /// This call is commented out since it causes a unet "A connection has already been set as ready. There can only be one." error.
-            base.OnClientSceneChanged(conn);
-            OnLobbyClientSceneChanged(conn);
-        }
-
-        void CallOnClientEnterLobby()
-        {
-            OnLobbyClientEnter();
-            foreach (var player in lobbySlots)
-            {
-                if (player == null)
-                    continue;
-
-                player.readyToBegin = false;
-                player.OnClientEnterLobby();
-            }
-        }
-
-        void CallOnClientExitLobby()
-        {
-            OnLobbyClientExit();
-            foreach (var player in lobbySlots)
-            {
-                if (player == null)
-                    continue;
-
-                player.OnClientExitLobby();
-            }
-        }
+       
 
         public void ResetGame()
         {
@@ -512,6 +535,7 @@ namespace Prototype.NetworkLobby
             NetworkManager.singleton.StopHost();
             NetworkManager.singleton.StopClient();
             NetworkManager.singleton.StopMatchMaker();
+            NetworkManager.singleton.StartMatchMaker();
             mapGen = GameObject.FindGameObjectWithTag("MapGenTopLevel");
             ChangeTo(mainMenuPanel);
             if(inGameMenuPanel != null)
