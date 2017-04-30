@@ -86,7 +86,11 @@ public class HillScript : NetworkBehaviour {
             if (hillController == p && p.dead)
             {
                 totalPlayersInHill = 0;
-                ClearTargetsValues();
+                if (!BountyManager.gameOver)
+                {
+                    ClearTargetsValues();
+                }
+
                 break;
             }
             if (targets[p].capturing)
@@ -172,9 +176,14 @@ public class HillScript : NetworkBehaviour {
 					if (targets[p].time >= timeToCapture) {
 						targets[p] = new Capture(timeToCapture,true);
 						hillController = p;
-						//GetComponent<SpriteRenderer> ().color = p.playerColor;
-                        RpcColorChange(p.playerColor);
-                        ClearTargetsValuesCapture();
+                        //GetComponent<SpriteRenderer> ().color = p.playerColor;
+                        if (!BountyManager.gameOver)
+                        {
+                            RpcColorChange(p.playerColor);
+                            ClearTargetsValuesCapture();
+                        }
+
+                        
 					}
 				}
                 else

@@ -541,10 +541,13 @@ namespace Prototype.NetworkLobby
                 Destroy(b.gameObject);
             }
 
-            
-            NetworkManager.singleton.StopHost();
-            NetworkManager.singleton.StopClient();
-            NetworkManager.singleton.StopMatchMaker();
+            if (NetworkManager.singleton)
+            {
+                NetworkManager.singleton.StopHost();
+                NetworkManager.singleton.StopClient();
+                NetworkManager.singleton.StopMatchMaker();
+            }
+
             //NetworkManager.singleton.StartMatchMaker();
             mapGen = GameObject.FindGameObjectWithTag("MapGenTopLevel");
             Debug.Log("ResetGame");

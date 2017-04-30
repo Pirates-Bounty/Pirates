@@ -44,6 +44,8 @@ public class BountyManager : NetworkBehaviour {
     private RectTransform minimapRect;
     private GameObject hillTimerText;
 
+    public static bool gameOver = false;
+
     public static bool kingOfTheHill = true;
 
 
@@ -139,7 +141,7 @@ public class BountyManager : NetworkBehaviour {
         if (playerList.Length != LobbyManager.numberPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
-		if (playerIconGOs.Length < playerList.Length) {
+		if (playerIconGOs.Length != playerList.Length) {
 			playerIconGOs = new GameObject[playerList.Length];
 		}
         for (int i = 0; i < playerList.Length; i++) {
@@ -311,6 +313,7 @@ public class BountyManager : NetworkBehaviour {
 
 
     private IEnumerator DeclareVictory(int playerID) {
+        gameOver = true;
         // declare the winning player to be the pirate king
         //print("Victory has been declared!");
         if (isServer)

@@ -108,6 +108,7 @@ public class Player : NetworkBehaviour {
     private GameObject respawnTimerText;
     private Image sprintCooldownImage;
     private Rigidbody2D rb;
+    private Collider2D pColl;
     // upgrade menu ranks
     public SyncListInt upgradeRanks = new SyncListInt();
     // base stats
@@ -216,7 +217,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-
+        pColl = GetComponent<Collider2D>();
         leaderArrow = GameObject.Find("MainCanvas/UI/Compass");
 
         upgradePanel = FindObjectOfType<UpgradePanel>();
@@ -280,6 +281,15 @@ public class Player : NetworkBehaviour {
         // networking check
         if (!isLocalPlayer || dead) {
             return;
+        }
+        if (dead && pColl.enabled)
+        {
+            pColl.enabled = false;
+        }
+
+        if(!dead && !pColl.enabled)
+        {
+            pColl.enabled = true;
         }
 
         // update the camera's position
