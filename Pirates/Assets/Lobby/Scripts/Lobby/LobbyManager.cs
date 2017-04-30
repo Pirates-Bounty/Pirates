@@ -427,7 +427,6 @@ namespace Prototype.NetworkLobby
                     p.ToggleJoinButton(numPlayers >= minPlayers);
                 }
             }
-
             Debug.Log("LobbyServerDisconnect");
             ResetGame();
 
@@ -583,8 +582,6 @@ namespace Prototype.NetworkLobby
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
-            ResetGame();
-            Debug.Log("ClientDisconenct");
             ChangeTo(mainMenuPanel);
         }
 

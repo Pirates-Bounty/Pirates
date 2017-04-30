@@ -331,9 +331,19 @@ public class BountyManager : NetworkBehaviour {
 
         //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
         Debug.Log("About to reset");
-        yield return new WaitForSeconds(5.0f);
-        Debug.Log("Reset");
-        GameObject.Find("LobbyManager").GetComponent<LobbyManager>().ResetGame();
+        if (isServer)
+        {
+            yield return new WaitForSeconds(5.0f);
+            Debug.Log("Reset");
+            GameObject.Find("LobbyManager").GetComponent<LobbyManager>().ResetGame();
+        }
+        else
+        {
+            yield return new WaitForSeconds(4.0f);
+            Debug.Log("Reset");
+            GameObject.Find("LobbyManager").GetComponent<LobbyManager>().ResetGame();
+        }
+
     }
 
     [ClientRpc]
