@@ -328,9 +328,9 @@ public class BountyManager : NetworkBehaviour {
 
         GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID + 1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
-        
-        //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
 
+        //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
+        Debug.Log("About to reset");
         yield return new WaitForSeconds(5.0f);
         Debug.Log("Reset");
         GameObject.Find("LobbyManager").GetComponent<LobbyManager>().ResetGame();

@@ -428,6 +428,9 @@ namespace Prototype.NetworkLobby
                 }
             }
 
+            Debug.Log("LobbyServerDisconnect");
+            ResetGame();
+
         }
 
         public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
@@ -580,6 +583,8 @@ namespace Prototype.NetworkLobby
         public override void OnClientDisconnect(NetworkConnection conn)
         {
             base.OnClientDisconnect(conn);
+            ResetGame();
+            Debug.Log("ClientDisconenct");
             ChangeTo(mainMenuPanel);
         }
 
