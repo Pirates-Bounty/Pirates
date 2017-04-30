@@ -78,7 +78,7 @@ public class MapGenerator : NetworkBehaviour {
 
         //GenerateGameObjects();
 
-        int numPlayers = LobbyManager.singleton.numPlayers;
+        int numPlayers = LobbyManager.numberPlayers;
         maxResources = (.2f * 20000) / width;
     }
 
