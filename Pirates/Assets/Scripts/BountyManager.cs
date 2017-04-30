@@ -31,6 +31,7 @@ public class BountyManager : NetworkBehaviour {
     private Sprite iconSprite;
     private GameObject[] playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
     private GameObject localPlayerIcon = null;
+    public static BountyManager Instance;
     private int currentIndex = 0;
     public UpgradePanel upgradePanel;
     public GameObject Hill;
@@ -48,6 +49,7 @@ public class BountyManager : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
+        Instance = this;
         playerList = FindObjectsOfType<Player>();
 		playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
