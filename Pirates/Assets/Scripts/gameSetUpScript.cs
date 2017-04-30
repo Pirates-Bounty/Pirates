@@ -34,7 +34,7 @@ public class gameSetUpScript : MonoBehaviour {
         //}
 
         //Loop through the players and spawn a spawn point for each player along the circle
-        for (int i = 0; i < LobbyManager.singleton.numPlayers; i++) {
+        for (int i = 0; i < LobbyManager.numberPlayers; i++) {
             //bool spawnable = false;
             GameObject spawn = Instantiate(spawnPoint, mapGen.GetRandLocAwayFromLand(5), Quaternion.identity) as GameObject;
             //int qWidth = (x > 0 ? mg.quadWidth : -mg.quadWidth);

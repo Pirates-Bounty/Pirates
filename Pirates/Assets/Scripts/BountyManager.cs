@@ -8,7 +8,7 @@ using Prototype.NetworkLobby;
 
 public class BountyManager : NetworkBehaviour {
     public const int BASE_BOUNTY = 200;
-    public const int MAX_BOUNTY = 30;
+    public const int MAX_BOUNTY = 2;
     public const int MAX_PLAYERS = 20;
     private GameObject bountyPanel;
     private Canvas canvas;
@@ -18,7 +18,7 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
-    public Player[] playerList = new Player[LobbyManager.singleton.numPlayers];
+    public Player[] playerList = new Player[LobbyManager.numberPlayers];
     private GameObject bountyBoard;
     private RectTransform bountyBoardRect;
     private GameObject scoreBar;
@@ -51,7 +51,7 @@ public class BountyManager : NetworkBehaviour {
     void Start() {
         Instance = this;
         playerList = FindObjectsOfType<Player>();
-		playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
+		playerIconGOs = new GameObject[LobbyManager.numberPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
@@ -136,7 +136,7 @@ public class BountyManager : NetworkBehaviour {
             bountyBoard.SetActive(false);
         }
 
-        if (playerList.Length < LobbyManager.singleton.numPlayers) {
+        if (playerList.Length != LobbyManager.numberPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
 		if (playerIconGOs.Length < playerList.Length) {
@@ -188,9 +188,10 @@ public class BountyManager : NetworkBehaviour {
             }
 
             if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY) {
+                victoryUndeclared = false;
                 RpcStopCaptureSFX();
                 StartCoroutine(DeclareVictory(playerList[i].ID));
-                victoryUndeclared = false;
+                
             }
         }
         for (int i = 0; i < playerIconGOs.Length; ++i) {
@@ -314,7 +315,15 @@ public class BountyManager : NetworkBehaviour {
     private IEnumerator DeclareVictory(int playerID) {
         // declare the winning player to be the pirate king
         //print("Victory has been declared!");
-        RpcStopCaptureSFX();
+        if (isServer)
+        {
+            RpcStopCaptureSFX();
+            for (int i = 0; i < playerList.Length; i++)
+            {
+                playerList[i].dead = true;
+            }
+        }
+
         //if (playerList[playerID].isLocalPlayer)
         SoundManager.Instance.PlaySFX_Victory();
         //else SoundManager.Instance.PlaySFX_Defeat();
@@ -324,13 +333,8 @@ public class BountyManager : NetworkBehaviour {
         
         //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
 
-        if (isServer) {
-            for (int i = 0; i < playerList.Length; i++) {
-                playerList[i].dead = true;
-            }
-        }
-
         yield return new WaitForSeconds(5.0f);
+        Debug.Log("Reset");
         GameObject.Find("LobbyManager").GetComponent<LobbyManager>().ResetGame();
     }
 

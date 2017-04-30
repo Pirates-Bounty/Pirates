@@ -45,6 +45,9 @@ namespace Prototype.NetworkLobby
 
         public Text statusInfo;
         public Text hostInfo;
+
+        [HideInInspector]
+        public static int numberPlayers = 0;
         
        
 
@@ -489,11 +492,16 @@ namespace Prototype.NetworkLobby
             {
                 if (lobbySlots[i] != null)
                 {
+                    
                     (lobbySlots[i] as LobbyPlayer).RpcUpdateCountdown(0);
+                    numberPlayers++;
                 }
             }
 
             mapGen.SetActive(true);
+
+
+
             ServerChangeScene(playScene);
 
         }
@@ -537,6 +545,7 @@ namespace Prototype.NetworkLobby
             NetworkManager.singleton.StopMatchMaker();
             //NetworkManager.singleton.StartMatchMaker();
             mapGen = GameObject.FindGameObjectWithTag("MapGenTopLevel");
+            Debug.Log("ResetGame");
             ChangeTo(mainMenuPanel);
             if(inGameMenuPanel != null)
             {
@@ -550,7 +559,7 @@ namespace Prototype.NetworkLobby
             }
 
 
-
+            Debug.Log("ResetGame");
             for (int i = 0; i < transform.childCount; i++)
             {
                 if(i < 2)
