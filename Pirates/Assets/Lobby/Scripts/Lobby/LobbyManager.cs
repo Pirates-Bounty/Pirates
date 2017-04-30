@@ -535,7 +535,7 @@ namespace Prototype.NetworkLobby
             NetworkManager.singleton.StopHost();
             NetworkManager.singleton.StopClient();
             NetworkManager.singleton.StopMatchMaker();
-            NetworkManager.singleton.StartMatchMaker();
+            //NetworkManager.singleton.StartMatchMaker();
             mapGen = GameObject.FindGameObjectWithTag("MapGenTopLevel");
             ChangeTo(mainMenuPanel);
             if(inGameMenuPanel != null)
