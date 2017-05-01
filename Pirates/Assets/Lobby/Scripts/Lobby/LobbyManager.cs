@@ -427,8 +427,6 @@ namespace Prototype.NetworkLobby
                     p.ToggleJoinButton(numPlayers >= minPlayers);
                 }
             }
-            Debug.Log("LobbyServerDisconnect");
-            ResetGame();
 
         }
 
@@ -564,7 +562,6 @@ namespace Prototype.NetworkLobby
             }
 
 
-            Debug.Log("ResetGame");
             for (int i = 0; i < transform.childCount; i++)
             {
                 if(i < 2)
