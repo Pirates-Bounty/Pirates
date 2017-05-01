@@ -1,19 +1,24 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Networking;
 
 namespace Prototype.NetworkLobby
 {
-    public class LobbyTopPanel : MonoBehaviour
+    public class LobbyTopPanel : NetworkBehaviour
     {
         public bool isInGame = false;
-        
+        private LobbyManager lm;
+        [SyncVar]
+        public int numberPlayers = 0;
+
 
         protected bool isDisplayed = true;
         protected Image panelImage;
 
         void Start()
         {
+            lm = transform.parent.GetComponent<LobbyManager>();
             panelImage = GetComponent<Image>();
         }
 
@@ -65,5 +70,24 @@ namespace Prototype.NetworkLobby
                 panelImage.enabled = isDisplayed;
             }
         }
+
+        public void OnExitButtonPressed()
+        {
+            if (isServer)
+            {
+                numberPlayers = 0;
+                lm.ResetGame();
+                return;
+            }
+            if (isLocalPlayer)
+            {
+                numberPlayers--;
+                lm.ResetGame();
+            }
+
+        }
+
+
+
     }
 }

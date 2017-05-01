@@ -64,6 +64,7 @@ public class MapGenerator : NetworkBehaviour {
     private BoundaryGenerator bg;
     private Texture2D minimapTexture;
     private GameObject minimap;
+    public LobbyTopPanel inGameMenuPanel;
 
     void Start() {
         if (!Instance) {
@@ -78,7 +79,7 @@ public class MapGenerator : NetworkBehaviour {
 
         //GenerateGameObjects();
 
-        int numPlayers = LobbyManager.numberPlayers;
+        int numPlayers = inGameMenuPanel.numberPlayers;
         maxResources = (.2f * 20000) / width;
     }
 

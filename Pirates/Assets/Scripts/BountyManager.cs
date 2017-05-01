@@ -7,10 +7,12 @@ using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 
 public class BountyManager : NetworkBehaviour {
+    public int numPlayers;
     public const int BASE_BOUNTY = 200;
     public const int MAX_BOUNTY = 2;
     public const int MAX_PLAYERS = 20;
     private GameObject bountyPanel;
+    public LobbyTopPanel inGameMenuPanel;
     private Canvas canvas;
     private Font font;
     private int fontSize = 10;
@@ -18,7 +20,7 @@ public class BountyManager : NetworkBehaviour {
     private int maxResources = 40;
     public GameObject resourcePrefab;
     private GameObject MapGen;
-    public Player[] playerList = new Player[LobbyManager.numberPlayers];
+    public Player[] playerList;
     private GameObject bountyBoard;
     private RectTransform bountyBoardRect;
     private GameObject scoreBar;
@@ -29,7 +31,7 @@ public class BountyManager : NetworkBehaviour {
     public bool victoryUndeclared;
     private bool createdPlayerIcons;
     private Sprite iconSprite;
-    private GameObject[] playerIconGOs = new GameObject[LobbyManager.singleton.numPlayers];
+    private GameObject[] playerIconGOs;
     private GameObject localPlayerIcon = null;
     public static BountyManager Instance;
     private int currentIndex = 0;
@@ -52,8 +54,10 @@ public class BountyManager : NetworkBehaviour {
     // Use this for initialization
     void Start() {
         Instance = this;
+        numPlayers = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>().numberPlayers;
+        playerList = new Player[numPlayers];
         playerList = FindObjectsOfType<Player>();
-		playerIconGOs = new GameObject[LobbyManager.numberPlayers];
+		playerIconGOs = new GameObject[numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
         MapGen = GameObject.FindGameObjectWithTag("mapGen");
@@ -138,7 +142,7 @@ public class BountyManager : NetworkBehaviour {
             bountyBoard.SetActive(false);
         }
 
-        if (playerList.Length != LobbyManager.numberPlayers) {
+        if (playerList.Length != numPlayers) {
             playerList = FindObjectsOfType<Player>();
         }
 		if (playerIconGOs.Length != playerList.Length) {

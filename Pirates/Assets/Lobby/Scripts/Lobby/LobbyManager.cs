@@ -46,8 +46,7 @@ namespace Prototype.NetworkLobby
         public Text statusInfo;
         public Text hostInfo;
 
-        [HideInInspector]
-        public static int numberPlayers = 0;
+
         
        
 
@@ -446,14 +445,25 @@ namespace Prototype.NetworkLobby
         public override void OnLobbyServerPlayersReady()
         {
 			bool allready = true;
+            int count = 0;
 			for(int i = 0; i < lobbySlots.Length; ++i)
 			{
 				if(lobbySlots[i] != null)
-					allready &= lobbySlots[i].readyToBegin;
+                {
+                    allready &= lobbySlots[i].readyToBegin;
+                    count++;
+                }
+					
 			}
 
-			if(allready)
-				StartCoroutine(ServerCountdownCoroutine());
+            if (allready)
+            {
+                StartCoroutine(ServerCountdownCoroutine());
+                inGameTopPanel.numberPlayers = count;
+                Debug.Log(inGameTopPanel.numberPlayers);
+            }
+
+                
         }
 
         public IEnumerator ServerCountdownCoroutine()
@@ -494,7 +504,7 @@ namespace Prototype.NetworkLobby
                 {
                     
                     (lobbySlots[i] as LobbyPlayer).RpcUpdateCountdown(0);
-                    numberPlayers++;
+
                 }
             }
 
@@ -529,10 +539,15 @@ namespace Prototype.NetworkLobby
             }
         }
 
-       
+       public void ExitGameButton()
+        {
+            ResetGame();
+
+        }
 
         public void ResetGame()
         {
+            inGameTopPanel.numberPlayers = 0;
             BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
             foreach (BountyManager b in bm)
             {
@@ -574,6 +589,7 @@ namespace Prototype.NetworkLobby
                 }
 
             }
+
 
 
         }
