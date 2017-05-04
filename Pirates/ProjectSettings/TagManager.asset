@@ -13,6 +13,7 @@ TagManager:
   - UpgradePanel
   - TileMap
   - MapGenTopLevel
+  - InGameMenuPanel
   layers:
   - Default
   - TransparentFX

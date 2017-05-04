@@ -496,7 +496,12 @@ namespace Prototype.NetworkLobby
             Instantiate(gameSetUp, transform.position, Quaternion.identity);
             if (inGameMenuPanel != null)
             {
+                Debug.Log("Valid in game menu panel");
                 inGameMenuPanel.SetActive(true);
+            }
+            else
+            {
+                Debug.Log("null ingamemenupanel");
             }
             for (int i = 0; i < lobbySlots.Length; ++i)
             {
@@ -583,9 +588,14 @@ namespace Prototype.NetworkLobby
                 {
                     transform.GetChild(i).gameObject.SetActive(true);
                 }
-                else
+                else if(transform.GetChild(i).tag != "InGameMenuPanel")
                 {
                     transform.GetChild(i).gameObject.SetActive(false);
+                }
+                else
+                {
+                    transform.GetChild(i).GetComponent<Image>().enabled = false;
+                    transform.GetChild(i).GetChild(0).gameObject.SetActive(false);
                 }
 
             }

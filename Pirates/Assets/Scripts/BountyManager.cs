@@ -135,42 +135,75 @@ public class BountyManager : NetworkBehaviour {
     }*/
 
     // Update is called once per frame
-    void Update() {
-        if (Input.GetKey(KeyCode.Tab)) {
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.Tab))
+        {
             bountyBoard.SetActive(true);
-        } else if (Input.GetKeyUp(KeyCode.Tab)) {
+        }
+        else if (Input.GetKeyUp(KeyCode.Tab))
+        {
             bountyBoard.SetActive(false);
         }
 
-        if (playerList.Length != numPlayers) {
-            playerList = FindObjectsOfType<Player>();
+        if (playerList != null)
+        {
+            if (playerList.Length != numPlayers)
+            {
+                playerList = FindObjectsOfType<Player>();
+                Debug.Log("PlayerListLength: " + playerList.Length);
+            }
         }
-		if (playerIconGOs.Length != playerList.Length) {
-			playerIconGOs = new GameObject[playerList.Length];
-		}
-        for (int i = 0; i < playerList.Length; i++) {
-			
-			if (playerIconGOs [i] == null) {
-				GameObject playerIcon = new GameObject ("Player Icon " + (i + 1));
-				playerIcon.transform.parent = bountyBoard.transform;
-				Image image = playerIcon.AddComponent<Image> ();
-				image.sprite = iconSprite;
-				RectTransform rect = playerIcon.GetComponent<RectTransform> ();
-				rect.anchorMin = new Vector2 (Mathf.Min (1.0f, CalculateWorth (playerList [i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-				rect.anchorMax = new Vector2 (Mathf.Min (1.0f, CalculateWorth (playerList [i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
-				rect.offsetMin = Vector3.zero;
-				rect.offsetMax = Vector3.zero;
-				playerIconGOs [i] = playerIcon;
-			} else {
-				RectTransform rect = playerIconGOs [i].GetComponent<RectTransform> ();
-				rect.anchorMin = new Vector2 (Mathf.Min (1.0f, CalculateWorth (playerList [i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-				rect.anchorMax = new Vector2 (Mathf.Min (1.0f, CalculateWorth (playerList [i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
-				rect.offsetMin = Vector3.zero;
-				rect.offsetMax = Vector3.zero;
-			}
+        else
+        {
+            Debug.Log("Null playerList");
+        }
 
-            if (playerList[i].isLocalPlayer) {
-                if (localPlayerIcon == null) {
+        if (playerIconGOs != null)
+        {
+            if (playerIconGOs.Length != playerList.Length)
+            {
+                Debug.Log("PlayerIconLength: " + playerIconGOs.Length);
+                playerIconGOs = new GameObject[playerList.Length];
+            }
+        }
+
+        else
+        {
+            Debug.Log("Null playerIconGos");
+        }
+        if (playerList != null && playerIconGOs != null)
+        {
+
+        for (int i = 0; i < playerList.Length; i++)
+        {
+
+            if (playerIconGOs[i] == null)
+            {
+                GameObject playerIcon = new GameObject("Player Icon " + (i + 1));
+                playerIcon.transform.parent = bountyBoard.transform;
+                Image image = playerIcon.AddComponent<Image>();
+                image.sprite = iconSprite;
+                RectTransform rect = playerIcon.GetComponent<RectTransform>();
+                rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+                rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+                rect.offsetMin = Vector3.zero;
+                rect.offsetMax = Vector3.zero;
+                playerIconGOs[i] = playerIcon;
+            }
+            else
+            {
+                RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
+                rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+                rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+                rect.offsetMin = Vector3.zero;
+                rect.offsetMax = Vector3.zero;
+            }
+
+            if (playerList[i].isLocalPlayer)
+            {
+                if (localPlayerIcon == null)
+                {
                     localPlayerIcon = new GameObject("Player Icon " + (i + 1));
                     localPlayerIcon.transform.parent = scoreBar.transform;
                     Image image = localPlayerIcon.AddComponent<Image>();
@@ -181,7 +214,9 @@ public class BountyManager : NetworkBehaviour {
                     rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, 1f);
                     rect.offsetMin = Vector3.zero;
                     rect.offsetMax = Vector3.zero;
-                } else {
+                }
+                else
+                {
                     RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
                     float iconPos = scoreBar.transform.position.y;
                     rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
@@ -191,21 +226,28 @@ public class BountyManager : NetworkBehaviour {
                 }
             }
 
-            if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY) {
+            if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY)
+            {
                 victoryUndeclared = false;
                 RpcStopCaptureSFX();
                 StartCoroutine(DeclareVictory(playerList[i].ID));
-                
+
             }
         }
-        for (int i = 0; i < playerIconGOs.Length; ++i) {
-            if (!playerIconGOs[i]) {
+        for (int i = 0; i < playerIconGOs.Length; ++i)
+        {
+            if (!playerIconGOs[i])
+            {
                 createdPlayerIcons = false;
                 break;
-            } else {
+            }
+            else
+            {
                 createdPlayerIcons = true;
             }
         }
+
+    }
     }
 
     public int RegisterPlayer(Player player) {

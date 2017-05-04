@@ -372,7 +372,7 @@ public class MapGenerator : NetworkBehaviour {
             tile = map[xRand + radius, yRand + radius];
             tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
             Collider2D collision = Physics2D.OverlapArea(new Vector2(tilePos.x - 3, tilePos.y - 3), new Vector2(tilePos.x + 3, tilePos.y + 3));
-            if(collision != null && collision.tag != "Resource")
+            if(collision != null && (collision.tag != "Resource" && collision.tag != "Player"))
             {
                 Occupied = false;
             }

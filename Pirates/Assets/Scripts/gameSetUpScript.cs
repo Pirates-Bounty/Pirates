@@ -44,7 +44,7 @@ public class gameSetUpScript : MonoBehaviour {
         for (int i = 0; i < numPlayers; i++) {
             //bool spawnable = false;
 
-            GameObject spawn = Instantiate(spawnPoint, mapGen.GetRandLocAwayFromLand(5), Quaternion.identity) as GameObject;
+            GameObject spawn = Instantiate(spawnPoint, mapGen.GetRandLocAwayFromLand(3), Quaternion.identity) as GameObject;
             //int qWidth = (x > 0 ? mg.quadWidth : -mg.quadWidth);
             //int qHeight = (y > 0 ? -mg.quadHeight : mg.quadHeight);
             //Checks to see if a good spot to spawn the spawnPoints
