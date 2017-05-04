@@ -66,6 +66,8 @@ public class MapGenerator : NetworkBehaviour {
     private GameObject minimap;
     public LobbyTopPanel inGameMenuPanel;
 
+    private int resourceMult = 1000;
+
     void Start() {
         if (!Instance) {
             DontDestroyOnLoad(gameObject);
@@ -80,7 +82,7 @@ public class MapGenerator : NetworkBehaviour {
         //GenerateGameObjects();
 
         int numPlayers = inGameMenuPanel.numberPlayers;
-        maxResources = (.2f * 20000) / width;
+        maxResources = (.4f * resourceMult) / width;
     }
 
 
@@ -122,7 +124,7 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     public void MaxResourceChange() {
-        maxResources = (int)((resourceSlider.value * 20000) / width);
+        maxResources = (int)((resourceSlider.value * resourceMult) / width);
     }
 
     public void InputSeed() {
@@ -229,16 +231,18 @@ public class MapGenerator : NetworkBehaviour {
                     // this way, there will be a larger island in the middle of the map
                     // comment this line to go back to the old generation
                     //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
-                    if (noise < landFreq) {
-                        if (noise > Random.Range(0, 40f)) {
+                    if (noise <= landFreq)
+                    {
+                        if (noise > Random.Range(0, 40f))
+                        {
                             map[i, j] = (int)TileType.TREE;
-                        } else {
+                        }
+                        else
+                        {
                             map[i, j] = (int)TileType.GRASS;
                         }
-
-                    } else if (noise < landFreq + .05) {
-                        map[i, j] = (int)TileType.SAND;
-                    } else if (noise >= landFreq + .05) {
+                    }
+                    else if (noise > landFreq) {
 
                         map[i, j] = (int)TileType.WATER;
                     }
@@ -342,7 +346,6 @@ public class MapGenerator : NetworkBehaviour {
                         break;
                     case TileType.GRASS:
                     case TileType.TREE:
-                    case TileType.SAND:
                         Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + id);
                         AddTileToMap(tilePos, s, null);
                         break;
@@ -361,12 +364,22 @@ public class MapGenerator : NetworkBehaviour {
         int yRand = (int)inBounds.y;
         int tile = map[xRand + radius, yRand + radius];
         Vector2 tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
-        while ((TileType)tile != TileType.WATER) {
+        bool Occupied = true;
+        while ((TileType)tile != TileType.WATER || Occupied) {
             inBounds = Random.insideUnitCircle * radius;
             xRand = (int)inBounds.x;
             yRand = (int)inBounds.y;
             tile = map[xRand + radius, yRand + radius];
             tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
+            Collider2D collision = Physics2D.OverlapArea(new Vector2(tilePos.x - 3, tilePos.y - 3), new Vector2(tilePos.x + 3, tilePos.y + 3));
+            if(collision != null && collision.tag != "Resource")
+            {
+                Occupied = false;
+            }
+            else if(collision == null)
+            {
+                Occupied = false;
+            }
         }
 
         return tilePos;
