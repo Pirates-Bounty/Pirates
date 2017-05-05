@@ -381,7 +381,7 @@ public class BountyManager : NetworkBehaviour {
         //if (playerList[playerID].isLocalPlayer)
         SoundManager.Instance.PlaySFX_Victory();
         //else SoundManager.Instance.PlaySFX_Defeat();
-
+        Debug.Log("player id" + playerID);
         GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
 
