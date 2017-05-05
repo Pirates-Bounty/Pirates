@@ -151,6 +151,10 @@ public class BountyManager : NetworkBehaviour {
             if (playerList.Length != numPlayers)
             {
                 playerList = FindObjectsOfType<Player>();
+                foreach(Player p in playerList)
+                {
+                    p.ID = RegisterPlayer(p);
+                }
                 Debug.Log("PlayerListLength: " + playerList.Length);
             }
         }
@@ -230,6 +234,9 @@ public class BountyManager : NetworkBehaviour {
             {
                 victoryUndeclared = false;
                 RpcStopCaptureSFX();
+                Debug.Log(playerList[i].playerName);
+                Debug.Log(i);
+                    Debug.Log(playerList.Length);
                 StartCoroutine(DeclareVictory(playerList[i].ID));
 
             }
@@ -256,7 +263,7 @@ public class BountyManager : NetworkBehaviour {
         return prevIndex;*/
 		for (int i = 0; i < playerList.Length; i++) {
 			if (playerList [i] == player) {
-				return i;
+				return i + 1;
 			}
 		}
 		return -1;
@@ -284,7 +291,7 @@ public class BountyManager : NetworkBehaviour {
         } else {
             killer.streak++;
         }
-        broadcastText = UI.CreateText("Broadcast", "Player " + (killerID + 1) + " has slain Player " + (victimID + 1),
+        broadcastText = UI.CreateText("Broadcast", "Player " + (killerID) + " has slain Player " + (victimID),
             font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
         Destroy(broadcastText, 5f);
     }
@@ -375,7 +382,7 @@ public class BountyManager : NetworkBehaviour {
         SoundManager.Instance.PlaySFX_Victory();
         //else SoundManager.Instance.PlaySFX_Defeat();
 
-        GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID + 1) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
+        GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
 
         //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
