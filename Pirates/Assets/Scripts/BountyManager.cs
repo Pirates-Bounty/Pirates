@@ -234,10 +234,7 @@ public class BountyManager : NetworkBehaviour {
             {
                 victoryUndeclared = false;
                 RpcStopCaptureSFX();
-                Debug.Log(playerList[i].playerName);
-                Debug.Log(i);
-                    Debug.Log(playerList.Length);
-                StartCoroutine(DeclareVictory(playerList[i].ID));
+                StartCoroutine(DeclareVictory(i));
 
             }
         }
@@ -372,6 +369,7 @@ public class BountyManager : NetworkBehaviour {
         if (isServer)
         {
             RpcStopCaptureSFX();
+            Debug.Log("player id" + playerID);
             for (int i = 0; i < playerList.Length; i++)
             {
                 playerList[i].dead = true;
