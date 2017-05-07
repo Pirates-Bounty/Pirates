@@ -164,7 +164,6 @@ public class BountyManager : NetworkBehaviour {
                 {
                     p.ID = RegisterPlayer(p);
                 }
-                Debug.Log("PlayerListLength: " + playerList.Length);
             }
         }
         else
@@ -176,7 +175,6 @@ public class BountyManager : NetworkBehaviour {
         {
             if (playerIconGOs.Length != playerList.Length)
             {
-                Debug.Log("PlayerIconLength: " + playerIconGOs.Length);
                 playerIconGOs = new GameObject[playerList.Length];
             }
         }
@@ -213,30 +211,34 @@ public class BountyManager : NetworkBehaviour {
                 rect.offsetMax = Vector3.zero;
             }
 
-            if (playerList[i].isLocalPlayer)
-            {
-                if (localPlayerIcon == null)
+            if(playerList[i] != null)
                 {
-                    localPlayerIcon = new GameObject("Player Icon " + (i + 1));
-                    localPlayerIcon.transform.parent = scoreBar.transform;
-                    Image image = localPlayerIcon.AddComponent<Image>();
-                    image.sprite = iconSprite;
-                    RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
-                    float iconPos = scoreBar.transform.position.y;
-                    rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
-                    rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, 1f);
-                    rect.offsetMin = Vector3.zero;
-                    rect.offsetMax = Vector3.zero;
-                }
-                else
-                {
-                    RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
-                    float iconPos = scoreBar.transform.position.y;
-                    rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
-                    rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, 1f);
-                    rect.offsetMin = Vector3.zero;
-                    rect.offsetMax = Vector3.zero;
-                }
+                    if (playerList[i].isLocalPlayer)
+                    {
+                        if (localPlayerIcon == null)
+                        {
+                            localPlayerIcon = new GameObject("Player Icon " + (i + 1));
+                            localPlayerIcon.transform.parent = scoreBar.transform;
+                            Image image = localPlayerIcon.AddComponent<Image>();
+                            image.sprite = iconSprite;
+                            RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
+                            float iconPos = scoreBar.transform.position.y;
+                            rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
+                            rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, 1f);
+                            rect.offsetMin = Vector3.zero;
+                            rect.offsetMax = Vector3.zero;
+                        }
+                        else
+                        {
+                            RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
+                            float iconPos = scoreBar.transform.position.y;
+                            rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
+                            rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, 1f);
+                            rect.offsetMin = Vector3.zero;
+                            rect.offsetMax = Vector3.zero;
+                        }
+                    }
+
             }
 
             if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY)
@@ -247,9 +249,9 @@ public class BountyManager : NetworkBehaviour {
                     RpcStopCaptureSFX();
                 }
 
-                    Debug.Log(playerList[i].ID);
-                    Debug.Log("Player List Length: " + playerList.Length);
-                    Debug.Log(playerList[i].playerName);
+                    //Debug.Log(playerList[i].ID);
+                    //Debug.Log("Player List Length: " + playerList.Length);
+                    //Debug.Log(playerList[i].playerName);
                 StartCoroutine(DeclareVictory(playerList[i].playerName));
 
             }

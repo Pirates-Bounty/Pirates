@@ -456,15 +456,13 @@ public class MapGenerator : NetworkBehaviour {
         {
             localNumberPlayers = 0;
             inGameMenuPanel.numberPlayers = 0;
+            Debug.Log("Server press exit");
             lm.ResetGame();
             return;
         }
-        if (isLocalPlayer)
-        {
-            localNumberPlayers--;
-            inGameMenuPanel.numberPlayers--;
-            lm.ResetGame();
-        }
+        localNumberPlayers--;
+        inGameMenuPanel.numberPlayers--;
+        lm.ResetGame();
 
     }
 
