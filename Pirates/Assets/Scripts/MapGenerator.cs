@@ -460,13 +460,9 @@ public class MapGenerator : NetworkBehaviour {
             lm.ResetGame();
             return;
         }
-        if (isLocalPlayer)
-        {
-            localNumberPlayers--;
-            inGameMenuPanel.numberPlayers--;
-            Debug.Log("press exit");
-            lm.ResetGame();
-        }
+        localNumberPlayers--;
+        inGameMenuPanel.numberPlayers--;
+        lm.ResetGame();
 
     }
 
