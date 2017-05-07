@@ -215,7 +215,6 @@ namespace Prototype.NetworkLobby
 
         public void ChangeTo(RectTransform newPanel)
         {
-            NetworkServer.SetAllClientsNotReady();
             if (currentPanel != null)
             {
                 currentPanel.gameObject.SetActive(false);
@@ -549,6 +548,12 @@ namespace Prototype.NetworkLobby
         {
             ResetGame();
 
+        }
+
+        public override void ServerChangeScene(string sceneName)
+        {
+            NetworkServer.SetAllClientsNotReady();
+            base.ServerChangeScene(sceneName);
         }
 
         public void ResetGame()
