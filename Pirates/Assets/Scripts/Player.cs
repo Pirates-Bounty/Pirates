@@ -952,4 +952,12 @@ public class Player : NetworkBehaviour {
     {
         SoundManager.Instance.StopCaptureSFX();
     }
+
+	public void PlayPointSFX() {
+		SoundManager.Instance.StopCaptureSFX ();
+		SoundManager.Instance.PlayPointSFX ();
+	}
+	public void StopPointSFX() {
+		SoundManager.Instance.StopPointSFX ();
+	}
 }

@@ -120,6 +120,7 @@ public class HillScript : NetworkBehaviour {
                 }
 				if (scoreReserve <= 0f) {
                     RpcStopCaptureSFX();
+					hillController.StopPointSFX ();
                     scoreReserve = Random.Range (10f, 15f);
 
                     ClearTargetsValues();
@@ -176,12 +177,15 @@ public class HillScript : NetworkBehaviour {
 					targets[p] = new Capture(targets[p].time + Time.deltaTime,true);
 					if (targets[p].time >= timeToCapture) {
 						targets[p] = new Capture(timeToCapture,true);
+						if(hillController != null)
+							hillController.StopPointSFX ();
 						hillController = p;
                         //GetComponent<SpriteRenderer> ().color = p.playerColor;
                         if (!BountyManager.gameOver)
                         {
                             RpcColorChange(p.playerColor);
                             ClearTargetsValuesCapture();
+							p.PlayPointSFX ();
                         }
 
                         
