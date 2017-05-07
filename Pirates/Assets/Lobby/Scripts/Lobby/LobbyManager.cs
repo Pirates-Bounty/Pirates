@@ -46,7 +46,7 @@ namespace Prototype.NetworkLobby
         public Text statusInfo;
         public Text hostInfo;
 
-
+        private int numPlayers = 0;
         
        
 
@@ -459,8 +459,7 @@ namespace Prototype.NetworkLobby
             if (allready)
             {
                 StartCoroutine(ServerCountdownCoroutine());
-                inGameTopPanel.numberPlayers = count;
-                Debug.Log(inGameTopPanel.numberPlayers);
+                numPlayers = count;
             }
 
                 
@@ -492,7 +491,10 @@ namespace Prototype.NetworkLobby
                 }
             }
 
-            mapGen.GetComponentInChildren<MapGenerator>().CmdReGenerate();
+            MapGenerator mg = mapGen.GetComponentInChildren<MapGenerator>();
+            mg.localNumberPlayers = numPlayers;
+            mg.CmdReGenerate();
+            
             Instantiate(gameSetUp, transform.position, Quaternion.identity);
             if (inGameMenuPanel != null)
             {
@@ -550,9 +552,16 @@ namespace Prototype.NetworkLobby
 
         }
 
+        public override void ServerChangeScene(string sceneName)
+        {
+            NetworkServer.SetAllClientsNotReady();
+            base.ServerChangeScene(sceneName);
+        }
+
         public void ResetGame()
         {
             inGameTopPanel.numberPlayers = 0;
+            inGameTopPanel.mg.numPlayers = 0;
             BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
             foreach (BountyManager b in bm)
             {

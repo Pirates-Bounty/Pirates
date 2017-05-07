@@ -68,6 +68,10 @@ public class MapGenerator : NetworkBehaviour {
 
     private int resourceMult = 1000;
 
+    [SyncVar]
+    public int numPlayers = 0;
+    public int localNumberPlayers = 0;
+
     void Start() {
         if (!Instance) {
             DontDestroyOnLoad(gameObject);
@@ -80,8 +84,11 @@ public class MapGenerator : NetworkBehaviour {
         Generate();
 
         //GenerateGameObjects();
+        if (isServer)
+        {
+            numPlayers = localNumberPlayers;
+        }
 
-        int numPlayers = inGameMenuPanel.numberPlayers;
         maxResources = (.4f * resourceMult) / width;
     }
 
@@ -157,6 +164,14 @@ public class MapGenerator : NetworkBehaviour {
             return;
         }
         minimap.GetComponent<RawImage>().texture = minimapTexture;
+        if (isServer)
+        {
+            if(localNumberPlayers != numPlayers)
+            {
+                numPlayers = localNumberPlayers;
+                inGameMenuPanel.numberPlayers = numPlayers;
+            }
+        }
     }
 
 
@@ -432,4 +447,6 @@ public class MapGenerator : NetworkBehaviour {
         }
         tMap.SetTile(v3pos, tile);
     }
+
+
 }

@@ -54,7 +54,8 @@ public class BountyManager : NetworkBehaviour {
     // Use this for initialization
     void Start() {
         Instance = this;
-        numPlayers = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>().numberPlayers;
+        inGameMenuPanel = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>();
+        numPlayers = inGameMenuPanel.numberPlayers;
         playerList = new Player[numPlayers];
         playerList = FindObjectsOfType<Player>();
 		playerIconGOs = new GameObject[numPlayers];
@@ -146,6 +147,14 @@ public class BountyManager : NetworkBehaviour {
             bountyBoard.SetActive(false);
         }
 
+        if (isServer)
+        {
+            if(numPlayers != inGameMenuPanel.numberPlayers)
+            {
+                numPlayers = inGameMenuPanel.numberPlayers;
+            }
+        }
+
         if (playerList != null)
         {
             if (playerList.Length != numPlayers)
@@ -233,11 +242,15 @@ public class BountyManager : NetworkBehaviour {
             if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY)
             {
                 victoryUndeclared = false;
-                RpcStopCaptureSFX();
+                if (isServer)
+                {
+                    RpcStopCaptureSFX();
+                }
+
                     Debug.Log(playerList[i].ID);
                     Debug.Log("Player List Length: " + playerList.Length);
                     Debug.Log(playerList[i].playerName);
-                StartCoroutine(DeclareVictory(playerList[i].name));
+                StartCoroutine(DeclareVictory(playerList[i].playerName));
 
             }
         }
@@ -292,7 +305,7 @@ public class BountyManager : NetworkBehaviour {
             killer.streak++;
         }
 
-        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.name) + " has slain Player " + (playerList[victimLoc]),
+        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName),
             font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
         Destroy(broadcastText, 5f);
     }

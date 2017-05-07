@@ -36,7 +36,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010902933306}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -111,6 +111,7 @@ MonoBehaviour:
   waterMat: {fileID: 2100000, guid: 91ffbfb29bfd2154a9d15ee583a910e2, type: 2}
   boundaryMat: {fileID: 2100000, guid: 3dad96c43f707434c9bd7253bcb88abb, type: 2}
   mapPic: {fileID: 0}
+  inGameMenuPanel: {fileID: 0}
 --- !u!114 &114000011153274272
 MonoBehaviour:
   m_ObjectHideFlags: 1
