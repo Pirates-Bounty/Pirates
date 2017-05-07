@@ -234,7 +234,10 @@ public class BountyManager : NetworkBehaviour {
             {
                 victoryUndeclared = false;
                 RpcStopCaptureSFX();
-                StartCoroutine(DeclareVictory(i));
+                    Debug.Log(playerList[i].ID);
+                    Debug.Log("Player List Length: " + playerList.Length);
+                    Debug.Log(playerList[i].playerName);
+                StartCoroutine(DeclareVictory(playerList[i].name));
 
             }
         }
@@ -288,7 +291,8 @@ public class BountyManager : NetworkBehaviour {
         } else {
             killer.streak++;
         }
-        broadcastText = UI.CreateText("Broadcast", "Player " + (killerID) + " has slain Player " + (victimID),
+
+        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.name) + " has slain Player " + (playerList[victimLoc]),
             font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
         Destroy(broadcastText, 5f);
     }
@@ -362,14 +366,13 @@ public class BountyManager : NetworkBehaviour {
     }
 
 
-    private IEnumerator DeclareVictory(int playerID) {
+    private IEnumerator DeclareVictory(string playerName) {
         gameOver = true;
         // declare the winning player to be the pirate king
         //print("Victory has been declared!");
         if (isServer)
         {
             RpcStopCaptureSFX();
-            Debug.Log("player id" + playerID);
             for (int i = 0; i < playerList.Length; i++)
             {
                 playerList[i].dead = true;
@@ -379,8 +382,7 @@ public class BountyManager : NetworkBehaviour {
         //if (playerList[playerID].isLocalPlayer)
         SoundManager.Instance.PlaySFX_Victory();
         //else SoundManager.Instance.PlaySFX_Defeat();
-        Debug.Log("player id" + playerID);
-        GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerID) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
+        GameObject lastText = (UI.CreateText("Victory Text", "Player " + (playerName) + " is the Pirate King!", font, Color.black, 100, canvas.transform,
             Vector3.zero, new Vector2(0.1f, 0.1f), new Vector2(0.9f, 0.9f), TextAnchor.MiddleCenter, true));
 
         //lastText.GetComponent<Text> ().resizeTextForBestFit = true;
