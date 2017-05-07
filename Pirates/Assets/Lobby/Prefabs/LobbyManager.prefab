@@ -1999,6 +1999,7 @@ MonoBehaviour:
   addPlayerButton: {fileID: 144256}
   mapGen: {fileID: 0}
   backButton: {fileID: 114260811001180232}
+  mg: {fileID: 0}
   statusInfo: {fileID: 11403930}
   hostInfo: {fileID: 11415712}
   _playerNumber: 0
@@ -2070,7 +2071,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114574822448741242}
+      - m_Target: {fileID: 0}
         m_MethodName: OnExitButtonPressed
         m_Mode: 1
         m_Arguments:

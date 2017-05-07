@@ -43,6 +43,8 @@ namespace Prototype.NetworkLobby
 
         public Button backButton;
 
+        public MapGenerator mg;
+
         public Text statusInfo;
         public Text hostInfo;
 
@@ -560,8 +562,7 @@ namespace Prototype.NetworkLobby
 
         public void ResetGame()
         {
-            inGameTopPanel.numberPlayers = 0;
-            inGameTopPanel.mg.numPlayers = 0;
+            mg.localNumberPlayers = 0;
             BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
             foreach (BountyManager b in bm)
             {

@@ -72,23 +72,7 @@ namespace Prototype.NetworkLobby
             }
         }
 
-        public void OnExitButtonPressed()
-        {
-            if (isServer)
-            {
-                numberPlayers = 0;
-                mg.numPlayers = numberPlayers;
-                lm.ResetGame();
-                return;
-            }
-            if (isLocalPlayer)
-            {
-                numberPlayers--;
-                mg.numPlayers = numberPlayers;
-                lm.ResetGame();
-            }
 
-        }
 
 
 

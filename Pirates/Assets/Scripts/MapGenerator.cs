@@ -65,6 +65,7 @@ public class MapGenerator : NetworkBehaviour {
     private Texture2D minimapTexture;
     private GameObject minimap;
     public LobbyTopPanel inGameMenuPanel;
+    public LobbyManager lm;
 
     private int resourceMult = 1000;
 
@@ -446,6 +447,25 @@ public class MapGenerator : NetworkBehaviour {
             tile.gameObject = g;
         }
         tMap.SetTile(v3pos, tile);
+    }
+
+
+    public void OnExitButtonPressed()
+    {
+        if (isServer)
+        {
+            localNumberPlayers = 0;
+            inGameMenuPanel.numberPlayers = 0;
+            lm.ResetGame();
+            return;
+        }
+        if (isLocalPlayer)
+        {
+            localNumberPlayers--;
+            inGameMenuPanel.numberPlayers--;
+            lm.ResetGame();
+        }
+
     }
 
 
