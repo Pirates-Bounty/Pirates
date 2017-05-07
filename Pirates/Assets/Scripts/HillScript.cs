@@ -102,9 +102,7 @@ public class HillScript : NetworkBehaviour {
 
 		if (hiding) {
 			if (hideTimer > 0) {
-				if (isServer) {
-					hideTimer -= Time.deltaTime;
-				}
+				hideTimer -= Time.deltaTime;
 				hillTimerText.text = "New Bounty Fountain spawns in " + Mathf.CeilToInt (hideTimer) + " seconds";
 			} else {
 				RevealHill ();
@@ -128,7 +126,6 @@ public class HillScript : NetworkBehaviour {
 					totalPlayersInHill = 0;
 					//BountyManager.Instance.CmdMoveHill ();
 					RpcMoveHill ();
-					hideTimer = TIME_BETWEEN_SPAWNS;
                 }
 
                 
@@ -218,6 +215,7 @@ public class HillScript : NetworkBehaviour {
 		if (isServer) {
 			transform.position = MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(hillCheck);
 		}
+		hideTimer = TIME_BETWEEN_SPAWNS;
 	}
 
 
