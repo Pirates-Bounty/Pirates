@@ -16,10 +16,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000010230733252}
-  - 114: {fileID: 114000011444850496}
+  - component: {fileID: 4000010230733252}
+  - component: {fileID: 114000011444850496}
   m_Layer: 0
   m_Name: SoundManager
   m_TagString: Untagged
@@ -36,10 +36,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114000011444850496
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -59,8 +59,10 @@ MonoBehaviour:
   menuBGM: {fileID: 8300000, guid: b7805c59b3ffa7541b049ab765a736fd, type: 3}
   lobbyBGM: {fileID: 8300000, guid: c03ede385dad47245a9bca2dece1f8e5, type: 3}
   captureS: {fileID: 8300000, guid: f0f0ec0e741da41eabbd7849137f449d, type: 3}
+  pointS: {fileID: 8300000, guid: 020a5c57c20a17e48b2bd209bf43357e, type: 3}
   victoryS: {fileID: 8300000, guid: 51e8796c0fa254996af637bbb6a5b038, type: 3}
   defeatS: {fileID: 0}
   respawnS: {fileID: 8300000, guid: 828e906d15ddd4c4e8a26296d247d2ac, type: 3}
   hillSpawnS: {fileID: 8300000, guid: d14ac671353ce448aa476bde0e376d98, type: 3}
   hillWarningS: {fileID: 8300000, guid: 94975626120d0410199ef5227061de8a, type: 3}
+  prepareS: {fileID: 0}

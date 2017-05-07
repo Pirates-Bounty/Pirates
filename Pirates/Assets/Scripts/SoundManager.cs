@@ -33,6 +33,7 @@ public class SoundManager : MonoBehaviour {
     //public AudioClip captureS;
     private AudioSource captureSFX;
     public AudioClip captureS;
+	public AudioClip pointS;
     public AudioClip victoryS;
     public AudioClip defeatS;
     public AudioClip respawnS;
@@ -241,13 +242,23 @@ public class SoundManager : MonoBehaviour {
 
     public void PlayCaptureSFX()
     {
+		captureSFX.clip = captureS;
         captureSFX.volume = volumeSFX;
         captureSFX.Play();
     }
     public void StopCaptureSFX()
     {
-        captureSFX.Stop();
+		if(captureSFX.clip == captureS)
+        	captureSFX.Stop();
     }
+	public void PlayPointSFX () {
+		Debug.Log ("PlayPointSFX");
+		captureSFX.clip = pointS;
+		captureSFX.Play();
+	}
+	public void StopPointSFX () {
+		captureSFX.Stop ();
+	}
 
     public void UpdateBGMVolume()
     {

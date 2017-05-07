@@ -9,7 +9,7 @@ using Prototype.NetworkLobby;
 public class BountyManager : NetworkBehaviour {
     public int numPlayers;
     public const int BASE_BOUNTY = 200;
-    public const int MAX_BOUNTY = 2;
+    public const int MAX_BOUNTY = 20;
     public const int MAX_PLAYERS = 20;
     private GameObject bountyPanel;
     public LobbyTopPanel inGameMenuPanel;
@@ -386,6 +386,7 @@ public class BountyManager : NetworkBehaviour {
         if (isServer)
         {
             RpcStopCaptureSFX();
+			RpcStopPointSFX();
             for (int i = 0; i < playerList.Length; i++)
             {
                 playerList[i].dead = true;
@@ -420,6 +421,11 @@ public class BountyManager : NetworkBehaviour {
     {
         SoundManager.Instance.StopCaptureSFX();
     }
+	[ClientRpc]
+	void RpcStopPointSFX()
+	{
+		SoundManager.Instance.StopPointSFX();
+	}
 
     /*private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
     {
