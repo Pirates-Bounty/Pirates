@@ -182,7 +182,8 @@ public class HillScript : NetworkBehaviour {
                         {
                             RpcColorChange(p.playerColor);
                             ClearTargetsValuesCapture();
-							p.PlayPointSFX ();
+							if(p.isLocalPlayer)
+								p.PlayPointSFX ();
                         }
 
                         

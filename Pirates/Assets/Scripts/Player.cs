@@ -164,7 +164,9 @@ public class Player : NetworkBehaviour {
     public AudioClip sfx_upgradeMenuClose;
 
 	// PLAYER INFO //
+	[SyncVar]
 	public string playerName;
+	[SyncVar]
 	public Color playerColor;
 
     
@@ -206,7 +208,7 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
         inGameUI = transform.Find("Canvas").gameObject;
-        inGameHealthBar = inGameUI.transform.GetChild(0).GetComponent<RectTransform>();
+        inGameHealthBar = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
         Text t = inGameUI.transform.GetChild(2).GetComponent<Text>();
         t.text = playerName;
         t.color = playerColor;
@@ -667,13 +669,13 @@ public class Player : NetworkBehaviour {
         deathsText.text = "" + deaths;
 		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
-    void OnChangePlayer(float newHealth) {
+	void OnChangePlayer(float newHealth) {
+		inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
         }
         currentHealth = newHealth;
         healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
-        inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
@@ -954,10 +956,8 @@ public class Player : NetworkBehaviour {
     }
 
 	public void PlayPointSFX() {
-		if (isLocalPlayer) {
-			SoundManager.Instance.StopCaptureSFX ();
-			SoundManager.Instance.PlayPointSFX ();
-		}
+		SoundManager.Instance.StopCaptureSFX ();
+		SoundManager.Instance.PlayPointSFX ();
 	}
 	public void StopPointSFX() {
 		SoundManager.Instance.StopPointSFX ();
