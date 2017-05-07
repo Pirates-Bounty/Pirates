@@ -164,7 +164,6 @@ public class BountyManager : NetworkBehaviour {
                 {
                     p.ID = RegisterPlayer(p);
                 }
-                Debug.Log("PlayerListLength: " + playerList.Length);
             }
         }
         else
@@ -176,7 +175,6 @@ public class BountyManager : NetworkBehaviour {
         {
             if (playerIconGOs.Length != playerList.Length)
             {
-                Debug.Log("PlayerIconLength: " + playerIconGOs.Length);
                 playerIconGOs = new GameObject[playerList.Length];
             }
         }
@@ -247,9 +245,9 @@ public class BountyManager : NetworkBehaviour {
                     RpcStopCaptureSFX();
                 }
 
-                    Debug.Log(playerList[i].ID);
-                    Debug.Log("Player List Length: " + playerList.Length);
-                    Debug.Log(playerList[i].playerName);
+                    //Debug.Log(playerList[i].ID);
+                    //Debug.Log("Player List Length: " + playerList.Length);
+                    //Debug.Log(playerList[i].playerName);
                 StartCoroutine(DeclareVictory(playerList[i].playerName));
 
             }
