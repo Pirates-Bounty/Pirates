@@ -233,11 +233,15 @@ public class BountyManager : NetworkBehaviour {
             if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY)
             {
                 victoryUndeclared = false;
-                RpcStopCaptureSFX();
+                if (isServer)
+                {
+                    RpcStopCaptureSFX();
+                }
+
                     Debug.Log(playerList[i].ID);
                     Debug.Log("Player List Length: " + playerList.Length);
                     Debug.Log(playerList[i].playerName);
-                StartCoroutine(DeclareVictory(playerList[i].name));
+                StartCoroutine(DeclareVictory(playerList[i].playerName));
 
             }
         }
@@ -292,7 +296,7 @@ public class BountyManager : NetworkBehaviour {
             killer.streak++;
         }
 
-        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.name) + " has slain Player " + (playerList[victimLoc]),
+        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName),
             font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
         Destroy(broadcastText, 5f);
     }

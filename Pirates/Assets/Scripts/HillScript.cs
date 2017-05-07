@@ -114,7 +114,7 @@ public class HillScript : NetworkBehaviour {
 
                 if(hillController != null)
                 {
-                    Debug.Log(hillController.name);
+                    Debug.Log(hillController.playerName);
                     hillController.score += SCORE_INCREMENT * Time.deltaTime / targets.Count;
                     scoreReserve -= SCORE_INCREMENT * Time.deltaTime / targets.Count;
                 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public class Navigator : MonoBehaviour {
     // singleton
@@ -28,6 +29,7 @@ public class Navigator : MonoBehaviour {
 
 
     public void LoadLevel(string action) {
+        NetworkServer.SetAllClientsNotReady();
 		// Loads the scene based on the given string, or exits the game if the string is Quit
         SoundManager.Instance.StopAllBGM();
         if (action == "Quit") {

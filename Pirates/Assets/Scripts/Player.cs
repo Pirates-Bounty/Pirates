@@ -610,7 +610,7 @@ public class Player : NetworkBehaviour {
         if (currentHealth <= 0.0f) {
             SoundManager.Instance.PlaySFX(deathS, 1.0f);
             RpcRespawn();
-            BountyManager.Instance.CmdReportKill(enemyID, ID);
+            BountyManager.Instance.CmdReportKill(ID, enemyID);
             deaths++;
             if (streak < 0) {
                 streak--;

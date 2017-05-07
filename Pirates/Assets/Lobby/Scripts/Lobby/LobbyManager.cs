@@ -215,6 +215,7 @@ namespace Prototype.NetworkLobby
 
         public void ChangeTo(RectTransform newPanel)
         {
+            NetworkServer.SetAllClientsNotReady();
             if (currentPanel != null)
             {
                 currentPanel.gameObject.SetActive(false);
