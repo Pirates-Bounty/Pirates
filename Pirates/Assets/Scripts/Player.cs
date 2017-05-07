@@ -954,8 +954,10 @@ public class Player : NetworkBehaviour {
     }
 
 	public void PlayPointSFX() {
-		SoundManager.Instance.StopCaptureSFX ();
-		SoundManager.Instance.PlayPointSFX ();
+		if (isLocalPlayer) {
+			SoundManager.Instance.StopCaptureSFX ();
+			SoundManager.Instance.PlayPointSFX ();
+		}
 	}
 	public void StopPointSFX() {
 		SoundManager.Instance.StopPointSFX ();

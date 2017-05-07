@@ -242,7 +242,6 @@ public class SoundManager : MonoBehaviour {
 
     public void PlayCaptureSFX()
     {
-		captureSFX.clip = captureS;
         captureSFX.volume = volumeSFX;
         captureSFX.Play();
     }
@@ -258,6 +257,7 @@ public class SoundManager : MonoBehaviour {
 	}
 	public void StopPointSFX () {
 		captureSFX.Stop ();
+		captureSFX.clip = captureS;
 	}
 
     public void UpdateBGMVolume()
