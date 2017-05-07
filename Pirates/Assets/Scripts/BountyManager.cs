@@ -54,7 +54,8 @@ public class BountyManager : NetworkBehaviour {
     // Use this for initialization
     void Start() {
         Instance = this;
-        numPlayers = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>().numberPlayers;
+        inGameMenuPanel = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>();
+        numPlayers = inGameMenuPanel.numberPlayers;
         playerList = new Player[numPlayers];
         playerList = FindObjectsOfType<Player>();
 		playerIconGOs = new GameObject[numPlayers];
@@ -144,6 +145,14 @@ public class BountyManager : NetworkBehaviour {
         else if (Input.GetKeyUp(KeyCode.Tab))
         {
             bountyBoard.SetActive(false);
+        }
+
+        if (isServer)
+        {
+            if(numPlayers != inGameMenuPanel.numberPlayers)
+            {
+                numPlayers = inGameMenuPanel.numberPlayers;
+            }
         }
 
         if (playerList != null)
