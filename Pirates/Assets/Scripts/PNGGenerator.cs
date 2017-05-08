@@ -13,6 +13,15 @@ public class PNGGenerator : MonoBehaviour {
     private void GeneratePNGs() {
         for (int i = 0; i < 256; ++i) {
             Texture2D tex = new Texture2D(3, 3);
+
+            for(int x = 0; x < 3; x++)
+            {
+                for(int y = 0; y < 3; y++)
+                {
+                    tex.SetPixel(x, y, new Color(0, 0, 0, 0));
+                }
+            }
+
             tex.SetPixel(1, 1, Color.green);
             int copy = i;
             // find the closest power of two that is smaller than copy and subtract it from copy until copy is 0
@@ -30,7 +39,7 @@ public class PNGGenerator : MonoBehaviour {
                 }
                 tex.SetPixel(index % 3, 2 - Mathf.FloorToInt(index / 3), Color.green);
             }
-            Texture2D scaledTex = ScaleTexture(tex, 3 * size, 3 * size);
+            Texture2D scaledTex = ScaleTexture(tex, 256, 256);
             byte[] bytes = scaledTex.EncodeToPNG();
             Object.Destroy(tex);
             Object.Destroy(scaledTex);

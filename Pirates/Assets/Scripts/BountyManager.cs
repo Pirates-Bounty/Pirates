@@ -284,7 +284,10 @@ public class BountyManager : NetworkBehaviour {
 		return -1;
     }
 
-    [Command]
+
+
+
+[Command]
     public void CmdReportKill(int victimID, int killerID) {
 		Player killer = null;
 		int victimLoc = -1;
@@ -307,10 +310,10 @@ public class BountyManager : NetworkBehaviour {
             killer.streak++;
         }
 
-        broadcastText = UI.CreateText("Broadcast", "Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName),
-            font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
-        Destroy(broadcastText, 5f);
+        RpcBroadcastText("Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName));
     }
+
+
 
     public static float CalculateWorth(Player p) {
         if (kingOfTheHill) {
@@ -428,6 +431,12 @@ public class BountyManager : NetworkBehaviour {
 	{
 		SoundManager.Instance.StopPointSFX();
 	}
+
+    [ClientRpc]
+    void RpcBroadcastText(string message)
+    {
+        UI.CreateText("Broadcast",message, font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
+    }
 
     /*private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
     {

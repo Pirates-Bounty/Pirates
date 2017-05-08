@@ -64,6 +64,7 @@ public class MapGenerator : NetworkBehaviour {
     private BoundaryGenerator bg;
     private Texture2D minimapTexture;
     private GameObject minimap;
+    public GameObject inGameMenu;
     public LobbyTopPanel inGameMenuPanel;
     public LobbyManager lm;
 
@@ -170,7 +171,19 @@ public class MapGenerator : NetworkBehaviour {
             if(localNumberPlayers != numPlayers)
             {
                 numPlayers = localNumberPlayers;
-                inGameMenuPanel.numberPlayers = numPlayers;
+                if(inGameMenuPanel != null)
+                {
+                    inGameMenuPanel.numberPlayers = numPlayers;
+                }
+                else
+                {
+                    inGameMenu = GameObject.Find("InGameMenu");
+                    if (inGameMenu != null)
+                    {
+                        inGameMenuPanel = inGameMenu.GetComponent<LobbyTopPanel>();
+                    }
+                }
+
             }
         }
     }
