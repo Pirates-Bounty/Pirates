@@ -164,10 +164,9 @@ public class Player : NetworkBehaviour {
     public AudioClip sfx_upgradeMenuClose;
 
 	// PLAYER INFO //
-    [SyncVar]
+	[SyncVar]
 	public string playerName;
-
-    [SyncVar]
+	[SyncVar]
 	public Color playerColor;
 
     
@@ -588,20 +587,28 @@ public class Player : NetworkBehaviour {
         }
     }
     [Command]
-    void CmdDeath(bool isDead) {
-        dead = isDead;
-        if (isDead) {
-            GetComponent<Collider2D>().enabled = false;
-            gameObject.transform.FindChild("Sprite").gameObject.SetActive(false);
-            GameObject instantiatedResource = Instantiate(deathExplode, transform.position, Quaternion.identity) as GameObject;
-            NetworkServer.Spawn(instantiatedResource);
-        } else {
-            GetComponent<Collider2D>().enabled = true;
-            gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
-            SoundManager.Instance.PlaySFX_Respawn();
-            RpcFinishRespawn();
-        }
-    }
+	void CmdDeath(bool isDead) {
+		dead = isDead;
+		if (isDead) {
+			GetComponent<Collider2D>().enabled = false;
+			gameObject.transform.FindChild("Sprite").gameObject.SetActive(false);
+			gameObject.transform.FindChild("Canvas").gameObject.SetActive(false);
+			gameObject.transform.FindChild("Collision Particle System").gameObject.SetActive(false);
+			gameObject.transform.FindChild("Particle System").gameObject.SetActive(false);
+			GetComponent<PolygonCollider2D> ().enabled = false;
+			GameObject instantiatedResource = Instantiate(deathExplode, transform.position, Quaternion.identity) as GameObject;
+			NetworkServer.Spawn(instantiatedResource);
+		} else {
+			GetComponent<Collider2D>().enabled = true;
+			gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
+			gameObject.transform.FindChild("Canvas").gameObject.SetActive(true);
+			gameObject.transform.FindChild("Collision Particle System").gameObject.SetActive(true);
+			gameObject.transform.FindChild("Particle System").gameObject.SetActive(true);
+			GetComponent<PolygonCollider2D> ().enabled = true;
+			SoundManager.Instance.PlaySFX_Respawn();
+			RpcFinishRespawn();
+		}
+	}
     [Command]
     void CmdApplyDamage(float damage, int enemyID) {
         if (dead || currentHealth <= 0) {
@@ -670,14 +677,13 @@ public class Player : NetworkBehaviour {
         deathsText.text = "" + deaths;
 		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
-    void OnChangePlayer(float newHealth) {
-        inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+	void OnChangePlayer(float newHealth) {
+		inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
         }
         currentHealth = newHealth;
         healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
-        
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
@@ -958,10 +964,8 @@ public class Player : NetworkBehaviour {
     }
 
 	public void PlayPointSFX() {
-		if (isLocalPlayer) {
-			SoundManager.Instance.StopCaptureSFX ();
-			SoundManager.Instance.PlayPointSFX ();
-		}
+		SoundManager.Instance.StopCaptureSFX ();
+		SoundManager.Instance.PlayPointSFX ();
 	}
 	public void StopPointSFX() {
 		SoundManager.Instance.StopPointSFX ();

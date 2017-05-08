@@ -551,7 +551,6 @@ namespace Prototype.NetworkLobby
        public void ExitGameButton()
         {
             ResetGame();
-
         }
 
         public override void ServerChangeScene(string sceneName)
@@ -562,6 +561,9 @@ namespace Prototype.NetworkLobby
 
         public void ResetGame()
         {
+            SoundManager.Instance.StopAllBGM();
+            SoundManager.Instance.PlaySFXTransition(Resources.Load<AudioClip>("Sound/SFX/UI/DoorOpen"), 0.2f);
+            SoundManager.Instance.PlayBGM((int)TrackID.BGM_LOBBY);
             mg.localNumberPlayers = 0;
             BountyManager[] bm = GameObject.FindObjectsOfType<BountyManager>();
             foreach (BountyManager b in bm)
@@ -609,9 +611,6 @@ namespace Prototype.NetworkLobby
                 }
 
             }
-
-
-
         }
 
 
