@@ -54,14 +54,14 @@ public class BountyManager : NetworkBehaviour {
     // Use this for initialization
     void Start() {
         Instance = this;
-        inGameMenuPanel = GameObject.Find("InGameMenu").GetComponent<LobbyTopPanel>();
-        numPlayers = inGameMenuPanel.numberPlayers;
+        MapGen = GameObject.FindGameObjectWithTag("mapGen");
+        numPlayers = MapGen.GetComponent<MapGenerator>().numPlayers;
         playerList = new Player[numPlayers];
         playerList = FindObjectsOfType<Player>();
 		playerIconGOs = new GameObject[numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
-        MapGen = GameObject.FindGameObjectWithTag("mapGen");
+
         maxResources = (int)(MapGen.GetComponent<MapGenerator>().maxResources);
         //maxResources = Mathf.RoundToInt((width + height) / 50);
 
