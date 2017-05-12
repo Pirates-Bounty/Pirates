@@ -147,14 +147,6 @@ public class BountyManager : NetworkBehaviour {
             bountyBoard.SetActive(false);
         }
 
-        if (isServer)
-        {
-            if(numPlayers != inGameMenuPanel.numberPlayers)
-            {
-                numPlayers = inGameMenuPanel.numberPlayers;
-            }
-        }
-
         if (playerList != null)
         {
             if (playerList.Length != numPlayers)
