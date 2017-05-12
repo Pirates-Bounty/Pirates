@@ -375,7 +375,8 @@ public class MapGenerator : NetworkBehaviour {
                         break;
                     case TileType.GRASS:
                     case TileType.TREE:
-                        Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + id);
+                    case TileType.SAND:
+                        Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/255");
                         AddTileToMap(tilePos, s, null);
                         break;
                 }
