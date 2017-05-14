@@ -495,6 +495,7 @@ namespace Prototype.NetworkLobby
 
             MapGenerator mg = mapGen.GetComponentInChildren<MapGenerator>();
             mg.localNumberPlayers = numPlayers;
+            mg.numPlayers = numPlayers;
             mg.CmdReGenerate();
             
             Instantiate(gameSetUp, transform.position, Quaternion.identity);

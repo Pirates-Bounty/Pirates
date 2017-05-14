@@ -23,6 +23,7 @@ public class gameSetUpScript : MonoBehaviour {
 
     public void spawnPoints(MapGenerator mg) {
         numPlayers = mapGen.numPlayers;
+        Debug.Log(numPlayers);
         if (GameObject.FindGameObjectsWithTag("spawner") != null) {
             foreach (GameObject g in GameObject.FindGameObjectsWithTag("spawner")) {
                 Destroy(g);
