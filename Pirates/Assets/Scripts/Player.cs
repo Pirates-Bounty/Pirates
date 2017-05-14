@@ -687,11 +687,11 @@ public class Player : NetworkBehaviour {
 		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
 	void OnChangePlayer(float newHealth) {
-		inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        currentHealth = newHealth;
+        inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
         }
-        currentHealth = newHealth;
         healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
