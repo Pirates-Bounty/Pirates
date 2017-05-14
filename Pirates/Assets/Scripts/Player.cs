@@ -104,6 +104,7 @@ public class Player : NetworkBehaviour {
     private GameObject inGameUI;
     private Quaternion uiQuat;
     private RectTransform inGameHealthBar;
+    private RectTransform inGameHealthBarRed;
     private UpgradePanel upgradePanel;
     private GameObject respawnTimerText;
     private Image sprintCooldownImage;
@@ -158,6 +159,7 @@ public class Player : NetworkBehaviour {
 	private AudioClip currentCoinS;
 	private int coinIndex;
 	private int[] MHALL;
+    private float oldHealth;
 
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
@@ -208,13 +210,15 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
         inGameUI = transform.Find("Canvas").gameObject;
-        inGameHealthBar = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
-        Text t = inGameUI.transform.GetChild(2).GetComponent<Text>();
+        inGameHealthBar = inGameUI.transform.GetChild(2).GetComponent<RectTransform>();
+        inGameHealthBarRed = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
+        Text t = inGameUI.transform.GetChild(3).GetComponent<Text>();
         t.text = playerName;
         t.color = playerColor;
         uiQuat = Quaternion.identity;
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
+        oldHealth = currentHealth;
 
         if (!isLocalPlayer) {
             return;
@@ -274,6 +278,13 @@ public class Player : NetworkBehaviour {
         //{
         //    RpcRespawn();
         //}
+        if(oldHealth > currentHealth)
+        {
+            oldHealth -= 2 * Time.deltaTime;
+            inGameHealthBarRed.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        }
+
+
 		if (isServer && BountyManager.Instance && ID < 0) {
             ID = BountyManager.Instance.RegisterPlayer(this);
             //registered = true;
@@ -406,9 +417,13 @@ public class Player : NetworkBehaviour {
 				// left cannon
 				SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
-                // reset timer
-                firingTimerLeft = currFiringDelay;
 				numPurpleShots = Mathf.Floor(numPurpleShots-1);
+                // reset timer
+				if (numPurpleShots == 0) {
+					firingTimerLeft = currFiringDelay * 13;
+				} else {
+					firingTimerLeft = currFiringDelay;
+				}
             }
         }
 
@@ -419,9 +434,13 @@ public class Player : NetworkBehaviour {
                 // right cannon
                 SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
-                // reset timer
-                firingTimerRight = currFiringDelay;
 				numRedShots = Mathf.Floor(numRedShots-1);
+				// reset timer
+				if (numRedShots == 0) {
+					firingTimerRight = currFiringDelay * 13;
+				} else {
+					firingTimerRight = currFiringDelay;
+				}
             }
         }
         if (firingTimerLeft > 0 && firingTimerRight > 0) {
@@ -644,6 +663,7 @@ public class Player : NetworkBehaviour {
     [ClientRpc]
     void RpcFinishRespawn() {
         currentHealth = currMaxHealth;
+        oldHealth = currMaxHealth;
         gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
     }
     void UpdateSprites() {
@@ -899,13 +919,21 @@ public class Player : NetworkBehaviour {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
         if (firingTimerLeft <= 0) {
-            numPurpleShots += Time.deltaTime;
-            numPurpleShots = Mathf.Clamp(numPurpleShots, 0, MAX_SHOTS);
+			if (numPurpleShots == 0) {
+				numPurpleShots = MAX_SHOTS;
+			} else {
+				numPurpleShots += Time.deltaTime * 1.5f;
+				numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
+			}
         }
-        if (firingTimerRight <= 0) {
-            numRedShots += Time.deltaTime;
-            numRedShots = Mathf.Clamp(numRedShots, 0, MAX_SHOTS);
-        }
+		if (firingTimerRight <= 0) {
+			if (numRedShots == 0) {
+				numRedShots = MAX_SHOTS;
+			} else {
+				numRedShots += Time.deltaTime * 1.5f;
+				numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
+			}
+		}
     }
 
     private void UpdateSeagulls() {
