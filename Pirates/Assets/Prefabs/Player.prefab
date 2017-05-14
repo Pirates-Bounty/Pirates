@@ -1000,7 +1000,7 @@ MonoBehaviour:
   leaderArrow: {fileID: 0}
   currMoveSpeed: 10
   currRotationSpeed: 25
-  currFiringDelay: 0.3
+  currFiringDelay: 0.15
   currBoostDelay: 5
   currRamDamage: 20
   currProjectileStrength: 10
