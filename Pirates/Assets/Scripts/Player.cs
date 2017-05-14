@@ -280,8 +280,8 @@ public class Player : NetworkBehaviour {
         //}
         if(oldHealth > currentHealth)
         {
-            oldHealth -= Time.deltaTime;
-            inGameHealthBarRed.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+            oldHealth -= 2 * Time.deltaTime;
+            inGameHealthBarRed.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         }
 
 
@@ -698,7 +698,6 @@ public class Player : NetworkBehaviour {
 		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
 	void OnChangePlayer(float newHealth) {
-        oldHealth = currentHealth;
         currentHealth = newHealth;
         inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
