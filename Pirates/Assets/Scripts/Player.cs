@@ -679,7 +679,7 @@ public class Player : NetworkBehaviour {
     }
 	void OnChangePlayer(float newHealth) {
         currentHealth = newHealth;
-        inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
         }
