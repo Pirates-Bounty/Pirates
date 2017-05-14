@@ -406,9 +406,13 @@ public class Player : NetworkBehaviour {
 				// left cannon
 				SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireLeft((int)currProjectileStrength);
-                // reset timer
-                firingTimerLeft = currFiringDelay;
 				numPurpleShots = Mathf.Floor(numPurpleShots-1);
+                // reset timer
+				if (numPurpleShots == 0) {
+					firingTimerLeft = currFiringDelay * 13;
+				} else {
+					firingTimerLeft = currFiringDelay;
+				}
             }
         }
 
@@ -419,9 +423,13 @@ public class Player : NetworkBehaviour {
                 // right cannon
                 SoundManager.Instance.PlaySFX(currentShotS, 1.0f);
                 CmdFireRight((int)currProjectileStrength);
-                // reset timer
-                firingTimerRight = currFiringDelay;
 				numRedShots = Mathf.Floor(numRedShots-1);
+				// reset timer
+				if (numRedShots == 0) {
+					firingTimerRight = currFiringDelay * 13;
+				} else {
+					firingTimerRight = currFiringDelay;
+				}
             }
         }
         if (firingTimerLeft > 0 && firingTimerRight > 0) {
@@ -899,13 +907,21 @@ public class Player : NetworkBehaviour {
             CmdChangeHealth(currMaxHealth - oldMaxHealth, false);
         }
         if (firingTimerLeft <= 0) {
-            numPurpleShots += Time.deltaTime;
-            numPurpleShots = Mathf.Clamp(numPurpleShots, 0, MAX_SHOTS);
+			if (numPurpleShots == 0) {
+				numPurpleShots = MAX_SHOTS;
+			} else {
+				numPurpleShots += Time.deltaTime * 1.5f;
+				numPurpleShots = Mathf.Clamp (numPurpleShots, 0, MAX_SHOTS);
+			}
         }
-        if (firingTimerRight <= 0) {
-            numRedShots += Time.deltaTime;
-            numRedShots = Mathf.Clamp(numRedShots, 0, MAX_SHOTS);
-        }
+		if (firingTimerRight <= 0) {
+			if (numRedShots == 0) {
+				numRedShots = MAX_SHOTS;
+			} else {
+				numRedShots += Time.deltaTime * 1.5f;
+				numRedShots = Mathf.Clamp (numRedShots, 0, MAX_SHOTS);
+			}
+		}
     }
 
     private void UpdateSeagulls() {
