@@ -105,6 +105,7 @@ public class Player : NetworkBehaviour {
     private Quaternion uiQuat;
     private RectTransform inGameHealthBar;
     private RectTransform inGameHealthBarRed;
+    private RectTransform inGameHealthBarBlack;
     private UpgradePanel upgradePanel;
     private GameObject respawnTimerText;
     private Image sprintCooldownImage;
@@ -212,6 +213,7 @@ public class Player : NetworkBehaviour {
         inGameUI = transform.Find("Canvas").gameObject;
         inGameHealthBar = inGameUI.transform.GetChild(2).GetComponent<RectTransform>();
         inGameHealthBarRed = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
+        inGameHealthBarBlack = inGameUI.transform.GetChild(0).GetComponent<RectTransform>();
         Text t = inGameUI.transform.GetChild(3).GetComponent<Text>();
         t.text = playerName;
         t.color = playerColor;
@@ -280,8 +282,12 @@ public class Player : NetworkBehaviour {
         //}
         if(oldHealth > currentHealth)
         {
-            oldHealth -= 2 * Time.deltaTime;
+            oldHealth -= 20 * Time.deltaTime;
             inGameHealthBarRed.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        }
+        else if(currentHealth > oldHealth)
+        {
+            oldHealth = currentHealth;
         }
 
 
@@ -699,7 +705,8 @@ public class Player : NetworkBehaviour {
     }
 	void OnChangePlayer(float newHealth) {
         currentHealth = newHealth;
-        inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - currentHealth) / SCALE_MAX_HEALTH[0], inGameHealthBar.anchorMax.y);
+        inGameHealthBarBlack.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth) / SCALE_MAX_HEALTH[0], inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
         }
@@ -890,10 +897,10 @@ public class Player : NetworkBehaviour {
     }
 
     public void UpgradePlayer(Upgrade upgrade, bool positive) {
-        if (!isLocalPlayer) {
-            return;
+        if (isLocalPlayer) {
+            CmdUpgrade(upgrade, positive);
+
         }
-        CmdUpgrade(upgrade, positive);
         UpdateVariables();
         //UpdateSprites ();
     }
