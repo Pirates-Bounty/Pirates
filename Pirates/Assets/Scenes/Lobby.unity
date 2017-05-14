@@ -176,6 +176,11 @@ Prefab:
       propertyPath: lm
       value: 
       objectReference: {fileID: 1475096614}
+    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
+        type: 2}
+      propertyPath: tileSize
+      value: 5.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
   m_IsPrefabParent: 0

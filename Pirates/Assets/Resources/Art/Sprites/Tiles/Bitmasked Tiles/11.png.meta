@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 3fd313eda197c7b4bbb84b91d9c3809d
-timeCreated: 1492472792
+guid: 29465b479ff2c49c49287a07bb6734ed
+timeCreated: 1494795498
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName: {}
@@ -40,7 +40,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -58,27 +58,11 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
-  - buildTarget: Standalone
-    maxTextureSize: 2048
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
   spriteSheet:
     serializedVersion: 2
     sprites: []
-    outline:
-    - - {x: -534, y: 534}
-      - {x: -534, y: -534}
-      - {x: 534, y: -534}
-      - {x: 534, y: 534}
-    physicsShape:
-    - - {x: -534, y: 534}
-      - {x: -534, y: -534}
-      - {x: 534, y: -534}
-      - {x: 534, y: 534}
+    outline: []
+    physicsShape: []
   spritePackingTag: 
   userData: 
   assetBundleName: 
