@@ -590,29 +590,11 @@ public class Player : NetworkBehaviour {
 	void CmdDeath(bool isDead) {
 		dead = isDead;
 		if (isDead) {
-			GetComponent<Collider2D>().enabled = false;
-            for(int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).gameObject.SetActive(false);
-            }
-			//gameObject.transform.FindChild("Sprite").gameObject.SetActive(false);
-			//gameObject.transform.FindChild("Canvas").gameObject.SetActive(false);
-			//gameObject.transform.FindChild("Collision Particle System").gameObject.SetActive(false);
-			//gameObject.transform.FindChild("Particle System").gameObject.SetActive(false);
-			//GetComponent<PolygonCollider2D> ().enabled = false;
+			RpcSetSpriteActive (false);
 			GameObject instantiatedResource = Instantiate(deathExplode, transform.position, Quaternion.identity) as GameObject;
 			NetworkServer.Spawn(instantiatedResource);
 		} else {
-			GetComponent<Collider2D>().enabled = true;
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).gameObject.SetActive(true);
-            }
-   //         gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
-			//gameObject.transform.FindChild("Canvas").gameObject.SetActive(true);
-			//gameObject.transform.FindChild("Collision Particle System").gameObject.SetActive(true);
-			//gameObject.transform.FindChild("Particle System").gameObject.SetActive(true);
-			//GetComponent<PolygonCollider2D> ().enabled = true;
+			RpcSetSpriteActive (true);
 			SoundManager.Instance.PlaySFX_Respawn();
 			RpcFinishRespawn();
 		}
@@ -641,6 +623,15 @@ public class Player : NetworkBehaviour {
     void CmdSetRamDamage(float ramDam) {
         appliedRamDamage = ramDam;
     }
+	[ClientRpc]
+	void RpcSetSpriteActive(float setActive)
+	{
+		GetComponent<Collider2D>().enabled = setActive;
+		for(int i = 0; i < transform.childCount; i++)
+		{
+			transform.GetChild(i).gameObject.SetActive(setActive);
+		}
+	}
     [ClientRpc]
     void RpcRespawn() {
         gameObject.transform.FindChild("Sprite").gameObject.SetActive(false);
