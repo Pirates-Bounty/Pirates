@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public static class UI {
+public static class UI{
     public static GameObject CreateButton(string name, string text, Font font,
     Color fontColor, int fontSize, Transform parent, Sprite sprite, Sprite highlightedSprite,
     Vector3 position, Vector2 minAnchor, Vector2 maxAnchor, UnityEngine.Events.UnityAction method) {

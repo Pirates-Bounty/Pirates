@@ -9,7 +9,7 @@ using Prototype.NetworkLobby;
 public class BountyManager : NetworkBehaviour {
     public int numPlayers;
     public const int BASE_BOUNTY = 200;
-    public const int MAX_BOUNTY = 50;
+    public const int MAX_BOUNTY = 2;
     public const int MAX_PLAYERS = 20;
     private GameObject bountyPanel;
     public LobbyTopPanel inGameMenuPanel;
@@ -302,7 +302,7 @@ public class BountyManager : NetworkBehaviour {
             killer.streak++;
         }
 
-        RpcBroadcastText("Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName));
+        RpcBroadcastText("Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName),2);
     }
 
 
@@ -425,9 +425,10 @@ public class BountyManager : NetworkBehaviour {
 	}
 
     [ClientRpc]
-    void RpcBroadcastText(string message)
+    void RpcBroadcastText(string message, float time)
     {
-        UI.CreateText("Broadcast",message, font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
+        GameObject text = UI.CreateText("Broadcast",message, font, Color.black, 72, canvas.transform, Vector3.zero, new Vector3(0.1f, 0.5f), new Vector3(0.9f, 0.7f), TextAnchor.MiddleCenter, true);
+        Destroy(text, time);
     }
 
     /*private IEnumerator MoveHill(int rangeBegin, int rangeEnd)
