@@ -624,7 +624,7 @@ public class Player : NetworkBehaviour {
         appliedRamDamage = ramDam;
     }
 	[ClientRpc]
-	void RpcSetSpriteActive(float setActive)
+	void RpcSetSpriteActive(bool setActive)
 	{
 		GetComponent<Collider2D>().enabled = setActive;
 		for(int i = 0; i < transform.childCount; i++)
