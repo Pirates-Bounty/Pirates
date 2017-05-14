@@ -8,6 +8,7 @@ namespace Prototype.NetworkLobby
     public class LobbyMainMenu : MonoBehaviour 
     {
         public LobbyManager lobbyManager;
+        public MapGenerator mg;
 
         public RectTransform lobbyServerList;
         public RectTransform lobbyPanel;
@@ -85,6 +86,8 @@ namespace Prototype.NetworkLobby
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 OnClickCreateMatchmakingGame();
+                mg.Generate();
+                mg.GeneratePreviewTexture();
             }
         }
 

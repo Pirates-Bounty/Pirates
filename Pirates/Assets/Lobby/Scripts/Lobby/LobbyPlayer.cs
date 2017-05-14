@@ -103,6 +103,7 @@ namespace Prototype.NetworkLobby
         void SetupLocalPlayer()
         {
             nameInput.interactable = true;
+            nameInput.characterLimit = 16;
             remoteIcone.gameObject.SetActive(false);
             localIcone.gameObject.SetActive(true);
 
