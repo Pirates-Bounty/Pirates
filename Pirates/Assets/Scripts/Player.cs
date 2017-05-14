@@ -104,6 +104,7 @@ public class Player : NetworkBehaviour {
     private GameObject inGameUI;
     private Quaternion uiQuat;
     private RectTransform inGameHealthBar;
+    private RectTransform inGameHealthBarRed;
     private UpgradePanel upgradePanel;
     private GameObject respawnTimerText;
     private Image sprintCooldownImage;
@@ -158,6 +159,7 @@ public class Player : NetworkBehaviour {
 	private AudioClip currentCoinS;
 	private int coinIndex;
 	private int[] MHALL;
+    private float oldHealth;
 
     //other UI sounds
     public AudioClip sfx_upgradeMenuOpen;
@@ -208,13 +210,15 @@ public class Player : NetworkBehaviour {
         rb = GetComponent<Rigidbody2D>();
         font = Resources.Load<Font>("Art/Fonts/SHOWG");
         inGameUI = transform.Find("Canvas").gameObject;
-        inGameHealthBar = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
-        Text t = inGameUI.transform.GetChild(2).GetComponent<Text>();
+        inGameHealthBar = inGameUI.transform.GetChild(2).GetComponent<RectTransform>();
+        inGameHealthBarRed = inGameUI.transform.GetChild(1).GetComponent<RectTransform>();
+        Text t = inGameUI.transform.GetChild(3).GetComponent<Text>();
         t.text = playerName;
         t.color = playerColor;
         uiQuat = Quaternion.identity;
         sfx_upgradeMenuOpen = Resources.Load<AudioClip>("Sound/SFX/UI/Paper");
         sfx_upgradeMenuClose = Resources.Load<AudioClip>("Sound/SFX/UI/PaperReverse");
+        oldHealth = currentHealth;
 
         if (!isLocalPlayer) {
             return;
@@ -274,6 +278,13 @@ public class Player : NetworkBehaviour {
         //{
         //    RpcRespawn();
         //}
+        if(oldHealth > currentHealth)
+        {
+            oldHealth -= Time.deltaTime;
+            inGameHealthBarRed.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+        }
+
+
 		if (isServer && BountyManager.Instance && ID < 0) {
             ID = BountyManager.Instance.RegisterPlayer(this);
             //registered = true;
@@ -644,6 +655,7 @@ public class Player : NetworkBehaviour {
     [ClientRpc]
     void RpcFinishRespawn() {
         currentHealth = currMaxHealth;
+        oldHealth = currMaxHealth;
         gameObject.transform.FindChild("Sprite").gameObject.SetActive(true);
     }
     void UpdateSprites() {
@@ -678,6 +690,7 @@ public class Player : NetworkBehaviour {
 		bountyText.text = "" + (int)BountyManager.CalculateWorth(this);
     }
 	void OnChangePlayer(float newHealth) {
+        oldHealth = currentHealth;
         currentHealth = newHealth;
         inGameHealthBar.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
