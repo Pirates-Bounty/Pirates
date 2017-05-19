@@ -302,7 +302,7 @@ public class BountyManager : NetworkBehaviour {
             killer.streak++;
         }
 
-        RpcBroadcastText("Player " + (killer.playerName) + " has slain Player " + (playerList[victimLoc].playerName),2);
+        CmdBroadcastText(killer.playerName + " has slain " + playerList[victimLoc].playerName,2);
     }
 
 
@@ -423,7 +423,10 @@ public class BountyManager : NetworkBehaviour {
 	{
 		SoundManager.Instance.StopPointSFX();
 	}
-
+	[Command]
+	void CmdBroadcastText(string message, float time){
+		RpcBroadcastText (message, time);
+	}
     [ClientRpc]
     void RpcBroadcastText(string message, float time)
     {
