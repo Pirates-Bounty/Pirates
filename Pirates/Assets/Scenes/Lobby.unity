@@ -176,11 +176,6 @@ Prefab:
       propertyPath: lm
       value: 
       objectReference: {fileID: 1475096614}
-    - target: {fileID: 114000010229539288, guid: 20ba427c0c7784f4888393e79906c622,
-        type: 2}
-      propertyPath: tileSize
-      value: 5.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20ba427c0c7784f4888393e79906c622, type: 2}
   m_IsPrefabParent: 0
@@ -789,7 +784,7 @@ Grid:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1823972452}
   m_Enabled: 1
-  m_CellSize: {x: 1, y: 1, z: 1}
+  m_CellSize: {x: 5, y: 5, z: 1}
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0

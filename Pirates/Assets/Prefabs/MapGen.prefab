@@ -72,7 +72,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 100
   height: 100
-  frequency: 50
+  frequency: 30
   borderRadius: 0.5
   landFreq: 0.5
   seed: 200
@@ -103,7 +103,7 @@ MonoBehaviour:
   quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
-  tileSize: 4
+  tileSize: 5.5
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
   resourceSlider: {fileID: 0}
@@ -111,6 +111,7 @@ MonoBehaviour:
   waterMat: {fileID: 2100000, guid: 91ffbfb29bfd2154a9d15ee583a910e2, type: 2}
   boundaryMat: {fileID: 2100000, guid: 3dad96c43f707434c9bd7253bcb88abb, type: 2}
   mapPic: {fileID: 0}
+  inGameMenu: {fileID: 0}
   inGameMenuPanel: {fileID: 0}
   lm: {fileID: 0}
   numPlayers: 0

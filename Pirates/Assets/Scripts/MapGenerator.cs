@@ -53,7 +53,7 @@ public class MapGenerator : NetworkBehaviour {
 
     private bool addResources = false;
     public MapGenerator Instance;
-    public float tileSize;
+    private float tileSize;
     public Slider landSlider;
     public Slider widthSlider;
     public Slider resourceSlider;
@@ -92,6 +92,7 @@ public class MapGenerator : NetworkBehaviour {
         }
 
         maxResources = (.4f * resourceMult) / width;
+		tileSize = tMap.cellSize.x;
     }
 
 
@@ -367,7 +368,6 @@ public class MapGenerator : NetworkBehaviour {
         minimapTexture = GenerateTexture();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                Vector2 tilePos = new Vector2((i * tileSize) - (width * tileSize) / 2, (j * tileSize) - (height * tileSize) / 2);
                 int id = bitmaskedMap[i, j];
                 switch ((TileType)map[i, j]) {
                     case TileType.WATER:
@@ -377,7 +377,7 @@ public class MapGenerator : NetworkBehaviour {
                     case TileType.TREE:
                     case TileType.SAND:
 					Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/"+id);
-                        AddTileToMap(tilePos, s, null);
+					AddTileToMap(new Vector3Int(i - width/2, j - height/2, 0), s, null);
                         break;
                 }
 
@@ -453,14 +453,13 @@ public class MapGenerator : NetworkBehaviour {
     }
 
 
-    public void AddTileToMap(Vector3 pos, Sprite sp, GameObject g) {
+    public void AddTileToMap(Vector3Int pos, Sprite sp, GameObject g) {
         Tile tile = Tile.CreateInstance<Tile>();
         tile.sprite = sp;
-        Vector3Int v3pos = new Vector3Int((int)pos.x, (int)pos.y, (int)pos.z);
         if (g) {
             tile.gameObject = g;
         }
-        tMap.SetTile(v3pos, tile);
+        tMap.SetTile(pos, tile);
     }
 
 
