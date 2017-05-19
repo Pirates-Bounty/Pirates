@@ -59,11 +59,15 @@ namespace Prototype.NetworkLobby
 
         public void PlayerListModified()
         {
-            int i = 0;
+            //int i = 0;
             foreach (LobbyPlayer p in _players)
             {
-                p.OnPlayerListChanged(i);
-                ++i;
+                if (p.isLocalPlayer)
+                    p.OnPlayerListChanged(1);
+                else
+                    p.OnPlayerListChanged(0);
+
+            //    ++i;
             }
         }
     }
