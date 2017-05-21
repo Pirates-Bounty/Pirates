@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Menu : MonoBehaviour {
@@ -17,6 +18,7 @@ public class Menu : MonoBehaviour {
     private GameObject waves2;
     private GameObject waves3;
     private GameObject waves4;
+	private GameObject screenshot;
     
     private float maxRotation = 2f;
     private float currentRotation = 0.0f;
@@ -28,6 +30,8 @@ public class Menu : MonoBehaviour {
 	private AudioClip menuM;
     private AudioClip highlightAudio;
     private AudioClip selectAudio;
+
+	public Sprite screen1;
 
     // Use this for initialization
     void Start() {
@@ -56,7 +60,7 @@ public class Menu : MonoBehaviour {
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "", font, color, fontSize, canvas,
             Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonClicked"),
-            Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
+			Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { StartTutorial(); }); //Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
 
         // Quit Button
         quitButton = UI.CreateButton("Quit", "", font, color, fontSize, canvas,
@@ -115,6 +119,10 @@ public class Menu : MonoBehaviour {
             waves4.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
         }
 
+	}
+
+	void StartTutorial () {
+		Debug.Log ("Welcome to the tutorial, doofus!~~You are trapped with me forever! Mwahaha!");
 	}
     
 }
