@@ -187,9 +187,10 @@ public class BountyManager : NetworkBehaviour {
                 playerIcon.transform.parent = bountyBoard.transform;
                 Image image = playerIcon.AddComponent<Image>();
                 image.sprite = iconSprite;
+				image.color = playerList [i].playerColor;
                 RectTransform rect = playerIcon.GetComponent<RectTransform>();
-                rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-                rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+                rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
                 rect.offsetMin = Vector3.zero;
                 rect.offsetMax = Vector3.zero;
                 playerIconGOs[i] = playerIcon;
@@ -197,8 +198,8 @@ public class BountyManager : NetworkBehaviour {
             else
             {
                 RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
-                rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-                rect.anchorMax = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+				rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
                 rect.offsetMin = Vector3.zero;
                 rect.offsetMax = Vector3.zero;
             }
@@ -213,6 +214,7 @@ public class BountyManager : NetworkBehaviour {
                             localPlayerIcon.transform.parent = scoreBar.transform;
                             Image image = localPlayerIcon.AddComponent<Image>();
                             image.sprite = iconSprite;
+							image.color = playerList [i].playerColor;
                             RectTransform rect = localPlayerIcon.GetComponent<RectTransform>();
                             float iconPos = scoreBar.transform.position.y;
                             rect.anchorMin = new Vector2(Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, 0f);
