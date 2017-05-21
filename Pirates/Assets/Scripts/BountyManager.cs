@@ -31,6 +31,7 @@ public class BountyManager : NetworkBehaviour {
     public bool victoryUndeclared;
     private bool createdPlayerIcons;
     private Sprite iconSprite;
+	private GameObject[] playerNameGOs;
     private GameObject[] playerIconGOs;
     private GameObject localPlayerIcon = null;
     public static BountyManager Instance;
@@ -58,6 +59,7 @@ public class BountyManager : NetworkBehaviour {
         numPlayers = MapGen.GetComponent<MapGenerator>().numPlayers;
         playerList = new Player[numPlayers];
         playerList = FindObjectsOfType<Player>();
+		playerNameGOs = new GameObject[numPlayers];
 		playerIconGOs = new GameObject[numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
@@ -167,7 +169,14 @@ public class BountyManager : NetworkBehaviour {
         {
             if (playerIconGOs.Length != playerList.Length)
             {
-                playerIconGOs = new GameObject[playerList.Length];
+				//foreach (GameObject goIcon in playerIconGOs)
+				for (int i=0; i < playerIconGOs.Length; i++)
+				{
+					Destroy (playerIconGOs[i]);
+					Destroy (playerNameGOs [i]);
+				}
+				playerIconGOs = new GameObject[playerList.Length];
+				playerNameGOs = new GameObject[playerList.Length];
             }
         }
 
@@ -194,6 +203,20 @@ public class BountyManager : NetworkBehaviour {
                 rect.offsetMin = Vector3.zero;
                 rect.offsetMax = Vector3.zero;
                 playerIconGOs[i] = playerIcon;
+
+				GameObject playerName = new GameObject ("Player Name " + (i + 1));
+				playerName.transform.parent = bountyBoard.transform;
+				Text text = playerName.AddComponent<Text> ();
+				text.font = font;
+				text.alignment = TextAnchor.MiddleRight;
+				text.color = playerList [i].playerColor;
+				text.text = playerList [i].playerName;
+				rect = playerName.GetComponent<RectTransform>();
+				rect.anchorMin = new Vector2(-0.2f, iconStartY - (i + 1) * iconHeight);
+				rect.anchorMax = new Vector2(0f, iconStartY - i * iconHeight);
+				rect.offsetMin = Vector3.zero;
+				rect.offsetMax = Vector3.zero;
+				playerNameGOs[i] = playerName;
             }
             else
             {
