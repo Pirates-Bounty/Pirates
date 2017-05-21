@@ -54,8 +54,10 @@ namespace Prototype.NetworkLobby
 
         public void RemovePlayer(LobbyPlayer player)
         {
+			/*
             _players.Remove(player);
             PlayerListModified();
+			*/
         }
 
         public void PlayerListModified()
