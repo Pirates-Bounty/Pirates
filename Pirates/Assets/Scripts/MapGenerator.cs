@@ -68,7 +68,7 @@ public class MapGenerator : NetworkBehaviour {
     public LobbyTopPanel inGameMenuPanel;
     public LobbyManager lm;
 
-    private int resourceMult = 1000;
+    private int resourceMult = 1;
 
     [SyncVar]
     public int numPlayers = 0;
@@ -91,7 +91,7 @@ public class MapGenerator : NetworkBehaviour {
             numPlayers = localNumberPlayers;
         }
 
-        maxResources = (.4f * resourceMult) / width;
+        maxResources = (.4f * resourceMult) * width;
 		tileSize = tMap.cellSize.x;
     }
 
@@ -134,7 +134,7 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     public void MaxResourceChange() {
-        maxResources = (int)((resourceSlider.value * resourceMult) / width);
+        maxResources = (int)((resourceSlider.value * resourceMult) * width);
     }
 
     public void InputSeed() {
