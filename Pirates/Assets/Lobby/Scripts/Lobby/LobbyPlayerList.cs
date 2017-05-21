@@ -42,6 +42,7 @@ namespace Prototype.NetworkLobby
         {
             if (_players.Contains(player))
                 return;
+            
 
             _players.Add(player);
 
@@ -59,16 +60,9 @@ namespace Prototype.NetworkLobby
 
         public void PlayerListModified()
         {
-            //int i = 0;
             foreach (LobbyPlayer p in _players)
-            {
-                if (p.isLocalPlayer)
-                    p.OnPlayerListChanged(1);
-                else
-                    p.OnPlayerListChanged(0);
-
-            //    ++i;
-            }
+                if (p.isLocalPlayer) p.OnPlayerListChanged(1);
+                else p.OnPlayerListChanged(0);
         }
     }
 }

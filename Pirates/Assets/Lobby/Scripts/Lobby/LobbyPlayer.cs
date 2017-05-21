@@ -49,6 +49,7 @@ namespace Prototype.NetworkLobby
 
             if (LobbyManager.s_Singleton != null) LobbyManager.s_Singleton.OnPlayersNumberModified(1);
 
+            
             LobbyPlayerList._instance.AddPlayer(this);
             LobbyPlayerList._instance.DisplayDirectServerWarning(isServer && LobbyManager.s_Singleton.matchMaker == null);
 
@@ -65,6 +66,7 @@ namespace Prototype.NetworkLobby
             //will be created with the right value currently on server
             OnMyName(playerName);
             OnMyColor(playerColor);
+            LobbyPlayerList._instance.PlayerListModified(); //a bit redundant, but important to make the player lobby color works
         }
 
         public override void OnStartAuthority()
