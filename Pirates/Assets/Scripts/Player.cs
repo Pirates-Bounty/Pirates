@@ -269,7 +269,7 @@ public class Player : NetworkBehaviour {
     void UpdateMinimapPlayer() {
         if (playerRect)
         {
-            playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (mapGenerator.width);
+			playerRect.anchoredPosition = new Vector3(minimapRect.rect.width * transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (mapGenerator.width * mapGenerator.tileSize);
         }
         
 

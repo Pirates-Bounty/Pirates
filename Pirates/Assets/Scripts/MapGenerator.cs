@@ -53,7 +53,7 @@ public class MapGenerator : NetworkBehaviour {
 
     private bool addResources = false;
     public MapGenerator Instance;
-    private float tileSize;
+    public float tileSize;
     public Slider landSlider;
     public Slider widthSlider;
     public Slider resourceSlider;

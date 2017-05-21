@@ -221,7 +221,7 @@ public class HillScript : NetworkBehaviour {
 
 
 	void RevealHill () {
-		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (MapGen.GetComponent<MapGenerator>().width);
+		hillRepRect.anchoredPosition = new Vector3(minimapRect.rect.width* transform.position.x, minimapRect.rect.height * transform.position.y, 1) / (MapGen.GetComponent<MapGenerator>().width * MapGen.GetComponent<MapGenerator>().tileSize);
 		hiding = false;
 		myCollider.enabled = true;
 		mySprite.enabled = true;
