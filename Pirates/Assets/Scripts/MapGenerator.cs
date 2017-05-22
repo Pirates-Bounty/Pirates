@@ -33,6 +33,7 @@ public class MapGenerator : NetworkBehaviour {
     public GameObject mapPanel;
     private GameObject plane;
     private GameObject quad;
+    public Sprite[] plants;
     public string[] tileNames;
 
     [HideInInspector]
@@ -263,7 +264,7 @@ public class MapGenerator : NetworkBehaviour {
                     //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
                     if (noise <= landFreq)
                     {
-                        if (noise > Random.Range(0, 40f))
+                        if (noise > Random.Range(0, 1f))
                         {
                             map[i, j] = (int)TileType.TREE;
                         }
@@ -374,10 +375,17 @@ public class MapGenerator : NetworkBehaviour {
                         //AddTileToMap(tilePos, waterTile, null);
                         break;
                     case TileType.GRASS:
+					    Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/"+id);
+					    AddTileToMap(new Vector3Int(i - width/2, j - height/2, 0), s, null);
+                            break;
                     case TileType.TREE:
-                    case TileType.SAND:
-					Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/"+id);
-					AddTileToMap(new Vector3Int(i - width/2, j - height/2, 0), s, null);
+                        //GameObject tree = new GameObject();
+                        //tree.AddComponent<SpriteRenderer>().sortingOrder = 5;
+                        Sprite sp = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + id);
+                        int tid = Random.Range(0,plants.Length);
+                        Sprite ts = plants[tid];
+                        AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, 0), sp, null);
+                        AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, -1), ts, null);
                         break;
                 }
 

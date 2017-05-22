@@ -93,6 +93,15 @@ MonoBehaviour:
   resourcePrefab: {fileID: 1000011008275748, guid: 724fffc6dfd9dd146be86373a6068cd0,
     type: 2}
   mapPanel: {fileID: 0}
+  plants:
+  - {fileID: 21300000, guid: 78f1414dbd8aaa6408a2ea367debaaca, type: 3}
+  - {fileID: 21300000, guid: 926b72b843961ed4ba4ec87b68163abc, type: 3}
+  - {fileID: 21300000, guid: 0b1bcd99125611046b0de01bc3737182, type: 3}
+  - {fileID: 21300000, guid: 0cc7c1f5ab5b80c45aeac326f2b44789, type: 3}
+  - {fileID: 21300000, guid: 4f6ec4728cf83e042be37288d5b030a8, type: 3}
+  - {fileID: 21300000, guid: f12c5ecb7f87b95429228b256c9a7e7d, type: 3}
+  - {fileID: 21300000, guid: ffd315337e476934fa8f87fad0472a0d, type: 3}
+  - {fileID: 21300000, guid: f8c0bd4ceec930149b5a6b8f4da1e860, type: 3}
   tileNames:
   - water
   - grass
