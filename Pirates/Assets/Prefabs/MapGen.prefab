@@ -70,9 +70,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0df42657c9aa847a246f5815a62813, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 100
-  height: 100
-  frequency: 30
+  width: 30
+  height: 30
+  frequency: 50
   borderRadius: 0.5
   landFreq: 0.5
   seed: 200
