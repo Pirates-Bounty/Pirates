@@ -13,7 +13,7 @@ public class VolumeSlider : MonoBehaviour {
         sliderBGM.onValueChanged.AddListener(delegate { SoundManager.Instance.UpdateBGMVolume(); });
         sliderSFX = GameObject.Find("SliderBGM").GetComponent<UnityEngine.UI.Slider>();
         sliderSFX.value = SoundManager.Instance.volumeSFX;
-        sliderBGM.onValueChanged.AddListener(delegate { SoundManager.Instance.UpdateSFXVolume(); });
+        sliderSFX.onValueChanged.AddListener(delegate { SoundManager.Instance.UpdateSFXVolume(); });
     }
 
 	// Use this for initialization
