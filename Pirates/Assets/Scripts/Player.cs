@@ -740,6 +740,7 @@ public class Player : NetworkBehaviour {
                 SoundManager.Instance.PlaySFX(currentTurnS, 0.7f);
             }
             rb.MoveRotation(rb.rotation + currRotationSpeed * Time.deltaTime);
+			rb.angularVelocity = 0f;
         }
 
         if (Input.GetKey(right)) {
@@ -748,6 +749,7 @@ public class Player : NetworkBehaviour {
                 SoundManager.Instance.PlaySFX(currentTurnS, 0.7f);
             }
             rb.MoveRotation(rb.rotation - currRotationSpeed * Time.deltaTime);
+			rb.angularVelocity = 0f;
         }
         if (Input.GetKey(up)) {
             currVelocity = Mathf.Min(currMoveSpeed, currVelocity + currMoveSpeed * Time.deltaTime);
