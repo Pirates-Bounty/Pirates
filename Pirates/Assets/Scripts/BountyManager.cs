@@ -33,6 +33,7 @@ public class BountyManager : NetworkBehaviour {
     private Sprite iconSprite;
 	private GameObject[] playerNameGOs;
     private GameObject[] playerIconGOs;
+	private GameObject[] playerIconLowerGOs;
     private GameObject localPlayerIcon = null;
     public static BountyManager Instance;
     private int currentIndex = 0;
@@ -61,6 +62,7 @@ public class BountyManager : NetworkBehaviour {
         playerList = FindObjectsOfType<Player>();
 		playerNameGOs = new GameObject[numPlayers];
 		playerIconGOs = new GameObject[numPlayers];
+		playerIconLowerGOs = new GameObject[numPlayers];
         //upgradePanel = FindObjectOfType<UpgradePanel>();
         victoryUndeclared = true;
 
@@ -173,9 +175,11 @@ public class BountyManager : NetworkBehaviour {
 				for (int i=0; i < playerIconGOs.Length; i++)
 				{
 					Destroy (playerIconGOs[i]);
+					Destroy (playerIconLowerGOs[i]);
 					Destroy (playerNameGOs [i]);
 				}
 				playerIconGOs = new GameObject[playerList.Length];
+				playerIconLowerGOs = new GameObject[playerList.Length];
 				playerNameGOs = new GameObject[playerList.Length];
             }
         }
@@ -197,12 +201,21 @@ public class BountyManager : NetworkBehaviour {
                 Image image = playerIcon.AddComponent<Image>();
                 image.sprite = iconSprite;
 				image.color = playerList [i].playerColor;
+				playerIconLowerGOs [i] = Instantiate (playerIcon, scoreBar.transform);
+				
                 RectTransform rect = playerIcon.GetComponent<RectTransform>();
-                rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+				float worth = CalculateWorth (playerList [i]);
+				rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
                 rect.offsetMin = Vector3.zero;
                 rect.offsetMax = Vector3.zero;
                 playerIconGOs[i] = playerIcon;
+				
+				rect = playerIconLowerGOs [i].GetComponent<RectTransform> ();
+				rect.anchorMin = new Vector2(Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) - iconPadding, 0f);
+				rect.anchorMax = new Vector2(Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) + iconPadding, 1f);
+				rect.offsetMin = Vector3.zero;
+				rect.offsetMax = Vector3.zero;
 
 				GameObject playerName = new GameObject ("Player Name " + (i + 1));
 				playerName.transform.parent = bountyBoard.transform;
@@ -221,13 +234,18 @@ public class BountyManager : NetworkBehaviour {
             else
             {
                 RectTransform rect = playerIconGOs[i].GetComponent<RectTransform>();
-				rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
-				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, CalculateWorth(playerList[i]) / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
+				float worth = CalculateWorth (playerList [i]);
+				rect.anchorMin = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) - iconPadding, iconStartY - (i + 1) * iconHeight);
+				rect.anchorMax = new Vector2(0.05f + 0.9f * Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) + iconPadding, iconStartY - i * iconHeight);
                 rect.offsetMin = Vector3.zero;
                 rect.offsetMax = Vector3.zero;
+
+				rect = playerIconLowerGOs [i].GetComponent<RectTransform> ();
+				rect.anchorMin = new Vector2(Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) - iconPadding, 0f);
+				rect.anchorMax = new Vector2(Mathf.Min(1.0f, worth / (float)MAX_BOUNTY) + iconPadding, 1f);
             }
 
-            if(playerList[i] != null)
+            /*if(playerList[i] != null)
                 {
                     if (playerList[i].isLocalPlayer)
                     {
@@ -256,7 +274,7 @@ public class BountyManager : NetworkBehaviour {
                         }
                     }
 
-            }
+            }*/
 
             if (victoryUndeclared && CalculateWorth(playerList[i]) >= MAX_BOUNTY)
             {
