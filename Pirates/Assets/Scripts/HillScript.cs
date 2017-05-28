@@ -189,6 +189,10 @@ public class HillScript : NetworkBehaviour {
                         
 					}
 				}
+                else if(hillController == p && !p.dead)
+                {
+                    targets[p] = new Capture(0, true);
+                }
                 else
                 {
                     targets[p] = new Capture(0, false);
