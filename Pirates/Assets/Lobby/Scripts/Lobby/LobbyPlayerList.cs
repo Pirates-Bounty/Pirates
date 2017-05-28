@@ -17,6 +17,8 @@ namespace Prototype.NetworkLobby
         protected VerticalLayoutGroup _layout;
         protected List<LobbyPlayer> _players = new List<LobbyPlayer>();
 
+        private bool colorCheck = false;
+
         public void OnEnable()
         {
             _instance = this;
@@ -36,6 +38,7 @@ namespace Prototype.NetworkLobby
             
             if(_layout)
                 _layout.childAlignment = Time.frameCount%2 == 0 ? TextAnchor.UpperCenter : TextAnchor.UpperLeft;
+            if (!colorCheck) PlayerListModified(); //lobby color check
         }
 
         public void AddPlayer(LobbyPlayer player)
@@ -63,8 +66,14 @@ namespace Prototype.NetworkLobby
         public void PlayerListModified()
         {
             foreach (LobbyPlayer p in _players)
-                if (p.isLocalPlayer) p.OnPlayerListChanged(1);
+            {
+                if (p.isLocalPlayer)
+                {
+                    p.OnPlayerListChanged(1);
+                    colorCheck = true;
+                }
                 else p.OnPlayerListChanged(0);
+            }
         }
     }
 }

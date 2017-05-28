@@ -66,7 +66,6 @@ namespace Prototype.NetworkLobby
             //will be created with the right value currently on server
             OnMyName(playerName);
             OnMyColor(playerColor);
-            LobbyPlayerList._instance.PlayerListModified(); //a bit redundant, but important to make the player lobby color works
         }
 
         public override void OnStartAuthority()
