@@ -9,7 +9,7 @@ using Prototype.NetworkLobby;
 public class BountyManager : NetworkBehaviour {
     public int numPlayers;
     public const int BASE_BOUNTY = 200;
-    public const int MAX_BOUNTY = 2;
+    public const int MAX_BOUNTY = 30;
     public const int MAX_PLAYERS = 20;
     private GameObject bountyPanel;
     public LobbyTopPanel inGameMenuPanel;
