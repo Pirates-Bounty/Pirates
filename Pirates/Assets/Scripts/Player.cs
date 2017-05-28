@@ -283,7 +283,7 @@ public class Player : NetworkBehaviour {
         if(oldHealth > currentHealth)
         {
 			oldHealth = Mathf.Max (oldHealth - 20 * Time.deltaTime, currentHealth);
-            inGameHealthBarRed.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
+			inGameHealthBarRed.anchorMax = new Vector2(0.8f - 0.6f * (SCALE_MAX_HEALTH[0] - oldHealth) / currMaxHealth, inGameHealthBar.anchorMax.y);
         }
         else if(currentHealth > oldHealth)
         {
@@ -701,7 +701,7 @@ public class Player : NetworkBehaviour {
     }
 	void OnChangePlayer(float newHealth) {
         currentHealth = newHealth;
-        inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (currMaxHealth - currentHealth) / SCALE_MAX_HEALTH[0], inGameHealthBar.anchorMax.y);
+		inGameHealthBar.anchorMax = new Vector2(0.8f - 0.6f * (SCALE_MAX_HEALTH[0] - currentHealth) / SCALE_MAX_HEALTH[0], inGameHealthBar.anchorMax.y);
 		inGameHealthBarBlack.anchorMax = new Vector2(0.8f - 0.6f * (SCALE_MAX_HEALTH[0] - currMaxHealth) / SCALE_MAX_HEALTH[0], inGameHealthBar.anchorMax.y);
         if (!isLocalPlayer) {
             return;
