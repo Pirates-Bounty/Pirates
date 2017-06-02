@@ -100,8 +100,14 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
         ClientScene.RegisterPrefab(resourcePrefab);
-        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(3), Quaternion.identity) as GameObject;
+        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(2), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
+    }
+
+    public IEnumerator DelayedSpawn(int time)
+    {
+        yield return new WaitForSeconds(time);
+        CmdSpawnResource();
     }
 
     [Command]

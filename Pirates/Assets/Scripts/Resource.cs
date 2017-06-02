@@ -11,8 +11,8 @@ public class Resource : NetworkBehaviour {
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.CompareTag("Player")) {
 			col.gameObject.SendMessage("AddGold", gold);
-			
-            GameObject.FindGameObjectWithTag("bountyManager").SendMessage("CmdSpawnResource");
+            BountyManager bm = GameObject.FindGameObjectWithTag("bountyManager").GetComponent<BountyManager>();
+            bm.StartCoroutine(bm.DelayedSpawn(2));
 			Destroy(gameObject);
 		}
 	}

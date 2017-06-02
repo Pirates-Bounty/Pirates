@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 using Prototype.NetworkLobby;
 using UnityEngine.UI;
@@ -33,6 +34,7 @@ public class MapGenerator : NetworkBehaviour {
     public GameObject mapPanel;
     private GameObject plane;
     private GameObject quad;
+    private List<Vector2> waterPos = new List<Vector2>();
     public Sprite[] plants;
     public string[] tileNames;
 
@@ -135,7 +137,7 @@ public class MapGenerator : NetworkBehaviour {
     }
 
     public void MaxResourceChange() {
-        maxResources = (int)((resourceSlider.value * resourceMult) * width);
+        maxResources = (int)((resourceSlider.value * resourceMult) * (width * 1.5));
     }
 
     public void InputSeed() {
@@ -201,6 +203,7 @@ public class MapGenerator : NetworkBehaviour {
     public void ClearMap()
     {
         map = new int[width, height];
+        waterPos = new List<Vector2>();
         //tMap.ClearAllTiles();
 
         int cCount = transform.childCount;
@@ -274,8 +277,9 @@ public class MapGenerator : NetworkBehaviour {
                         }
                     }
                     else if (noise > landFreq) {
-
+                        //Debug.Log("water");
                         map[i, j] = (int)TileType.WATER;
+                        waterPos.Add(new Vector2(i, j));
                     }
                 }
             }
@@ -372,7 +376,14 @@ public class MapGenerator : NetworkBehaviour {
                 int id = bitmaskedMap[i, j];
                 switch ((TileType)map[i, j]) {
                     case TileType.WATER:
-                        //AddTileToMap(tilePos, waterTile, null);
+                        //GameObject waterObj = new GameObject();
+                        //waterObj.tag = "water";
+                        //BoxCollider2D coll = waterObj.AddComponent<BoxCollider2D>();
+                        //coll.size = new Vector2(tMap.cellSize.x, tMap.cellSize.y);
+                        //Instantiate(waterObj, new Vector3(i - width / 2 * tMap.cellSize.x, j - height / 2 * tMap.cellSize.y, 0), Quaternion.identity);
+                        Sprite ws = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + 1);
+      
+                        AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, 0), null, null);
                         break;
                     case TileType.GRASS:
 					    Sprite s = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/"+id);
@@ -394,22 +405,24 @@ public class MapGenerator : NetworkBehaviour {
 
     }
 
-    public Vector2 GetRandWaterTile() {
-        int radius = width / 2 - 5;
+    public Vector2 GetRandWaterTile(int size) {
+        int radius = width / 2 - 1;
         Random.InitState(System.DateTime.Now.Millisecond);
-        Vector2 inBounds = Random.insideUnitCircle * radius;
-        int xRand = (int)inBounds.x;
-        int yRand = (int)inBounds.y;
-        int tile = map[xRand + radius, yRand + radius];
-        Vector2 tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
+        Vector2 RandPos = waterPos[Random.Range(0, waterPos.Count)];
+        Debug.Log(RandPos);
+        int xRand = (int)RandPos.x;
+        int yRand = (int)RandPos.y;
+        int tile = map[xRand, yRand];
+        Vector2 tilePos = new Vector2((xRand - width / 2) * tMap.cellSize.x, (yRand - height / 2) * tMap.cellSize.y);
         bool Occupied = true;
-        while ((TileType)tile != TileType.WATER || Occupied) {
-            inBounds = Random.insideUnitCircle * radius;
-            xRand = (int)inBounds.x;
-            yRand = (int)inBounds.y;
-            tile = map[xRand + radius, yRand + radius];
-            tilePos = new Vector2(xRand * tileSize, yRand * tileSize);
-            Collider2D collision = Physics2D.OverlapArea(new Vector2(tilePos.x - 3, tilePos.y - 3), new Vector2(tilePos.x + 3, tilePos.y + 3));
+        while (!Occupied) {
+            RandPos = waterPos[Random.Range(0, waterPos.Count)];
+            xRand = (int)RandPos.x;
+            yRand = (int)RandPos.y;
+            tile = map[xRand, yRand];
+            tilePos = new Vector2((xRand - width / 2) * tMap.cellSize.x, (yRand - height / 2) * tMap.cellSize.y);
+            //randTilePos = new Vector2(tilePos.x + Random.Range(-tileSize / 2, tileSize / 2), tilePos.y + Random.Range(-tileSize / 2, tileSize / 2));
+            Collider2D collision = Physics2D.OverlapArea(new Vector2(tilePos.x - size, tilePos.y - size), new Vector2(tilePos.x + size, tilePos.y + size));
             if(collision != null && (collision.tag != "Resource" && collision.tag != "Player"))
             {
                 Occupied = false;
@@ -426,11 +439,12 @@ public class MapGenerator : NetworkBehaviour {
     public Vector2 GetRandLocAwayFromLand(int size) {
         Vector2 returnLoc = Vector2.zero;
         bool end = false;
-        while (!end) {
-            returnLoc = GetRandWaterTile();
+        while (!end)
+        {
+            returnLoc = GetRandWaterTile(size);
             end = CheckNeighborsForWater(size, returnLoc);
-
         }
+
         return returnLoc;
     }
 
