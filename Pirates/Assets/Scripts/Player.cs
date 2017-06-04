@@ -93,6 +93,12 @@ public class Player : NetworkBehaviour {
     private RectTransform purpleCannonRect;
     private GameObject redCannon;
     private RectTransform redCannonRect;
+    private float purpleCannonRectAnchorMin;
+    private float purpleCannonRectWidth;
+    private float redCannonRectAnchorMax;
+    private float redCannonRectWidth;
+    private float healthBarRectAnchorMax;
+    private float healthBarRectWidth;
     private Font font;
     private Text resourcesText;
     private Text killsText;
@@ -226,26 +232,31 @@ public class Player : NetworkBehaviour {
             return;
         }
         pColl = GetComponent<Collider2D>();
-        leaderArrow = GameObject.Find("MainCanvas/UI/Compass");
+        leaderArrow = GameObject.Find("MainCanvas/UI/HUD/Compass");
 
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
-        healthBar = GameObject.Find("MainCanvas/UI/Health Bar");
+        healthBar = GameObject.Find("MainCanvas/UI/HUD/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
-        purpleCannon = GameObject.Find("MainCanvas/UI/Purple Cannon");
+        purpleCannon = GameObject.Find("MainCanvas/UI/HUD/Purple Cannon");
         purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
-        redCannon = GameObject.Find("MainCanvas/UI/Red Cannon");
+        redCannon = GameObject.Find("MainCanvas/UI/HUD/Red Cannon");
         redCannonRect = redCannon.GetComponent<RectTransform>();
-        sprintCooldownImage = GameObject.Find("MainCanvas/UI/Sprint Cooldown").GetComponent<Image>();
+        redCannonRectAnchorMax = redCannonRect.anchorMax.x;
+        redCannonRectWidth = redCannonRect.anchorMax.x - redCannonRect.anchorMin.y;
+        purpleCannonRectAnchorMin = purpleCannonRect.anchorMin.x;
+        purpleCannonRectWidth = purpleCannonRect.anchorMax.x - purpleCannonRect.anchorMin.y;
+        sprintCooldownImage = GameObject.Find("MainCanvas/UI/HUD/Sprint Cooldown").GetComponent<Image>();
         resourcesText = GameObject.Find("MainCanvas/UI/Bounty Display Text").GetComponent<Text>();
-        killsText = GameObject.Find("MainCanvas/UI/KDR/Kills Text").GetComponent<Text>();
-        deathsText = GameObject.Find("MainCanvas/UI/KDR/Deaths Text").GetComponent<Text>();
-        bountyText = GameObject.Find("MainCanvas/UI/KDR/Bounty Text").GetComponent<Text>();
+        killsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Kills Text").GetComponent<Text>();
+        deathsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Deaths Text").GetComponent<Text>();
+        bountyText = GameObject.Find("MainCanvas/UI/HUD/KDR/Bounty Text").GetComponent<Text>();
         minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
         playerRect = GameObject.Find("MainCanvas/UI/HUD/Minimap/Player").GetComponent<RectTransform>();
-
+        healthBarRectAnchorMax = healthBarRect.anchorMax.x;
+        healthBarRectWidth = healthBarRect.anchorMax.x - healthBarRect.anchorMin.x;
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);
         respawnTimerText.SetActive(false);
@@ -692,8 +703,8 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose, 0.15f);
         }
-        purpleCannonRect.anchorMin = new Vector2(0.13f + 0.236f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
-        redCannonRect.anchorMax = new Vector2(0.66f - 0.236f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        purpleCannonRect.anchorMin = new Vector2(purpleCannonRectAnchorMin + purpleCannonRectWidth * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(redCannonRectAnchorMax - redCannonRectWidth * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
         sprintCooldownImage.fillAmount = 1f - boostTimer / currBoostDelay;
         killsText.text = "" + kills;
         deathsText.text = "" + deaths;
@@ -706,7 +717,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
+        healthBarRect.anchorMax = new Vector2(healthBarRectAnchorMax - healthBarRectWidth * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
