@@ -166,7 +166,7 @@ public class MapGenerator : NetworkBehaviour {
     // Update is called once per frame
     void Update() {
         if (!minimap) {
-            minimap = GameObject.Find("MainCanvas/Minimap");
+            minimap = GameObject.Find("MainCanvas/UI/HUD/Minimap");
             return;
         }
         minimap.GetComponent<RawImage>().texture = minimapTexture;
@@ -237,6 +237,7 @@ public class MapGenerator : NetworkBehaviour {
             }
         }
         tex.Apply();
+        
         return tex;
     }
     public static bool IsInCircle(int x, int y, int radius) {
@@ -267,7 +268,7 @@ public class MapGenerator : NetworkBehaviour {
                     //noise *= centerWeight * noise * Mathf.Pow((Mathf.Pow(i - width / 2, 2) + Mathf.Pow(j - height / 2, 2)), 0.5f) / (width / 2 + height / 2);
                     if (noise <= landFreq)
                     {
-                        if (noise > Random.Range(0, 1f))
+                        if (noise > Random.Range(0, .5f))
                         {
                             map[i, j] = (int)TileType.TREE;
                         }
@@ -371,6 +372,7 @@ public class MapGenerator : NetworkBehaviour {
 
         // minimap
         minimapTexture = GenerateTexture();
+       
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int id = bitmaskedMap[i, j];
@@ -393,10 +395,20 @@ public class MapGenerator : NetworkBehaviour {
                         //GameObject tree = new GameObject();
                         //tree.AddComponent<SpriteRenderer>().sortingOrder = 5;
                         Sprite sp = Resources.Load<Sprite>("Art/Sprites/Tiles/Bitmasked Tiles/" + id);
-                        int tid = Random.Range(0,plants.Length);
-                        Sprite ts = plants[tid];
                         AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, 0), sp, null);
-                        AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, -1), ts, null);
+                        //AddTileToMap(new Vector3Int(i - width / 2, j - height / 2, 0), ts, null);
+                        GameObject plant = new GameObject();
+                        SpriteRenderer pRender = plant.AddComponent<SpriteRenderer>();
+
+                        int r = Random.Range(1, 5);
+                        for(int k = 0; k < r; k++)
+                        {
+                            pRender.sprite = plants[Random.Range(0, plants.Length)];
+                            GameObject p = Instantiate(plant, new Vector3(((i - width / 2) * tMap.cellSize.x) + Random.Range(5, 20),((j - height / 2) * tMap.cellSize.y) + Random.Range(5, 20), 0), Quaternion.identity);
+                            p.transform.parent = gameObject.transform;
+                            p.transform.localScale *= Random.Range(.5f, 1.5f);
+                        }
+
                         break;
                 }
 

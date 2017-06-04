@@ -26,12 +26,12 @@ public class Player : NetworkBehaviour {
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
     public const float MAX_SHOTS = 4.0f;
-    public static int[] UPGRADE_SCALE = { 1, 5, 20 };
+    public static int[] UPGRADE_SCALE = { 1, 5, 10 };
 
 	public static float[] SCALE_MAX_HEALTH = { 100f, 150f, 250f, 400f };
 	public static float[] SCALE_RAM_DAMAGE = { 15f, 20f, 30f, 50f };
-	public static float[] SCALE_MOVE_SPEED = { 20f, 30f, 40f, 50f };
-	public static float[] SCALE_ROTATION_SPEED = { 50f, 50f*4f/3f, 50f*5f/3f, 70f };
+	public static float[] SCALE_MOVE_SPEED = { 25f, 35f, 45f, 60f };
+	public static float[] SCALE_ROTATION_SPEED = { 90f, 100f, 110f, 150f };
 	public static float[] SCALE_BOOST_LENGTH = { 1.0f, 1.25f, 1.5f, 1.75f };
 	public static float[] SCALE_BOOST_DELAY = { 5.0f, 4.0f, 3.0f, 2.0f };
 	public static float[] SPEED_LEVELS = { 20f, 40f, 100f, 140f, 200f };
@@ -93,6 +93,12 @@ public class Player : NetworkBehaviour {
     private RectTransform purpleCannonRect;
     private GameObject redCannon;
     private RectTransform redCannonRect;
+    private float purpleCannonRectAnchorMin;
+    private float purpleCannonRectWidth;
+    private float redCannonRectAnchorMax;
+    private float redCannonRectWidth;
+    private float healthBarRectAnchorMax;
+    private float healthBarRectWidth;
     private Font font;
     private Text resourcesText;
     private Text killsText;
@@ -226,26 +232,31 @@ public class Player : NetworkBehaviour {
             return;
         }
         pColl = GetComponent<Collider2D>();
-        leaderArrow = GameObject.Find("MainCanvas/UI/Compass");
+        leaderArrow = GameObject.Find("MainCanvas/UI/HUD/Compass");
 
         upgradePanel = FindObjectOfType<UpgradePanel>();
         upgradePanel.player = this;
         upgradePanel.UpdateUI();
         upgradePanel.Hide();
-        healthBar = GameObject.Find("MainCanvas/UI/Health Bar");
+        healthBar = GameObject.Find("MainCanvas/UI/HUD/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
-        purpleCannon = GameObject.Find("MainCanvas/UI/Purple Cannon");
+        purpleCannon = GameObject.Find("MainCanvas/UI/HUD/Purple Cannon");
         purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
-        redCannon = GameObject.Find("MainCanvas/UI/Red Cannon");
+        redCannon = GameObject.Find("MainCanvas/UI/HUD/Red Cannon");
         redCannonRect = redCannon.GetComponent<RectTransform>();
-        sprintCooldownImage = GameObject.Find("MainCanvas/UI/Sprint Cooldown").GetComponent<Image>();
+        redCannonRectAnchorMax = redCannonRect.anchorMax.x;
+        redCannonRectWidth = redCannonRect.anchorMax.x - redCannonRect.anchorMin.y;
+        purpleCannonRectAnchorMin = purpleCannonRect.anchorMin.x;
+        purpleCannonRectWidth = purpleCannonRect.anchorMax.x - purpleCannonRect.anchorMin.y;
+        sprintCooldownImage = GameObject.Find("MainCanvas/UI/HUD/Sprint Cooldown").GetComponent<Image>();
         resourcesText = GameObject.Find("MainCanvas/UI/Bounty Display Text").GetComponent<Text>();
-        killsText = GameObject.Find("MainCanvas/UI/KDR/Kills Text").GetComponent<Text>();
-        deathsText = GameObject.Find("MainCanvas/UI/KDR/Deaths Text").GetComponent<Text>();
-        bountyText = GameObject.Find("MainCanvas/UI/KDR/Bounty Text").GetComponent<Text>();
-        minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
-        playerRect = GameObject.Find("MainCanvas/Minimap/Player").GetComponent<RectTransform>();
-
+        killsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Kills Text").GetComponent<Text>();
+        deathsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Deaths Text").GetComponent<Text>();
+        bountyText = GameObject.Find("MainCanvas/UI/HUD/KDR/Bounty Text").GetComponent<Text>();
+        minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
+        playerRect = GameObject.Find("MainCanvas/UI/HUD/Minimap/Player").GetComponent<RectTransform>();
+        healthBarRectAnchorMax = healthBarRect.anchorMax.x;
+        healthBarRectWidth = healthBarRect.anchorMax.x - healthBarRect.anchorMin.x;
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);
         respawnTimerText.SetActive(false);
@@ -692,8 +703,8 @@ public class Player : NetworkBehaviour {
             else
                 SoundManager.Instance.PlaySFX(sfx_upgradeMenuClose, 0.15f);
         }
-        purpleCannonRect.anchorMin = new Vector2(0.13f + 0.236f * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
-        redCannonRect.anchorMax = new Vector2(0.66f - 0.236f * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
+        purpleCannonRect.anchorMin = new Vector2(purpleCannonRectAnchorMin + purpleCannonRectWidth * (MAX_SHOTS - numPurpleShots) / MAX_SHOTS, purpleCannonRect.anchorMin.y);
+        redCannonRect.anchorMax = new Vector2(redCannonRectAnchorMax - redCannonRectWidth * (MAX_SHOTS - numRedShots) / MAX_SHOTS, redCannonRect.anchorMax.y);
         sprintCooldownImage.fillAmount = 1f - boostTimer / currBoostDelay;
         killsText.text = "" + kills;
         deathsText.text = "" + deaths;
@@ -706,7 +717,7 @@ public class Player : NetworkBehaviour {
         if (!isLocalPlayer) {
             return;
         }
-        healthBarRect.anchorMax = new Vector2(0.67f - 0.545f * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
+        healthBarRect.anchorMax = new Vector2(healthBarRectAnchorMax - healthBarRectWidth * (currMaxHealth - currentHealth) / currMaxHealth, healthBarRect.anchorMax.y);
     }
     void OnChangeResources(int newResources) {
         if (!isLocalPlayer) {
