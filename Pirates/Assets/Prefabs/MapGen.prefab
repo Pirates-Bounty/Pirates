@@ -112,7 +112,7 @@ MonoBehaviour:
   quadHeight: 6
   maxResources: 0.4
   Instance: {fileID: 0}
-  tileSize: 5.5
+  tileSize: 20
   landSlider: {fileID: 0}
   widthSlider: {fileID: 0}
   resourceSlider: {fileID: 0}

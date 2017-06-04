@@ -71,9 +71,9 @@ public class BountyManager : NetworkBehaviour {
 
         font = Resources.Load<Font>("Art/Fonts/Amarillo");
         iconSprite = Resources.Load<Sprite>("Art/Lobby/In Game UI/PlayerIndicator");
-        hillRep = GameObject.Find("MainCanvas/Minimap/Hill");
+        hillRep = GameObject.Find("MainCanvas/UI/HUD/Minimap/Hill");
         hillRepRect = hillRep.GetComponent<RectTransform>();
-        minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+        minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
         bountyBoard = GameObject.Find("MainCanvas/UI/Bounty Board");
         bountyBoard.SetActive(false);
         scoreBar = GameObject.Find("MainCanvas/UI/ScoreBar");
@@ -100,8 +100,14 @@ public class BountyManager : NetworkBehaviour {
             return;
         }
         ClientScene.RegisterPrefab(resourcePrefab);
-        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(3), Quaternion.identity) as GameObject;
+        GameObject instantiatedResource = Instantiate(resourcePrefab, MapGen.GetComponent<MapGenerator>().GetRandLocAwayFromLand(2), Quaternion.identity) as GameObject;
         NetworkServer.Spawn(instantiatedResource);
+    }
+
+    public IEnumerator DelayedSpawn(int time)
+    {
+        yield return new WaitForSeconds(time);
+        CmdSpawnResource();
     }
 
     [Command]
