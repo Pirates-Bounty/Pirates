@@ -26,12 +26,12 @@ public class Player : NetworkBehaviour {
     public const int MAX_UPGRADES = 3;
     public const int UPGRADE_COST = 100;
     public const float MAX_SHOTS = 4.0f;
-    public static int[] UPGRADE_SCALE = { 1, 5, 20 };
+    public static int[] UPGRADE_SCALE = { 1, 5, 10 };
 
 	public static float[] SCALE_MAX_HEALTH = { 100f, 150f, 250f, 400f };
 	public static float[] SCALE_RAM_DAMAGE = { 15f, 20f, 30f, 50f };
-	public static float[] SCALE_MOVE_SPEED = { 30f, 40f, 50f, 60f };
-	public static float[] SCALE_ROTATION_SPEED = { 50f, 50f*4f/3f, 50f*5f/3f, 70f };
+	public static float[] SCALE_MOVE_SPEED = { 25f, 35f, 45f, 60f };
+	public static float[] SCALE_ROTATION_SPEED = { 90f, 100f, 110f, 150f };
 	public static float[] SCALE_BOOST_LENGTH = { 1.0f, 1.25f, 1.5f, 1.75f };
 	public static float[] SCALE_BOOST_DELAY = { 5.0f, 4.0f, 3.0f, 2.0f };
 	public static float[] SPEED_LEVELS = { 20f, 40f, 100f, 140f, 200f };
