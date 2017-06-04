@@ -243,8 +243,8 @@ public class Player : NetworkBehaviour {
         killsText = GameObject.Find("MainCanvas/UI/KDR/Kills Text").GetComponent<Text>();
         deathsText = GameObject.Find("MainCanvas/UI/KDR/Deaths Text").GetComponent<Text>();
         bountyText = GameObject.Find("MainCanvas/UI/KDR/Bounty Text").GetComponent<Text>();
-        minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
-        playerRect = GameObject.Find("MainCanvas/Minimap/Player").GetComponent<RectTransform>();
+        minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
+        playerRect = GameObject.Find("MainCanvas/UI/HUD/Minimap/Player").GetComponent<RectTransform>();
 
         respawnTimerText = UI.CreateText("Respawn Timer Text", "10", font, Color.black, 200, canvas.transform,
             Vector3.zero, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), TextAnchor.MiddleCenter, true);

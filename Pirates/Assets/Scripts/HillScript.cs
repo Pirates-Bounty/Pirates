@@ -62,9 +62,9 @@ public class HillScript : NetworkBehaviour {
 		myCollider = GetComponent<Collider2D> ();
 		mySprite = GetComponent<SpriteRenderer> ();
 		MapGen = GameObject.FindGameObjectWithTag("mapGen");
-		hillRep = GameObject.Find("MainCanvas/Minimap/Hill");
+		hillRep = GameObject.Find("MainCanvas/UI/HUD/Minimap/Hill");
 		hillRepRect = hillRep.GetComponent<RectTransform>();
-		minimapRect = GameObject.Find("MainCanvas/Minimap").GetComponent<RectTransform>();
+		minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
 		hillTimerTextDisplay = GameObject.Find("MainCanvas/UI/HillTimerText");
 		hillTimerText = hillTimerTextDisplay.GetComponent<Text> ();
 		//bountyManager = GameObject.Find ("BountyManager");
