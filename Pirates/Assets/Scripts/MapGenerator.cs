@@ -166,7 +166,7 @@ public class MapGenerator : NetworkBehaviour {
     // Update is called once per frame
     void Update() {
         if (!minimap) {
-            minimap = GameObject.Find("MainCanvas/Minimap");
+            minimap = GameObject.Find("MainCanvas/UI/HUD/Minimap");
             return;
         }
         minimap.GetComponent<RawImage>().texture = minimapTexture;
@@ -237,6 +237,7 @@ public class MapGenerator : NetworkBehaviour {
             }
         }
         tex.Apply();
+        
         return tex;
     }
     public static bool IsInCircle(int x, int y, int radius) {
@@ -371,6 +372,7 @@ public class MapGenerator : NetworkBehaviour {
 
         // minimap
         minimapTexture = GenerateTexture();
+       
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int id = bitmaskedMap[i, j];
