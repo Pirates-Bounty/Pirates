@@ -18,7 +18,6 @@ public class Menu : MonoBehaviour {
     private GameObject waves2;
     private GameObject waves3;
     private GameObject waves4;
-	private GameObject screenshot;
     
     private float maxRotation = 2f;
     private float currentRotation = 0.0f;
@@ -31,7 +30,10 @@ public class Menu : MonoBehaviour {
     private AudioClip highlightAudio;
     private AudioClip selectAudio;
 
-	public Sprite screen1;
+	public Image tutorial;
+	public Text tutorialText;
+	private int slideIndex;
+	private string[][] slide;
 
     // Use this for initialization
     void Start() {
@@ -56,16 +58,19 @@ public class Menu : MonoBehaviour {
                 SoundManager.Instance.PlaySFXTransition(Resources.Load<AudioClip>("Sound/SFX/UI/DoorOpen"),0.2f);
                 SoundManager.Instance.PlayBGM((int)TrackID.BGM_LOBBY);
             } );
+		playButton.layer = 5;
 
         // Instructions Button
         instructionsButton = UI.CreateButton("How To Play", "", font, color, fontSize, canvas,
             Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/HowToPlayButtonClicked"),
 			Vector3.zero, new Vector2(0.375f, 0.05f), new Vector2(0.625f, 0.2f), delegate { StartTutorial(); }); //Navigator.Instance.LoadLevel("Lobby"); Navigator.Tutorial = true; });
+		instructionsButton.layer = 5;
 
         // Quit Button
         quitButton = UI.CreateButton("Quit", "", font, color, fontSize, canvas,
             Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/QuitButtonUnClicked"), Resources.Load<Sprite>("Art/Sprites/MARCH 21, 2017/QuitButtonClicked"),
             Vector3.zero, new Vector2(0.675f, 0.05f), new Vector2(0.95f, 0.2f), delegate { Navigator.Instance.LoadLevel("Quit"); });
+		quitButton.layer = 5;
 
         //=== SOUND SECTION - BEGIN ===
         //preparing highlight entries
@@ -119,10 +124,43 @@ public class Menu : MonoBehaviour {
             waves4.transform.Translate(new Vector3(0.5f * Time.deltaTime, 0.1f * Time.deltaTime, 0f));
         }
 
+		if (tutorial.IsActive ())
+			TutorialProcess ();
 	}
 
 	void StartTutorial () {
 		Debug.Log ("Welcome to the tutorial, doofus!~~You are trapped with me forever! Mwahaha!");
+		slide = new string[13][]{
+			new string[2]{ "1 - Welcome", "Slide 1"},
+			new string[2]{ "2 - Forward", "Slide 2"},
+			new string[2]{ "3 - Turn"   , "Slide 3"},
+			new string[2]{ "4 - Fire"   , "Slide 4"},
+			new string[2]{ "5 - Gold"   , "Slide 5"},
+			new string[2]{ "6 - Collect", "Slide 6"},
+			new string[2]{ "7 - Upgrade", "Slide 7"},
+			new string[2]{ "8 - Wow"    , "Slide 8"},
+			new string[2]{ "9 - Compass", "Slide 9"},
+			new string[2]{"10 - Hill"   , "Slide 10"},
+			new string[2]{"11 - Points" , "Slide 11"},
+			new string[2]{"12 - Capture", "Slide 12"},
+			new string[2]{"13 - Win"    , "Slide 13"}};
+		tutorial.transform.SetAsLastSibling();
+		tutorial.gameObject.SetActive(true);
+		slideIndex = 0;
+		tutorial.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Art/Screenshots/Placeholder/" + slide [slideIndex] [0]);
+		tutorialText.GetComponent<Text> ().text = slide [slideIndex] [1];
+	}
+
+	void TutorialProcess () {
+		if(Input.GetKeyDown (KeyCode.Mouse0)) {
+			++slideIndex;
+			if (slideIndex >= 13) {
+				tutorial.gameObject.SetActive (false);
+			} else {
+				tutorial.GetComponent<Image> ().sprite = Resources.Load<Sprite> ("Art/Screenshots/Placeholder/" + slide [slideIndex] [0]);
+				tutorialText.GetComponent<Text> ().text = slide [slideIndex] [1];
+			}
+		}
 	}
     
 }
