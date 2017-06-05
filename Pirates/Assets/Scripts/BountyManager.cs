@@ -76,7 +76,7 @@ public class BountyManager : NetworkBehaviour {
         minimapRect = GameObject.Find("MainCanvas/UI/HUD/Minimap").GetComponent<RectTransform>();
         bountyBoard = GameObject.Find("MainCanvas/UI/Bounty Board");
         bountyBoard.SetActive(false);
-        scoreBar = GameObject.Find("MainCanvas/UI/ScoreBar");
+        scoreBar = GameObject.Find("MainCanvas/UI/HUD/ScoreBar");
         hillTimerText = GameObject.Find("MainCanvas/UI/HillTimerText");
         canvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
 

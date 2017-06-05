@@ -75,7 +75,7 @@ MonoBehaviour:
   frequency: 50
   borderRadius: 0.5
   landFreq: 0.5
-  seed: 200
+  seed: 614
   sprites:
   - {fileID: 21300000, guid: 3123cec5d298f47a583b27249e4d90cf, type: 3}
   - {fileID: 21300000, guid: 3eff16a8442f9431991397c7f6a61f36, type: 3}
