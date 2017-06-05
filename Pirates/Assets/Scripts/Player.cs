@@ -249,7 +249,7 @@ public class Player : NetworkBehaviour {
         purpleCannonRectAnchorMin = purpleCannonRect.anchorMin.x;
         purpleCannonRectWidth = purpleCannonRect.anchorMax.x - purpleCannonRect.anchorMin.y;
         sprintCooldownImage = GameObject.Find("MainCanvas/UI/HUD/Sprint Cooldown").GetComponent<Image>();
-        resourcesText = GameObject.Find("MainCanvas/UI/Bounty Display Text").GetComponent<Text>();
+        resourcesText = GameObject.Find("MainCanvas/UI/HUD/Button/BountyDisplayText").GetComponent<Text>();
         killsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Kills Text").GetComponent<Text>();
         deathsText = GameObject.Find("MainCanvas/UI/HUD/KDR/Deaths Text").GetComponent<Text>();
         bountyText = GameObject.Find("MainCanvas/UI/HUD/KDR/Bounty Text").GetComponent<Text>();
