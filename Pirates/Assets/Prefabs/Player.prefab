@@ -1021,7 +1021,7 @@ MonoBehaviour:
   turnS2: {fileID: 8300000, guid: d7b9a17728cdf5746b460ed7e926f629, type: 3}
   turnS3: {fileID: 8300000, guid: 5319a53bec150b049a357991d9c7ba9b, type: 3}
   ramS: {fileID: 8300000, guid: 812801548bde36048b6e157424c3ddf9, type: 3}
-  deathS: {fileID: 8300000, guid: 031e595c937541b4aa484075b1469c21, type: 3}
+  deathS: {fileID: 8300000, guid: 812801548bde36048b6e157424c3ddf9, type: 3}
   boostS1: {fileID: 8300000, guid: b69f9eb13b487aa4e8561e5c1ed36899, type: 3}
   boostS2: {fileID: 8300000, guid: 5ff1dc798dfe1334b932f2c3b2f0963a, type: 3}
   boostS3: {fileID: 8300000, guid: ed87d62c723661744918d881039ae976, type: 3}
