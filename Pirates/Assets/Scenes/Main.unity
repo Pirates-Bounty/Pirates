@@ -95,7 +95,7 @@ NavMeshSettings:
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114000011206907210, guid: 962aad46b4d389b4e9ab9e97ca10d20f,
     type: 2}
-  m_PrefabInternal: {fileID: 248864879}
+  m_PrefabInternal: {fileID: 750152489}
   m_Script: {fileID: 11500000, guid: a801ce4352876c347b37d655a072e478, type: 3}
 --- !u!1 &233450272
 GameObject:
@@ -137,7 +137,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &248864879
+--- !u!1001 &750152489
 Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2
