@@ -166,7 +166,7 @@ public class MapGenerator : NetworkBehaviour {
     // Update is called once per frame
     void Update() {
         if (!minimap) {
-            minimap = GameObject.Find("MainCanvas/UI/HUD/Minimap");
+            minimap = GameObject.Find("MainCanvas/UI/Minimap");
             return;
         }
         minimap.GetComponent<RawImage>().texture = minimapTexture;
