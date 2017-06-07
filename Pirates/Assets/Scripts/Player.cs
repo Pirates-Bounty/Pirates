@@ -240,6 +240,7 @@ public class Player : NetworkBehaviour {
         upgradePanel.Hide();
         healthBar = GameObject.Find("MainCanvas/UI/HUD/Health Bar");
         healthBarRect = healthBar.GetComponent<RectTransform>();
+        healthBar.GetComponent<Canvas>().sortingOrder = 10;
         purpleCannon = GameObject.Find("MainCanvas/UI/HUD/Purple Cannon");
         purpleCannonRect = purpleCannon.GetComponent<RectTransform>();
         redCannon = GameObject.Find("MainCanvas/UI/HUD/Red Cannon");
