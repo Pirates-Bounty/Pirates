@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 public class HillScript : NetworkBehaviour {
 
 	public const float SCORE_INCREMENT = 1.0f;
-	public const float TIME_BETWEEN_SPAWNS = 2f;
+	public const float TIME_BETWEEN_SPAWNS = 5f;
     public int totalPlayersInHill = 0;
     public int hillCheck = 2;
 	public int hillSize = 4;
